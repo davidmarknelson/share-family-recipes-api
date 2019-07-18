@@ -1,0 +1,24 @@
+{
+  "name": "food-auth-api",
+  "version": "1.0.0",
+  "description": "An api for authentication.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "api-dev": "nodemon -r dotenv/config app.js"
+  },
+  "keywords": [
+    "Auth"
+  ],
+  "author": "David Nelson",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^3.18.0"
+  },
+  "devDependencies": {
+    "dotenv": "^8.0.0"
+  }
+}
