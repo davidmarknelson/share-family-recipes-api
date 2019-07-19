@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const routes = require('./src/routes/index');
 
+//  App configuration
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -15,4 +16,4 @@ app.use(express.static('src/public'));
 app.use(routes);
 
 
-app.listen(process.env.PORT || 8083, () => console.log(`Auth api is running on ${process.env.PORT}.`));
+app.listen(process.env.PORT || 8083, () => console.log(`food-auth-api is running on port ${process.env.PORT}.`));

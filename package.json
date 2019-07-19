@@ -7,6 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "api-dev": "nodemon -r dotenv/config app.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dnel9281/food-auth-api"
+  },
   "keywords": [
     "Auth"
   ],
@@ -16,7 +20,10 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "helmet": "^3.18.0"
+    "helmet": "^3.18.0",
+    "pg": "^7.11.0",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^5.10.1"
   },
   "devDependencies": {
     "dotenv": "^8.0.0"
