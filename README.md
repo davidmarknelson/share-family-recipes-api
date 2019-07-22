@@ -8,3 +8,4 @@
 `DB_PORT` is the port number of your postgresql DB.  
 `DB_USER` is the username for your postgresql DB.  
 `DB_PW` is the password of your postgresql DB.  
+`JWT_SECRET` is the secret for the json web token.  

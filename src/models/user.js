@@ -1,5 +1,17 @@
+const bcrypt = require('bcryptjs');
+
+function hashPassword (user, options) {
+  if (!user.changed('password')) {
+    return;
+  }
+
+  let salt = bcrypt.genSaltSync(10);
+  let hash = bcrypt.hashSync(user.password, salt);
+  user.setDataValue('password', hash);
+}
+
 module.exports = (sequelize, type) => {
-  return sequelize.define('user', {
+  const user = sequelize.define('user', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
@@ -34,5 +46,21 @@ module.exports = (sequelize, type) => {
     isAdmin: type.BOOLEAN,
     createdAt: type.DATE,
     updatedAt: type.DATE
+  }, {
+    hooks: {
+      beforeCreate: hashPassword,
+      beforeUpdate: hashPassword
+    }
   });
+
+  user.comparePasswords = (reqPassword, dbPassword) => {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(reqPassword, dbPassword, (err, res) => {
+        if (err) { return reject(err); }
+        return resolve(res);
+      });
+    });
+  }
+
+  return user;
 };

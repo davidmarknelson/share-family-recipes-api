@@ -1,4 +1,12 @@
 const User = require('../models/sequelize').user;
+const jwt = require('jsonwebtoken');
+
+function jwtSignUser(user) {
+  const oneWeek = 60 * 60 * 24 * 7;
+  return jwt.sign(user, process.env.JWT_SECRET, {
+    expiresIn: oneWeek
+  });
+}
 
 const users = {
 
@@ -22,7 +30,12 @@ const users = {
 
   signup: (req, res) => {
     User.create(req.body)
-    .then(user => res.status(200).json(user))
+    .then(user => 
+      res.status(200).json({
+        user: user,
+        jwt: jwtSignUser(user.dataValues)
+      })
+    )
     .catch(err => {
       if (err.errors[0].message === 'email must be unique') {
         return res.status(400).json({ message: 'This email account is already in use.' });
@@ -42,16 +55,26 @@ const users = {
       return user;
     })
     .then(user => {
-      const isPasswordValid = user.password === req.body.password;
-      if (!isPasswordValid) throw new Error('The login information was incorrect.');
-      return user;
+      return User.comparePasswords(req.body.password, user.password)
+        .then(result => {
+          if (!result) {
+            throw new Error('The login information was incorrect.');
+          } else {
+            return user;
+          }
+        });
     })
-    .then(user => res.status(200).json(user))
+    .then(user => 
+      res.status(200).json({
+        user: user,
+        jwt: jwtSignUser(user.dataValues)
+      })
+    )
     .catch(err => {
-      console.log("Error object!!!!!",err)
-      res.status(500).json({
-        message: err.message
-      });
+      if (err.message === 'The login information was incorrect.') {
+        res.status(403).json({ message: err.message });
+      }
+      res.status(500).json({ message: err.message });
     });
   },
 
