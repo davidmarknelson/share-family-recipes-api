@@ -9,11 +9,10 @@ router.route('/').get((req, res) => {
 // =========================================================
 // User routes
 // =========================================================
-// This gets the full user profile by email
-router.route('/user').get(users.findEmail);
 // This route checks if a username is available
 router.route('/user/username').get(users.findUsername);
-router.route('/user/create').post(users.create);
+router.route('/user/signup').post(users.signup);
+router.route('/user/login').post(users.login);
 router.route('/user/update').put(users.update);
 router.route('/user/delete').delete(users.delete);
 
@@ -21,7 +20,14 @@ router.route('/user/delete').delete(users.delete);
 // Meal routes
 // =========================================================
 router.route('/meals').get(meals.findAll);
+router.route('/meals/name').get(meals.findMealName);
 router.route('/meals/create').post(meals.create);
+router.route('/meals/update').put(meals.update);
+// Likes routes
+router.route('/meals/addlike').put();
+router.route('/meals/removelike').put();
+
+
 
 
 

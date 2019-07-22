@@ -35,4 +35,4 @@ module.exports = (sequelize, type) => {
     createdAt: type.DATE,
     updatedAt: type.DATE
   });
-}
+};

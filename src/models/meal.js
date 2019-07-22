@@ -7,11 +7,8 @@ module.exports = (sequelize, type) => {
     },
     name: {
       type: type.STRING,
-      allowNull: false
-    },
-    tags: {
-      type: type.ARRAY(type.STRING),
-      allowNull: false
+      allowNull: false,
+      unique: true      
     },
     ingredients: {
       type: type.ARRAY(type.TEXT),
@@ -21,9 +18,16 @@ module.exports = (sequelize, type) => {
       type: type.ARRAY(type.STRING),
       allowNull: false
     },
+    prepTime: {
+      type: type.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: 0
+      }
+    },
     cookTime: {
       type: type.INTEGER,
-      allowNull: false,
+      defaultValue: 0,
       validate: {
         min: 0
       }
@@ -36,8 +40,18 @@ module.exports = (sequelize, type) => {
         max: 5
       }
     },
-    likes: type.INTEGER,
+    creatorUsername: {
+      type: type.STRING,
+      allowNull: false
+    },
+    likes: {
+      type: type.INTEGER,
+      defaultValue: 0,
+      validate: {
+        min: 0
+      }
+    },
     createdAt: type.DATE,
     updatedAt: type.DATE
   });
-}
+};
