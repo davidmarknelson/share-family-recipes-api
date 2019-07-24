@@ -1,4 +1,4 @@
-const Meal = require('../models/sequelize').Meal;
+const Meal = require('../models/sequelize').meal;
 
 const meals = {
 

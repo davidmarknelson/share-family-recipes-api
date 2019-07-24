@@ -1,13 +1,15 @@
 const bcrypt = require('bcryptjs');
 
-function hashPassword (user, options) {
-  if (!user.changed('password')) {
-    return;
-  }
-
+function hashPasswordOnCreate (user) {
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.password, salt);
-  user.setDataValue('password', hash);
+  user.password = hash;
+}
+
+function hashPasswordOnUpdate (user) {
+  let salt = bcrypt.genSaltSync(10);
+  let hash = bcrypt.hashSync(user.attributes.password, salt);
+  user.attributes.password = hash;
 }
 
 module.exports = (sequelize, type) => {
@@ -48,8 +50,8 @@ module.exports = (sequelize, type) => {
     updatedAt: type.DATE
   }, {
     hooks: {
-      beforeCreate: hashPassword,
-      beforeUpdate: hashPassword
+      beforeCreate: hashPasswordOnCreate,
+      beforeBulkUpdate: hashPasswordOnUpdate
     }
   });
 

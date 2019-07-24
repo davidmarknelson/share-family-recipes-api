@@ -51,7 +51,10 @@ const users = {
       where: { email: req.body.email }
     })
     .then(user => {
-      if (!user) throw new Error('The login information was incorrect.');
+      if (!user) {
+        throw new Error('The login information was incorrect.');
+
+      }
       return user;
     })
     .then(user => {
@@ -72,7 +75,7 @@ const users = {
     )
     .catch(err => {
       if (err.message === 'The login information was incorrect.') {
-        res.status(403).json({ message: err.message });
+        return res.status(403).json({ message: err.message });
       }
       res.status(500).json({ message: err.message });
     });
