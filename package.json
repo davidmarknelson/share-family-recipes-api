@@ -4,7 +4,7 @@
   "description": "An api for authentication.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r dotenv/config src/test/common.js src/test/**/*.js --recursive --timeout 6000 --exit",
     "api-dev": "nodemon -r dotenv/config app.js"
   },
   "repository": {
@@ -28,6 +28,9 @@
     "sequelize": "^5.10.1"
   },
   "devDependencies": {
-    "dotenv": "^8.0.0"
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "dotenv": "^8.0.0",
+    "mocha": "^6.2.0"
   }
 }

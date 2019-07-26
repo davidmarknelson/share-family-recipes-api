@@ -1,12 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const models = {};
+const db = {};
 
 // Database configuration
-const sequelize = new Sequelize(process.env.DB, process.env.DB_USER, process.env.DB_PW, {
-  host: process.env.HOST,
-  dialect: 'postgres'
+let DB;
+(process.env.NODE_ENV === "test") ? DB = process.env.DB_TEST : DB = process.env.DB;
+const sequelize = new Sequelize(DB, process.env.DB_USER, process.env.DB_PW, {
+    host: process.env.HOST,
+    dialect: 'postgres',
+    logging: false
 });
 
 sequelize
@@ -26,15 +29,14 @@ fs
   )
   .forEach((file) => {
     const model = sequelize.import(path.join(__dirname, file))
-    models[model.name] = model
+    db[model.name] = model
   });
 
-Object.keys(models).forEach((modelName) => {
-  if ('associate' in models[modelName]) {
-    models[modelName].associate(models)
+Object.keys(db).forEach((modelName) => {
+  if ('associate' in db[modelName]) {
+    db[modelName].associate(db)
   }
 })
-
 
 // For development
 if (process.env.NODE_ENV === "development") {
@@ -52,4 +54,7 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-module.exports = models;
+// For tests
+db.sequelize = sequelize;
+
+module.exports = db;

@@ -18,10 +18,13 @@ const users = {
       if (!user) {
         res.status(200).json({ message: 'This username is available.' });
       } else {
-        res.status(400).json({ message: 'This username is already in use.' });
+        throw new Error('This username is already in use.');
       }
     })
     .catch(err => {
+      if (err.message === 'This username is already in use.') {
+        return res.status(400).json({ message: 'This username is already in use.' });
+      }
       res.status(500).json({
         message: err.message
       });
@@ -39,6 +42,9 @@ const users = {
     .catch(err => {
       if (err.errors[0].message === 'email must be unique') {
         return res.status(400).json({ message: 'This email account is already in use.' });
+      }
+      if (err.errors[0].message === 'username must be unique') {
+        return res.status(400).json({ message: 'This username is already in use.' });
       }
       res.status(500).json({
         message: err.errors[0].message || err.message

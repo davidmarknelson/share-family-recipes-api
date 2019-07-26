@@ -15,5 +15,6 @@ app.use(express.static('src/public'));
 // Routes
 app.use(routes);
 
-
 app.listen(process.env.PORT || 8083, () => console.log(`food-auth-api is running on port ${process.env.PORT}.`));
+
+module.exports = app;
