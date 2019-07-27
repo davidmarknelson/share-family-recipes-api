@@ -32,7 +32,10 @@ describe('Users', () => {
           res.body.user.should.have.property('password');
           res.body.user.should.have.property('isAdmin', true);
           res.body.user.should.have.property('createdAt');
+          res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
+          res.body.user.updatedAt.should.be.a.dateString();
+          res.body.user.createdAt.should.equal(res.body.user.updatedAt);
           done();
         });
     });
@@ -99,7 +102,9 @@ describe('Users', () => {
           res.body.user.should.have.property('password');
           res.body.user.should.have.property('isAdmin', true);
           res.body.user.should.have.property('createdAt');
+          res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
+          res.body.user.updatedAt.should.be.a.dateString();
           done();
         });
     });
