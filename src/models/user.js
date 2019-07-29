@@ -1,12 +1,12 @@
 const bcrypt = require('bcryptjs');
 
-function hashPasswordOnCreate (user) {
+function hashPasswordOnCreate(user) {
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.password, salt);
   user.password = hash;
 }
 
-function hashPasswordOnUpdate (user) {
+function hashPasswordOnUpdate(user) {
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.attributes.password, salt);
   user.attributes.password = hash;
@@ -39,6 +39,11 @@ module.exports = (sequelize, type) => {
       validate: {
         isEmail: true
       }
+    },
+    isVerified: {
+      type: type.BOOLEAN, 
+      allowNull: false,
+      defaultValue: false
     },
     password: {
       type: type.TEXT,

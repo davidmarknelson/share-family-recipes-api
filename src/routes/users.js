@@ -6,6 +6,8 @@ const auth = require('../middleware/auth');
 router.route('/username').get(users.findUsername);
 router.route('/signup').post(users.signup);
 router.route('/login').post(users.login);
+// This route gets the profile for users who have a valid jwt
+router.route('/profile').get(auth.isAuthenticated, users.profile);
 router.route('/update').put(auth.isAuthenticated, users.update);
 router.route('/delete').delete(auth.isAuthenticated, users.delete);
 

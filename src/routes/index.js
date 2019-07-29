@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const auth = require('../middleware/auth');
 const users = require('./users');
 const meals = require('./meals');
 const savedMeals = require('./savedMeals');
+const verifyEmails = require('./verifyEmails');
 
 // Base route
 router.route('/').get((req, res) => {
@@ -17,5 +17,15 @@ router.use('/meals', meals);
 
 // Saved Meal routes
 router.use('/saved', savedMeals);
+
+// Verify Email routes
+router.use('/verify', verifyEmails);
+
+// Future routes
+// // Reset password routes
+// router.use('/reset', placeholder);
+
+// // Liked Meal routes
+// router.use('/like', placeholder);
 
 module.exports = router;
