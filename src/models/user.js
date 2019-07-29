@@ -50,7 +50,11 @@ module.exports = (sequelize, type) => {
       allowNull: false,
       unique: true
     },
-    isAdmin: type.BOOLEAN,
+    isAdmin: {
+      type: type.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
     createdAt: type.DATE,
     updatedAt: type.DATE
   }, {

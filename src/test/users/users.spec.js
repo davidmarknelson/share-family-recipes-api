@@ -4,6 +4,7 @@ const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
+
 describe('Users', () => {
   let newUser;
 
@@ -21,6 +22,7 @@ describe('Users', () => {
         .send(utils.user)
         .end((err, res) => {
           newUser = res.body;
+
           res.should.have.status(200);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
@@ -38,6 +40,10 @@ describe('Users', () => {
           res.body.user.createdAt.should.equal(res.body.user.updatedAt);
           done();
         });
+    });
+
+    it('should have a property to show that the verification email has been received by the user', () => {
+      newUser.user.emailAccepted.should.be.true;
     });
 
     it('should send a message when a username is already being used', (done) => {
@@ -151,6 +157,24 @@ describe('Users', () => {
           done();
         });
     });
+
+    it('should return an error message if there was an error updating', (done) => {
+      let updateduser = newUser.user;
+      updateduser.firstName = 'Jane';
+      updateduser.password = 'password';
+      updateduser.email = 'wrong@email.com';
+      let token = `Bearer ${newUser.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .send(updateduser)
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal("There was an error updating your profile.");
+          done();
+        });
+    });
   });
 
   describe('DELETE /user/delete', () => {
@@ -164,6 +188,20 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully deleted.");
+          done();
+        });
+    });
+
+    it('should return a error message when a user is not deleted', (done) => {
+      let token = `Bearer ${newUser.jwt}`;
+
+      chai.request(server)
+        .delete('/user/delete')
+        .set("Authorization", token)
+        .send({email: utils.userWithCredentials.email})
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal("There was an error deleting your profile.");
           done();
         });
     });

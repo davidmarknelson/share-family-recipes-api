@@ -81,9 +81,18 @@ const users = {
         html: message
       };
 
-      let email = await transporter.sendMail(mailOptions);
+      user.dataValues.emailAccepted = false;
 
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
+      let email = await transporter.sendMail(mailOptions);
+      if (email.accepted[0] === `${req.body.email}`) {
+        user.dataValues.emailAccepted = true;
+      }
+
+      // This is used to get the token string and preview url for tests
+      if (process.env.NODE_ENV === "developement" || "test") {
+        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
+        user.dataValues.token = tokenObj.token
+      }
 
       res.status(200).json({
         user: user,
@@ -130,7 +139,6 @@ const users = {
       let user = await User.update(req.body, {
         where: { email: req.body.email }
       });
-      console.log(user)
 
       if (user[0] === 1) {
         return res.status(200).json({ message: "User successfully updated." });
@@ -149,7 +157,6 @@ const users = {
       let user = await User.destroy({
         where: { email: req.body.email }
       });
-      console.log(user)
 
       if (user) {
         return res.status(200).json({ message: "User successfully deleted." });
