@@ -15,6 +15,7 @@ describe('Users', () => {
       });
   });
 
+
   describe('POST /user/signup', () => {
     it('should return a user object when a new user is created', (done) => {
       chai.request(server)
@@ -38,6 +39,7 @@ describe('Users', () => {
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
           res.body.user.createdAt.should.equal(res.body.user.updatedAt);
+          if(err) done(err);
           done();
         });
     });
@@ -53,6 +55,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This username is already in use.');
+          if(err) done(err);
           done();
         });
     });
@@ -64,10 +67,12 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This email account is already in use.');
+          if(err) done(err);
           done();
         });
     });
   });
+
 
   describe('GET /user/username', () => {
     it('should show that a username is unavailable', (done) => {
@@ -76,6 +81,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This username is already in use.');
+          if(err) done(err);
           done();
         });
     });
@@ -86,10 +92,12 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal('This username is available.');
+          if(err) done(err);
           done();
         });
     });
   });
+
 
   describe('POST /user/login', () => {
     it('should login user with correct credentials', (done) => {
@@ -111,6 +119,7 @@ describe('Users', () => {
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
+          if(err) done(err);
           done();
         });
     });
@@ -122,6 +131,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.have.property('message', 'The login information was incorrect.');
+          if(err) done(err);
           done();
         });
     });
@@ -133,11 +143,11 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.have.property('message', 'The login information was incorrect.');
+          if(err) done(err);
           done();
         });
     });
   });
-
   
 
   describe('UPDATE /user/update', () => {
@@ -154,6 +164,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully updated.");
+          if(err) done(err);
           done();
         });
     });
@@ -172,10 +183,12 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("There was an error updating your profile.");
+          if(err) done(err);
           done();
         });
     });
   });
+  
 
   describe('DELETE /user/delete', () => {
     it('should return a message when a user is deleted', (done) => {
@@ -188,6 +201,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully deleted.");
+          if(err) done(err);
           done();
         });
     });
@@ -202,6 +216,7 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("There was an error deleting your profile.");
+          if(err) done(err);
           done();
         });
     });

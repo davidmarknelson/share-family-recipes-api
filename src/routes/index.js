@@ -22,8 +22,8 @@ router.use('/saved', savedMeals);
 router.use('/verify', verifyEmails);
 
 // Future routes
-// // Reset password routes
-// router.use('/reset', placeholder);
+// // Reset and update password routes
+// router.use('/password', placeholder);
 
 // // Liked Meal routes
 // router.use('/like', placeholder);

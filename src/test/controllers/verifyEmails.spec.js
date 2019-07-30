@@ -21,14 +21,55 @@ describe('Email verification', () => {
   });
 
   describe('POST verify email', () => {
-    it('should return a message when the email has been successfully verified', () => {
-      user.should.have.status(200);
-      user.message.should.equal('Your email is now verified.');
+    it('should return a message when the wrong token is sent', (done) => {
+      let verifyObj = {
+        email: user.user.email,
+        token: 'wrongtoken'
+      }
+
+      chai.request(server)
+        .post('/verify')
+        .send(verifyObj)
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal('There was an error verifying your email.');
+          if(err) done(err);
+          done();
+        });
     });
 
-    it('should return a message when there was an error verifying email', () => {
-      user.should.have.status(500);
-      user.message.should.equal('There was an error verifying your email.');
+    it('should return a message when the wrong email is sent', (done) => {
+      let verifyObj = {
+        email: "wrong@email.com",
+        token: user.user.token
+      }
+
+      chai.request(server)
+        .post('/verify')
+        .send(verifyObj)
+        .end((err, res) => {
+          res.should.have.status(403);
+          res.body.message.should.equal('There was an error verifying your email.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return a message when the email has been successfully verified', (done) => {
+      let verifyObj = {
+        email: user.user.email,
+        token: user.user.token
+      }
+
+      chai.request(server)
+        .post('/verify')
+        .send(verifyObj)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.message.should.equal('Your email is now verified.');
+          if(err) done(err);
+          done();
+        });
     });
   });
 

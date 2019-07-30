@@ -1,4 +1,5 @@
 module.exports = {
+  // User controller test objects
   user: {
     username: "jdoe",
     firstName: "John",
