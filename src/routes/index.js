@@ -3,6 +3,7 @@ const users = require('./users');
 const meals = require('./meals');
 const savedMeals = require('./savedMeals');
 const verifyEmails = require('./verifyEmails');
+const passwords = require('./passwords');
 
 // Base route
 router.route('/').get((req, res) => {
@@ -21,10 +22,10 @@ router.use('/saved', savedMeals);
 // Verify Email routes
 router.use('/verify', verifyEmails);
 
-// Future routes
-// // Reset and update password routes
-// router.use('/password', placeholder);
+// Reset and update password routes
+router.use('/password', passwords);
 
+// Future routes
 // // Liked Meal routes
 // router.use('/like', placeholder);
 

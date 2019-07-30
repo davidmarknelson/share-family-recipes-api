@@ -6,7 +6,7 @@ const auth = {
     if (token) {
       jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) { 
-          res.status(403).json({ message: err.message }); 
+          return res.status(403).json({ message: err.message }); 
         }
         if (decoded) {
           req.decoded = decoded;
