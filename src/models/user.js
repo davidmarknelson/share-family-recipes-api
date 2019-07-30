@@ -7,6 +7,7 @@ function hashPasswordOnCreate(user) {
 }
 
 function hashPasswordOnUpdate(user) {
+  if (!user.attributes.password) return;
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.attributes.password, salt);
   user.attributes.password = hash;

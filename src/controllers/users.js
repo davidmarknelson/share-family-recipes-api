@@ -72,7 +72,7 @@ const users = {
         req.body.firstName, 
         req.body.lastName, 
         tokenObj.token
-      )
+      );
 
       const mailOptions = {
         from: `${process.env.EMAIL}`,

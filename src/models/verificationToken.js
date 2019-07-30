@@ -2,6 +2,11 @@ const Op = require('sequelize').Op;
 
 module.exports = function(sequelize, type) {
   const verificationToken = sequelize.define('verification_token', {
+    id: {
+      type: type.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     token: {
       type: type.STRING,
       allowNull: false
@@ -12,7 +17,7 @@ module.exports = function(sequelize, type) {
         return verificationToken.destroy({
           where: {
             createdAt: {
-              [Op.lt]: new Date(Date.now() - 60 * 1000)
+              [Op.lt]: new Date(Date.now() - 7200 * 1000)
             }
           }
         })
