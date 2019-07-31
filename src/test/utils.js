@@ -1,7 +1,7 @@
 module.exports = {
   // User controller test objects
   user: {
-    username: "jdoe",
+    username: "johndoe",
     firstName: "John",
     lastName: "Doe",
     email: "test@email.com",
@@ -9,7 +9,7 @@ module.exports = {
     isAdmin: true
   },
   userNewUsername: {
-    username: "johndoe",
+    username: "johndoe2",
     firstName: "John",
     lastName: "Doe",
     email: "test@email.com",
@@ -21,6 +21,14 @@ module.exports = {
     firstName: "John",
     lastName: "Smith",
     email: "smith@email.com",
+    password: "password",
+    isAdmin: true
+  },
+  userWithShortUsername: {
+    username: "jdoe",
+    firstName: "John",
+    lastName: "Doe",
+    email: "test@email.com",
     password: "password",
     isAdmin: true
   },

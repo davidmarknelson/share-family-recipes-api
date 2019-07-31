@@ -5,7 +5,7 @@ const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
 
-describe('Users', () => {
+describe.only('Users', () => {
   let newUser;
 
   before(() => {
@@ -17,6 +17,20 @@ describe('Users', () => {
 
 
   describe('POST /user/signup', () => {
+    it('should return an error is the username is too short', (done) => {
+      chai.request(server)
+      .post('/user/signup')
+      .send(utils.userWithShortUsername)
+      .end((err, res) => {
+        newUser = res.body;
+
+        res.should.have.status(500);
+        res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
+        if(err) done(err);
+        done();
+      });
+    });
+
     it('should return a user object when a new user is created', (done) => {
       chai.request(server)
         .post('/user/signup')
@@ -28,7 +42,7 @@ describe('Users', () => {
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 1);
-          res.body.user.should.have.property('username', 'jdoe');
+          res.body.user.should.have.property('username', 'johndoe');
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
@@ -109,7 +123,7 @@ describe('Users', () => {
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 1);
-          res.body.user.should.have.property('username', 'jdoe');
+          res.body.user.should.have.property('username', 'johndoe');
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
@@ -183,6 +197,23 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("There was an error updating your profile.");
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message if the username is too short', (done) => {
+      let updateduser = newUser.user;
+      updateduser.username = 'jane';
+      let token = `Bearer ${newUser.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .send(updateduser)
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
           if(err) done(err);
           done();
         });

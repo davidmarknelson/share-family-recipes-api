@@ -1,13 +1,21 @@
 const bcrypt = require('bcryptjs');
 
-function hashPasswordOnCreate(user) {
+function hashPasswordAndTrimOnCreate(user) {
+  user.username = user.username.trim();
+  user.firstName = user.firstName.trim();
+  user.lastName = user.lastName.trim();
+  user.password = user.password.trim();
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.password, salt);
   user.password = hash;
 }
 
-function hashPasswordOnUpdate(user) {
+function hashPasswordAndTrimOnUpdate(user) {
+  user.attributes.username = user.attributes.username.trim();
+  user.attributes.firstName = user.attributes.firstName.trim();
+  user.attributes.lastName = user.attributes.lastName.trim();
   if (!user.attributes.password) return;
+  user.attributes.password = user.attributes.password.trim();
   let salt = bcrypt.genSaltSync(10);
   let hash = bcrypt.hashSync(user.attributes.password, salt);
   user.attributes.password = hash;
@@ -23,7 +31,13 @@ module.exports = (sequelize, type) => {
     username: {
       type: type.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
+      validate: {
+        len: {
+          args: [5, 10],
+          msg: "Username must be between 5 and 15 characters."
+        }
+      }
     },
     firstName: {
       type: type.STRING,
@@ -60,8 +74,8 @@ module.exports = (sequelize, type) => {
     updatedAt: type.DATE
   }, {
     hooks: {
-      beforeCreate: hashPasswordOnCreate,
-      beforeBulkUpdate: hashPasswordOnUpdate
+      beforeCreate: hashPasswordAndTrimOnCreate,
+      beforeBulkUpdate: hashPasswordAndTrimOnUpdate
     }
   });
 
