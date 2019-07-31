@@ -27,6 +27,14 @@ module.exports = {
     }
   },
 
+  sendResetEmail: async (req, res) => {
+    try {
+
+    } catch (err) {
+      
+    }
+  },
+
   resetPassword: async (req, res) => {
     try {
 

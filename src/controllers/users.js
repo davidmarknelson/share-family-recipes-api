@@ -12,7 +12,7 @@ function jwtSignUser(user) {
   });
 }
 
-const users = {
+module.exports = {
 
   findUsername: async (req, res) => {
     try {
@@ -68,7 +68,6 @@ const users = {
         
       let message = helpers.makeVerificationEmail(
         process.env.URL, 
-        req.body.email, 
         req.body.firstName, 
         req.body.lastName, 
         tokenObj.token
@@ -167,6 +166,4 @@ const users = {
       res.status(500).json({ message: "There was an error deleting your profile." });
     }
   }
-}
-
-module.exports = users;
+};

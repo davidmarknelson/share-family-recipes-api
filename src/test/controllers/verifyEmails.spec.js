@@ -38,35 +38,27 @@ describe('Email verification', () => {
         });
     });
 
-    it('should return a message when the wrong email is sent', (done) => {
-      let verifyObj = {
-        email: "wrong@email.com",
-        token: user.user.token
-      }
-
+    it('should return a message when the email has been successfully verified', (done) => {
       chai.request(server)
         .post('/verify')
-        .send(verifyObj)
+        .send({ token: user.user.token })
         .end((err, res) => {
-          res.should.have.status(403);
-          res.body.message.should.equal('There was an error verifying your email.');
+          res.should.have.status(200);
+          res.body.message.should.equal('Your email is now verified.');
           if(err) done(err);
           done();
         });
     });
+  });
 
-    it('should return a message when the email has been successfully verified', (done) => {
-      let verifyObj = {
-        email: user.user.email,
-        token: user.user.token
-      }
-
+  describe('POST resend verification email', () => {
+    it('should send a message if the email was sent', () => {
       chai.request(server)
-        .post('/verify')
-        .send(verifyObj)
+        .post('/verify/resend')
+        .send({ email: "test@email.com" })
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.message.should.equal('Your email is now verified.');
+          res.body.message.should.equal("Email has successfully been sent.");
           if(err) done(err);
           done();
         });

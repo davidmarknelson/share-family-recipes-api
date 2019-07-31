@@ -13,4 +13,4 @@ module.exports = (sequelize, type) => {
   };
 
   return savedMeal;
-}
+};
