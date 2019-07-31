@@ -1,7 +1,7 @@
 const Op = require('sequelize').Op;
 
 module.exports = function(sequelize, type) {
-  const verificationToken = sequelize.define('verification_token', {
+  const resetToken = sequelize.define('reset_password_token', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
@@ -15,7 +15,7 @@ module.exports = function(sequelize, type) {
   }, {
     hooks: {
       beforeCreate: function deleteExpiredTokens() {
-        return verificationToken.destroy({
+        return resetToken.destroy({
           where: {
             createdAt: {
               [Op.lt]: new Date(Date.now() - 7200 * 1000)
@@ -32,9 +32,9 @@ module.exports = function(sequelize, type) {
     ]
   });
     
-  verificationToken.associate = (models) => {
-      verificationToken.belongsTo(models.user);
+  resetToken.associate = (models) => {
+    resetToken.belongsTo(models.user);
   };
 
-  return verificationToken;
+  return resetToken;
 };

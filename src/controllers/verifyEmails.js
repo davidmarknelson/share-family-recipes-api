@@ -83,7 +83,7 @@ module.exports = {
 
       let email = await transporter.sendMail(mailOptions);
 
-      // This is used to get the token string and preview url for tests
+      // This is used to get the preview url for tests
       if (process.env.NODE_ENV === "developement" || "test") {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
       }

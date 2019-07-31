@@ -6,5 +6,12 @@ module.exports = {
       <a href="${url}verify?token=${verificationToken}">Verify your email</a>
     `;
   },
-  resetPasswordEmail: () => {}
+  resetPasswordEmail: (url, verificationToken) => {
+    return `
+      <p>You are receiving this because you have requested to reset the password for your account.</p>
+      <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+      <p>Please click to button bellow to reset your password.</p>
+      <a href="${url}verify/reset?token=${verificationToken}">Reset your password</a>
+    `;
+  }
 };
