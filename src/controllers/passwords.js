@@ -93,9 +93,42 @@ module.exports = {
 
   resetPassword: async (req, res) => {
     try {
+      let tokenAndUser = await ResetPW.findOne({
+        where: {
+          token: req.body.token
+        },
+        include: [User]
+      });
 
+      if (!tokenAndUser) {
+        return res.status(404).json({ message: "Password reset token is invalid or has expired." });
+      }
+
+      let password = req.body.password;
+      let passwordConfirmation = req.body.passwordConfirmation;
+  
+      if (password !== passwordConfirmation) {
+        return res.status(400).json({ message: "Passwords do not match." });
+      }
+
+      let userObj = tokenAndUser.dataValues.user.dataValues;
+
+      let updatedUser = await User.update({
+        password: password
+      }, {
+        where: {
+          id: userObj.id,
+          email: userObj.email
+        }
+      });
+  
+      if (updatedUser[0] === 0) {
+        return res.status(404).json({ message: 'There was an error updating your password.' });
+      }
+
+      res.status(200).json({ message: "Your password was successfully reset." });
     } catch (err) {
-      
+      res.status(500).json({ message: "There was an error resetting your password." });
     }
   }
 }

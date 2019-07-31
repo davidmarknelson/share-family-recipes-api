@@ -16,6 +16,14 @@ module.exports = {
     password: "password",
     isAdmin: true
   },
+  user2: {
+    username: "jsmith",
+    firstName: "John",
+    lastName: "Smith",
+    email: "smith@email.com",
+    password: "password",
+    isAdmin: true
+  },
   userWithCredentials: {
     email: "test@email.com",
     password: "password"
