@@ -4,6 +4,16 @@ process.env.NODE_ENV = 'test';
 const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
+const User = require('../../models/sequelize').user;
+const Verification = require('../../models/sequelize').verification_token;
+const jwt = require('jsonwebtoken');
+
+function jwtSignUser(user) {
+  const oneWeek = 60 * 60 * 24 * 7;
+  return jwt.sign(user, process.env.JWT_SECRET, {
+    expiresIn: oneWeek
+  });
+}
 
 describe('Email verification', () => {
   let user;
@@ -11,15 +21,24 @@ describe('Email verification', () => {
   before(() => {
     return db.sync({force: true})
       .then(() => {
-        return chai.request(server)
-          .post('/user/signup')
-          .send(utils.user)
+        return User.create(utils.user);
       })
       .then(res => {
-        user = res.body;
-        console.log(`Database, tables, and user created for tests!`)
-      });
+        user = {
+          user: res,
+          jwt: jwtSignUser(res.dataValues)
+        };
+      })
+      .then(() => {
+        user.user.token = '123456789'
+        Verification.create({
+          token: '123456789',
+          userId: user.user.id
+        });
+      })
+      .then(() => console.log(`Database, tables, and user created for tests!`));
   });
+
 
   describe('POST verify email', () => {
     it('should return a message when the wrong token is sent', (done) => {
