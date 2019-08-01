@@ -1,3 +1,4 @@
+'use strict';
 process.env.NODE_ENV = 'test';
 
 const server = require("../../../app");
@@ -5,7 +6,7 @@ const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
 
-describe.only('Users', () => {
+describe('Users', () => {
   let newUser;
 
   before(() => {

@@ -1,3 +1,4 @@
+'use strict';
 const Op = require('sequelize').Op;
 
 module.exports = function(sequelize, type) {

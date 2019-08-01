@@ -1,3 +1,4 @@
+'use strict';
 const router = require('express').Router();
 const verify = require('../controllers/verifyEmails');
 const trim = require('../middleware/trim');

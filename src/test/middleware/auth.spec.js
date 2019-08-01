@@ -1,10 +1,19 @@
+'use strict';
 process.env.NODE_ENV = 'test';
 
-const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
+const User = require('../../models/sequelize').user;
 const httpMocks = require('node-mocks-http');
 const auth = require('../../middleware/auth');
+const jwt = require('jsonwebtoken');
+
+function jwtSignUser(user) {
+  const oneWeek = 60 * 60 * 24 * 7;
+  return jwt.sign(user, process.env.JWT_SECRET, {
+    expiresIn: oneWeek
+  });
+}
 
 describe('Auth middleware', () => {
   let user;
@@ -12,12 +21,13 @@ describe('Auth middleware', () => {
   before(() => {
     return db.sync({force: true})
       .then(() => {
-        return chai.request(server)
-          .post('/user/signup')
-          .send(utils.user)
+        return User.create(utils.user);
       })
       .then(res => {
-        user = res.body;
+        user = {
+          user: res,
+          jwt: jwtSignUser(res.dataValues)
+        };
         console.log(`Database, tables, and user created for tests!`)
       });
   });

@@ -1,3 +1,4 @@
+'use strict';
 module.exports = {
   // User controller test objects
   user: {
@@ -22,7 +23,7 @@ module.exports = {
     lastName: "Smith",
     email: "smith@email.com",
     password: "password",
-    isAdmin: true
+    isAdmin: false
   },
   userWithShortUsername: {
     username: "jdoe",

@@ -1,3 +1,4 @@
+'use strict';
 const Verification = require('../models/sequelize').verification_token;
 const User = require('../models/sequelize').user;
 const helpers = require('../helpers/email');
@@ -91,7 +92,7 @@ module.exports = {
       if (email.accepted[0] === `${req.body.email}`) {
         return res.status(200).json({ message: "Email has successfully been sent." });
       } else {
-        throw new Error();
+        throw Error();
       }
     } catch (err) {
       res.status(500).json({ message: "There was an error sending the email." });

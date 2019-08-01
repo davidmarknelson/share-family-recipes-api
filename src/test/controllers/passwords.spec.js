@@ -1,3 +1,4 @@
+'use strict';
 process.env.NODE_ENV = 'test';
 
 const server = require("../../../app");
@@ -89,10 +90,10 @@ describe('Password', () => {
     })
   })
 
-  describe('POST reset password', () => {
+  describe('PUT reset password', () => {
     it('should send an error if the token has expired or does not exist', (done) => {
       chai.request(server)
-        .post('/password/reset')
+        .put('/password/reset')
         .send({ token: '' })
         .end((err, res) => {
           res.should.have.status(404);
@@ -112,7 +113,7 @@ describe('Password', () => {
       })
       .then(token => {
         return chai.request(server)
-        .post('/password/reset')
+        .put('/password/reset')
         .send({
           token: "123456789",
           password: "match",
@@ -134,7 +135,7 @@ describe('Password', () => {
       }
 
       chai.request(server)
-        .post('/password/reset')
+        .put('/password/reset')
         .send(passwordObj)
         .end((err, res) => {
           res.should.have.status(200);

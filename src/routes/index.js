@@ -1,9 +1,11 @@
+'use strict';
 const router = require('express').Router();
 const users = require('./users');
 const meals = require('./meals');
 const savedMeals = require('./savedMeals');
 const verifyEmails = require('./verifyEmails');
 const passwords = require('./passwords');
+const admin = require('./admin');
 
 // Base route
 router.route('/').get((req, res) => {
@@ -12,6 +14,9 @@ router.route('/').get((req, res) => {
 
 // User routes
 router.use('/user', users);
+
+// Admin routes
+router.use('/admin', admin);
 
 // Meal routes
 router.use('/meals', meals);

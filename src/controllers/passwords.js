@@ -1,3 +1,4 @@
+'use strict';
 const User = require('../models/sequelize').user;
 const ResetPW = require('../models/sequelize').reset_password_token;
 const helpers = require('../helpers/email');

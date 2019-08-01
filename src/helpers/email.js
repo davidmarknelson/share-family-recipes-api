@@ -1,3 +1,4 @@
+'use strict';
 module.exports = {
   makeVerificationEmail: (url, firstName, lastName, verificationToken) => {
     return `

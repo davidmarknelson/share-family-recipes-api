@@ -1,3 +1,4 @@
+'use strict';
 const router = require('express').Router();
 const meals = require('../controllers/meals');
 const auth = require('../middleware/auth');

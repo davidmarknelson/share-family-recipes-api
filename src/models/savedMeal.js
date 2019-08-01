@@ -1,3 +1,4 @@
+'use strict';
 module.exports = (sequelize, type) => {
   const savedMeal = sequelize.define('saved_meal', {
     id: {

@@ -1,3 +1,4 @@
+'use strict';
 const bcrypt = require('bcryptjs');
 
 function hashPasswordAndTrimOnCreate(user) {
@@ -11,14 +12,15 @@ function hashPasswordAndTrimOnCreate(user) {
 }
 
 function hashPasswordAndTrimOnUpdate(user) {
-  user.attributes.username = user.attributes.username.trim();
-  user.attributes.firstName = user.attributes.firstName.trim();
-  user.attributes.lastName = user.attributes.lastName.trim();
-  if (!user.attributes.password) return;
-  user.attributes.password = user.attributes.password.trim();
-  let salt = bcrypt.genSaltSync(10);
-  let hash = bcrypt.hashSync(user.attributes.password, salt);
-  user.attributes.password = hash;
+  if (user.attributes.username) user.attributes.username = user.attributes.username.trim();
+  if (user.attributes.firstName) user.attributes.firstName = user.attributes.firstName.trim();
+  if (user.attributes.lastName) user.attributes.lastName = user.attributes.lastName.trim();
+  if (user.attributes.password) {
+    user.attributes.password = user.attributes.password.trim();
+    let salt = bcrypt.genSaltSync(10);
+    let hash = bcrypt.hashSync(user.attributes.password, salt);
+    user.attributes.password = hash;
+  }
 }
 
 module.exports = (sequelize, type) => {

@@ -1,3 +1,4 @@
+'use strict';
 process.env.NODE_ENV = 'test';
 
 const server = require("../../../app");
@@ -52,7 +53,7 @@ describe('Email verification', () => {
   });
 
   describe('POST resend verification email', () => {
-    it('should send a message if the email was sent', () => {
+    it('should send a message if the email was sent', (done) => {
       chai.request(server)
         .post('/verify/resend')
         .send({ email: "test@email.com" })

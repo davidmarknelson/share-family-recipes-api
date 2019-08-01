@@ -1,3 +1,4 @@
+'use strict';
 const User = require('../models/sequelize').user;
 const jwt = require('jsonwebtoken');
 const Verification = require('../models/sequelize').verification_token;
