@@ -8,6 +8,7 @@ const db = require('../../models/sequelize').sequelize;
 
 describe('Users', () => {
   let newUser;
+  let newUser2;
 
   before(() => {
     return db.sync({force: true})
@@ -32,7 +33,7 @@ describe('Users', () => {
       });
     });
 
-    it('should return a user object when a new user is created', (done) => {
+    it('should return an admin user object when a new user is created', (done) => {
       chai.request(server)
         .post('/user/signup')
         .send(utils.user)
@@ -49,6 +50,33 @@ describe('Users', () => {
           res.body.user.should.have.property('email', 'test@email.com');
           res.body.user.should.have.property('password');
           res.body.user.should.have.property('isAdmin', true);
+          res.body.user.should.have.property('createdAt');
+          res.body.user.createdAt.should.be.a.dateString();
+          res.body.user.should.have.property('updatedAt');
+          res.body.user.updatedAt.should.be.a.dateString();
+          res.body.user.createdAt.should.equal(res.body.user.updatedAt);
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return a user object that is not an admin when a new user is created', (done) => {
+      chai.request(server)
+        .post('/user/signup')
+        .send(utils.user2)
+        .end((err, res) => {
+          newUser2 = res.body;
+
+          res.should.have.status(200);
+          res.body.should.have.property('user');
+          res.body.should.have.property('jwt');
+          res.body.user.should.have.property('id', 2);
+          res.body.user.should.have.property('username', 'jsmith');
+          res.body.user.should.have.property('firstName', 'John');
+          res.body.user.should.have.property('lastName', 'Smith');
+          res.body.user.should.have.property('email', 'smith@email.com');
+          res.body.user.should.have.property('password');
+          res.body.user.should.have.property('isAdmin', false);
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');

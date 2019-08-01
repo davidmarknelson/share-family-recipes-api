@@ -51,6 +51,12 @@ module.exports = {
 
   signup: async (req, res) => {
     try {
+      if (req.body.adminCode === process.env.ADMIN_CODE) {
+        req.body.isAdmin = true;
+      } else {
+        req.body.isAdmin = false;
+      }
+
       let user = await User.create(req.body);
       let token = cryptoRandomString({length: 10, type: 'url-safe'});
       let tokenObj = await Verification.create({

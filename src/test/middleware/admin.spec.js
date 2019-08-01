@@ -65,7 +65,7 @@ describe('Admin middleware', () => {
     expect(nextSpy).to.not.have.been.called();
   });
 
-  it('should return call next() with an admin user', () => {
+  it('should call next() with an admin user', () => {
     let token = userAdmin.jwt;
     let request  = httpMocks.createRequest({
       method: 'GET',

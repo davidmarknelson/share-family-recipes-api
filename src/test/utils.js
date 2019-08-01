@@ -7,7 +7,8 @@ module.exports = {
     lastName: "Doe",
     email: "test@email.com",
     password: "password",
-    isAdmin: true
+    isAdmin: true,
+    adminCode: "123456789"
   },
   userNewUsername: {
     username: "johndoe2",
@@ -23,7 +24,8 @@ module.exports = {
     lastName: "Smith",
     email: "smith@email.com",
     password: "password",
-    isAdmin: false
+    isAdmin: false,
+    adminCode: "notValid"
   },
   userWithShortUsername: {
     username: "jdoe",
