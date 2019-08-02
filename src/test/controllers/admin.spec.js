@@ -15,7 +15,7 @@ function jwtSignUser(user) {
 }
 
 
-describe.only('Admin', () => {
+describe('Admin', () => {
   let user;
 
   before(() => {

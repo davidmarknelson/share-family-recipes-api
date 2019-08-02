@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, type) => {
-  return sequelize.define('meal', {
+  const meal = sequelize.define('meal', {
     id: {
       type: type.INTEGER,
       primaryKey: true,
@@ -12,38 +12,56 @@ module.exports = (sequelize, type) => {
       unique: true      
     },
     ingredients: {
-      type: type.ARRAY(type.TEXT),
-      allowNull: false
+      type: type.ARRAY(type.STRING),
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please enter ingredients.'
+        }
+      }
     },
     instructions: {
       type: type.ARRAY(type.STRING),
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Please enter instructions.'
+        }
+      }
     },
     prepTime: {
       type: type.INTEGER,
       defaultValue: 0,
       validate: {
-        min: 0
+        min: {
+          args: [0],
+          msg: "The prep time must be the number of minutes in number form."
+        }
       }
     },
     cookTime: {
       type: type.INTEGER,
       defaultValue: 0,
       validate: {
-        min: 0
+        min: {
+          args: [0],
+          msg: "The cook time must be the number of minutes in number form."
+        }
       }
     },
     difficulty: {
       type: type.INTEGER,
       allowNull: false,
       validate: {
-        min: 1,
-        max: 5
+        min: {
+          args: [1],
+          msg: "The level of difficulty must be between 1 and 5."
+        },
+        max: {
+          args: [5],
+          msg: "The level of difficulty must be between 1 and 5."
+        }
       }
-    },
-    creatorUsername: {
-      type: type.STRING,
-      allowNull: false
     },
     likes: {
       type: type.INTEGER,
@@ -55,4 +73,10 @@ module.exports = (sequelize, type) => {
     createdAt: type.DATE,
     updatedAt: type.DATE
   });
+
+  meal.associate = (models) => {
+    meal.belongsTo(models.user, {as: "creator"});
+  };
+
+  return meal;
 };

@@ -137,4 +137,57 @@ module.exports = {
     isAdmin: false,
     adminCode: "notValid"
   },
+  meal1: {
+    name: 'Sandwich',
+    ingredients: ['bread', 'cheese', 'meat'],
+    instructions: [
+      'Put the bread on the counter.', 
+      'Put the meat between 2 slices of bread.', 
+      'Put the cheese on the meat.'
+    ],
+    prepTime: 5,
+    cookTime: 0,
+    difficulty: 1,
+    creatorId: 1
+  },
+  meal2: {
+    name: 'Soup',
+    ingredients: ['water', 'vegetables', 'meat'],
+    instructions: [
+      'Cut the veggies.', 
+      'Boil the water.', 
+      'Put veggies and meat in the water until it is cooked.'
+    ],
+    prepTime: 10,
+    cookTime: 20,
+    difficulty: 3,
+    creatorId: 2
+  },
+  meal3: {
+    id: 3,
+    name: 'Rice',
+    ingredients: ['water', 'rice'],
+    instructions: [
+      'Wash the rice.', 
+      'Put the rice into the rice cooker.',
+      'Turn on the rice cooker.'
+    ],
+    prepTime: 2,
+    cookTime: 20,
+    difficulty: 1
+  },
+  meal3Update: {
+    id: 3,
+    name: 'Rice and spicy sauce',
+    ingredients: ['water', 'rice'],
+    instructions: [
+      'Wash the rice.', 
+      'Put the rice into the rice cooker.',
+      'Turn on the rice cooker.',
+      'Add spicy sauce'
+    ],
+    prepTime: 2,
+    cookTime: 20,
+    difficulty: 1
+  }
 };

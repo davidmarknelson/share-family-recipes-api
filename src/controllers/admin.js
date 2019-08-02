@@ -1,33 +1,18 @@
 'use strict';
 const User = require('../models/sequelize').user;
 const sequelize = require('../models/sequelize').sequelize;
+const offsetLimit = require('../helpers/offsetLimit');
 
 let attributesArray = [
   'id', 'username', 'firstName', 'lastName', 
   'email', 'isVerified', 'isAdmin', 'createdAt'
 ];
 
-function checkOffset(offset) {
-  if (offset < 0 || !offset) {
-    return 0;
-  } else {
-    return offset;
-  }
-}
-
-function checkLimit(limit) {
-  if (limit <= 0 || !limit) {
-    return  5;
-  } else {
-    return limit;
-  }
-}
-
 module.exports = {
   getUsersByNewest: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
@@ -42,14 +27,14 @@ module.exports = {
   },
   getUsersByOldest: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
         limit: limit,
         attributes: attributesArray,
-        order: [['createdAt']]
+        order: ['createdAt']
       });
       res.status(200).json(users);
     } catch (err) {
@@ -58,14 +43,14 @@ module.exports = {
   },
   getUsersAtoZ: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
         limit: limit,
         attributes: attributesArray,
-        order: [[sequelize.fn('lower', sequelize.col('username'))]]
+        order: [sequelize.fn('lower', sequelize.col('username'))]
       });
       res.status(200).json(users);
     } catch (err) {
@@ -74,8 +59,8 @@ module.exports = {
   },
   getUsersZtoA: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
@@ -90,14 +75,14 @@ module.exports = {
   },
   getUsersFirstNameAtoZ: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
         limit: limit,
         attributes: attributesArray,
-        order: [[sequelize.fn('lower', sequelize.col('firstName'))]]
+        order: [sequelize.fn('lower', sequelize.col('firstName'))]
       });
       res.status(200).json(users);
     } catch (err) {
@@ -106,8 +91,8 @@ module.exports = {
   },
   getUsersFirstNameZtoA: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
@@ -122,14 +107,14 @@ module.exports = {
   },
   getUsersLastNameAtoZ: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,
         limit: limit,
         attributes: attributesArray,
-        order: [[sequelize.fn('lower', sequelize.col('lastName'))]]
+        order: [sequelize.fn('lower', sequelize.col('lastName'))]
       });
       res.status(200).json(users);
     } catch (err) {
@@ -138,8 +123,8 @@ module.exports = {
   },
   getUsersLastNameZtoA: async (req, res) => {
     try {
-      let offset = checkOffset(req.query.offset);
-      let limit = checkLimit(req.query.limit);
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let users = await User.findAll({
         offset: offset,

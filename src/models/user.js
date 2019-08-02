@@ -63,7 +63,7 @@ module.exports = (sequelize, type) => {
       defaultValue: false
     },
     password: {
-      type: type.TEXT,
+      type: type.STRING,
       allowNull: false,
       unique: true
     },
