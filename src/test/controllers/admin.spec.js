@@ -15,7 +15,7 @@ function jwtSignUser(user) {
 }
 
 
-describe('Admin', () => {
+describe.only('Admin', () => {
   let user;
 
   before(() => {
@@ -23,9 +23,10 @@ describe('Admin', () => {
       .then(() => User.create(utils.user2))
       .then(() => {
         return Promise.all([
-          User.create(utils.user3), User.create(utils.user4), 
-          User.create(utils.user5), User.create(utils.user6), User.create(utils.user7), User.create(utils.user8), 
-          User.create(utils.user9), User.create(utils.user10), User.create(utils.user11), User.create(utils.user12)
+          User.create(utils.user3), User.create(utils.user4), User.create(utils.user5), 
+          User.create(utils.user6), User.create(utils.user7), User.create(utils.user8), 
+          User.create(utils.user9), User.create(utils.user10), User.create(utils.user11), 
+          User.create(utils.user12)
         ]);
       })
       .then(() => {
@@ -168,6 +169,134 @@ describe('Admin', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body[0].username.should.equal('user9');
+          res.body.should.have.lengthOf(10);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 5 users by first name A to Z with no offest and limit params', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/firstname')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].firstName.should.equal('Aaaa');
+          res.body.should.have.lengthOf(5);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 10 users by first name A to Z', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/firstname?offset=0&limit=10')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].firstName.should.equal('Aaaa');
+          res.body.should.have.lengthOf(10);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 5 users by first name Z to A with no offest and limit params', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/firstnamereverse')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].firstName.should.equal('John');
+          res.body.should.have.lengthOf(5);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 10 users by first name Z to A', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/firstnamereverse?offset=0&limit=10')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].firstName.should.equal('John');
+          res.body.should.have.lengthOf(10);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 5 users by last name A to Z with no offest and limit params', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/lastname')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].lastName.should.equal('Aaaa');
+          res.body.should.have.lengthOf(5);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 10 users by last name A to Z', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/lastname?offset=0&limit=10')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].lastName.should.equal('Aaaa');
+          res.body.should.have.lengthOf(10);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 5 users by last name Z to A with no offest and limit params', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/lastnamereverse')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].lastName.should.equal('Smith');
+          res.body.should.have.lengthOf(5);
+          if(err) done(err);
+          done();
+        });
+  });
+
+  it('should get the first 10 users by last name Z to A', (done) => {
+    let token = `Bearer ${user.jwt}`;
+
+    chai.request(server)
+        .get('/admin/lastnamereverse?offset=0&limit=10')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body[0].lastName.should.equal('Smith');
           res.body.should.have.lengthOf(10);
           if(err) done(err);
           done();

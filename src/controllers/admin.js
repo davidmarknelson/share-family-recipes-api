@@ -24,7 +24,7 @@ function checkLimit(limit) {
 }
 
 module.exports = {
-  getAllUsersByNewest: async (req, res) => {
+  getUsersByNewest: async (req, res) => {
     try {
       let offset = checkOffset(req.query.offset);
       let limit = checkLimit(req.query.limit);
@@ -40,7 +40,7 @@ module.exports = {
       res.status(500).json({ message: "There was an error getting the list of users." });
     }
   },
-  getAllUsersByOldest: async (req, res) => {
+  getUsersByOldest: async (req, res) => {
     try {
       let offset = checkOffset(req.query.offset);
       let limit = checkLimit(req.query.limit);
@@ -56,7 +56,7 @@ module.exports = {
       res.status(500).json({ message: "There was an error getting the list of users." });
     }
   },
-  getAllUsersAtoZ: async (req, res) => {
+  getUsersAtoZ: async (req, res) => {
     try {
       let offset = checkOffset(req.query.offset);
       let limit = checkLimit(req.query.limit);
@@ -72,7 +72,7 @@ module.exports = {
       res.status(500).json({ message: "There was an error getting the list of users." });
     }
   },
-  getAllUsersZtoA: async (req, res) => {
+  getUsersZtoA: async (req, res) => {
     try {
       let offset = checkOffset(req.query.offset);
       let limit = checkLimit(req.query.limit);
@@ -82,6 +82,70 @@ module.exports = {
         limit: limit,
         attributes: attributesArray, 
         order: [[sequelize.fn('lower', sequelize.col('username')), 'DESC']]
+      });
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of users." });
+    }
+  },
+  getUsersFirstNameAtoZ: async (req, res) => {
+    try {
+      let offset = checkOffset(req.query.offset);
+      let limit = checkLimit(req.query.limit);
+
+      let users = await User.findAll({
+        offset: offset,
+        limit: limit,
+        attributes: attributesArray,
+        order: [[sequelize.fn('lower', sequelize.col('firstName'))]]
+      });
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of users." });
+    }
+  },
+  getUsersFirstNameZtoA: async (req, res) => {
+    try {
+      let offset = checkOffset(req.query.offset);
+      let limit = checkLimit(req.query.limit);
+
+      let users = await User.findAll({
+        offset: offset,
+        limit: limit,
+        attributes: attributesArray, 
+        order: [[sequelize.fn('lower', sequelize.col('firstName')), 'DESC']]
+      });
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of users." });
+    }
+  },
+  getUsersLastNameAtoZ: async (req, res) => {
+    try {
+      let offset = checkOffset(req.query.offset);
+      let limit = checkLimit(req.query.limit);
+
+      let users = await User.findAll({
+        offset: offset,
+        limit: limit,
+        attributes: attributesArray,
+        order: [[sequelize.fn('lower', sequelize.col('lastName'))]]
+      });
+      res.status(200).json(users);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of users." });
+    }
+  },
+  getUsersLastNameZtoA: async (req, res) => {
+    try {
+      let offset = checkOffset(req.query.offset);
+      let limit = checkLimit(req.query.limit);
+
+      let users = await User.findAll({
+        offset: offset,
+        limit: limit,
+        attributes: attributesArray, 
+        order: [[sequelize.fn('lower', sequelize.col('lastName')), 'DESC']]
       });
       res.status(200).json(users);
     } catch (err) {
