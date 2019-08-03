@@ -95,9 +95,36 @@ const meals = {
         ]
       });
 
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of meals." });
+    }
+  },
+
+  getMealsContainingIngredients: async (req, res) => {
+    try {
+      let temp;
+      if (!Array.isArray(req.query.ingredient)) {
+        temp = [req.query.ingredient];
+      } else {
+        temp = req.query.ingredient;
       }
+      let ingredients = temp.map(val => val.toLowerCase());
+
+      let meals = await Meal.findAll({
+        where: {
+          ingredients: {
+            [Op.contains]: ingredients
+          }
+        },
+        include: [
+          { model: User, as: "creator", attributes: ['username']}
+        ]
+      });
+
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
       res.status(200).json(meals);
     } catch (err) {

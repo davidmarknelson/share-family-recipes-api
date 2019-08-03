@@ -119,6 +119,52 @@ describe('Meals', () => {
 
   });
 
+  describe('GET all meals the match ingredients', () => {
+    it('should return meals containing specified ingredients', (done) => {
+      chai.request(server)
+        .get('/meals/byingredients?ingredient=water')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body.should.have.lengthOf(1);
+          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('creator');
+          res.body[0].creatorId.should.equal(2);
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return meals containing specified case insensitive ingredients', (done) => {
+      chai.request(server)
+        .get('/meals/byingredients?ingredient=Water')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body.should.have.lengthOf(1);
+          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('creator');
+          res.body[0].creatorId.should.equal(2);
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message when no meals match the search', (done) => {
+      chai.request(server)
+        .get('/meals/byingredients?ingredient=beef')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.body.message.should.equal('There are no meals with those ingredients.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+  });
+
   describe('GET available meal name', () => {
     it('should return an error message if the meal name is taken', (done) => {
       chai.request(server)

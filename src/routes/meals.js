@@ -9,6 +9,7 @@ router.route('/names').get(meals.getMealsAtoZ);
 router.route('/namesreverse').get(meals.getMealsZtoA);
 router.route('/available').get(meals.findAvailableMealName);
 router.route('/search').get(meals.search);
+router.route('/byingredients').get(meals.getMealsContainingIngredients);
 router.route('/meal').get(meals.getMeal);
 router.route('/create').post(auth.isAuthenticated, meals.create);
 router.route('/update').put(auth.isAuthenticated, meals.update);
