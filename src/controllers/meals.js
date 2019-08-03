@@ -1,10 +1,13 @@
 'use strict';
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
+const Op = require('sequelize').Op;
+const sequelize = require('../models/sequelize').sequelize;
 const offsetLimit = require('../helpers/offsetLimit');
+
 const meals = {
 
-  findByNewest: async (req, res) => {
+  getByNewest: async (req, res) => {
     try {
       let offset = offsetLimit.checkOffset(req.query.offset);
       let limit = offsetLimit.checkOffset(req.query.limit);
@@ -29,7 +32,7 @@ const meals = {
     }
   },
 
-  findByOldest: async (req, res) => {
+  getByOldest: async (req, res) => {
     try {
       let offset = offsetLimit.checkOffset(req.query.offset);
       let limit = offsetLimit.checkOffset(req.query.limit);
@@ -54,10 +57,61 @@ const meals = {
     }
   },
 
+  getMealsAtoZ: async (req, res) => {
+    try {
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
+
+      let meals = await Meal.findAll({
+        offset: offset,
+        limit: limit,
+        order: [sequelize.fn('lower', sequelize.col('name'))],
+        include: [
+          { model: User, as: "creator", attributes: ['username']}
+        ]
+      });
+
+      if (meals.length === 0) {
+        return res.status(404).json({ message: 'There are no meals.' });
+      }
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of meals." });
+    }
+  },
+
+  getMealsZtoA: async (req, res) => {
+    try {
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
+
+      let meals = await Meal.findAll({
+        offset: offset,
+        limit: limit,
+        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+        include: [
+          { model: User, as: "creator", attributes: ['username']}
+        ]
+      });
+
+      if (meals.length === 0) {
+        return res.status(404).json({ message: 'There are no meals.' });
+      }
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of meals." });
+    }
+  },
+
   findAvailableMealName: async (req, res) => {
     try {
       let meal = await Meal.findOne({
-        where: { name: req.query.name }
+        where: sequelize.where(
+          sequelize.fn('lower', sequelize.col('name')), 
+          sequelize.fn('lower', req.query.name)
+        )
       });
 
       if (!meal) {
@@ -65,6 +119,44 @@ const meals = {
       } else {
         res.status(500).json({ message: 'That name is already taken.' });
       }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  search: async (req, res) => {
+    try {
+      let meals = await Meal.findAll({
+        where: {
+          name: {
+            [Op.iLike]: `%${req.query.name}%`
+          }
+        },
+        attributes: ['id', 'name']
+      });
+
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals that match your search.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  getMeal: async (req, res) => {
+    try {
+      let meal = await Meal.findOne({
+        where: {
+          name: req.query.name
+        },
+        include: [
+          { model: User, as: "creator", attributes: ['username']}
+        ]
+      });
+
+      if (!meal) return res.status(404).json({ message: 'There was an error getting the meal.' });
+
+      res.status(200).json(meal);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -95,6 +187,25 @@ const meals = {
         return res.status(200).json({ message: 'Meal successfully updated.' });
       } else {
         return res.status(500).json({ message: 'There was an error updating your meal.' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      let meal = await Meal.destroy({
+        where: { 
+          name: req.body.name,
+          creatorId: req.decoded.id
+        }
+      });
+
+      if (meal) {
+        return res.status(200).json({ message: 'Meal successfully deleted.' });
+      } else {
+        return res.status(500).json({ message: 'There was an error deleting your meal.' });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });

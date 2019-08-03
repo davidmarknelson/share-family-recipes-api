@@ -109,23 +109,6 @@ describe('Admin', () => {
         });
   });
 
-  it('should get the first 5 users by username A to Z with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/username')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].id.should.equal(12);
-          res.body[0].username.should.equal('johndoe');
-          res.body.should.have.lengthOf(5);
-          if(err) done(err);
-          done();
-        });
-  });
-
   it('should get the first 10 users by username A to Z', (done) => {
     let token = `Bearer ${user.jwt}`;
 
@@ -143,21 +126,6 @@ describe('Admin', () => {
         });
   });
 
-  it('should get the first 5 users by username Z to A with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/usernamereverse')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].username.should.equal('user9');
-          res.body.should.have.lengthOf(5);
-          if(err) done(err);
-          done();
-        });
-  });
 
   it('should get the first 10 users by username Z to A', (done) => {
     let token = `Bearer ${user.jwt}`;
@@ -170,22 +138,6 @@ describe('Admin', () => {
           res.body.should.be.an('array');
           res.body[0].username.should.equal('user9');
           res.body.should.have.lengthOf(10);
-          if(err) done(err);
-          done();
-        });
-  });
-
-  it('should get the first 5 users by first name A to Z with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/firstname')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].firstName.should.equal('Aaaa');
-          res.body.should.have.lengthOf(5);
           if(err) done(err);
           done();
         });
@@ -206,23 +158,7 @@ describe('Admin', () => {
           done();
         });
   });
-
-  it('should get the first 5 users by first name Z to A with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/firstnamereverse')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].firstName.should.equal('John');
-          res.body.should.have.lengthOf(5);
-          if(err) done(err);
-          done();
-        });
-  });
-
+  
   it('should get the first 10 users by first name Z to A', (done) => {
     let token = `Bearer ${user.jwt}`;
 
@@ -239,22 +175,6 @@ describe('Admin', () => {
         });
   });
 
-  it('should get the first 5 users by last name A to Z with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/lastname')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].lastName.should.equal('Aaaa');
-          res.body.should.have.lengthOf(5);
-          if(err) done(err);
-          done();
-        });
-  });
-
   it('should get the first 10 users by last name A to Z', (done) => {
     let token = `Bearer ${user.jwt}`;
 
@@ -266,22 +186,6 @@ describe('Admin', () => {
           res.body.should.be.an('array');
           res.body[0].lastName.should.equal('Aaaa');
           res.body.should.have.lengthOf(10);
-          if(err) done(err);
-          done();
-        });
-  });
-
-  it('should get the first 5 users by last name Z to A with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
-    chai.request(server)
-        .get('/admin/lastnamereverse')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body[0].lastName.should.equal('Smith');
-          res.body.should.have.lengthOf(5);
           if(err) done(err);
           done();
         });
