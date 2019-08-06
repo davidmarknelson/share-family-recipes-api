@@ -120,7 +120,7 @@ describe('Users', () => {
   describe('GET /user/username', () => {
     it('should show that a username is unavailable', (done) => {
       chai.request(server)
-        .get(`/user/username?username=${newUser.user.username}`)
+        .get(`/user/available-username?username=${newUser.user.username}`)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This username is already in use.');
@@ -131,7 +131,7 @@ describe('Users', () => {
   
     it('should show that a username is available', (done) => {
       chai.request(server)
-        .get('/user/username?username=newname')
+        .get('/user/available-username?username=newname')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal('This username is available.');

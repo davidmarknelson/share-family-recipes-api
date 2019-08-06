@@ -32,191 +32,6 @@ describe('Meals', () => {
       .then(() => console.log(`Database, tables, and user created for tests!`));
   });
 
-  describe('GET all meals', () => {
-    it('should return meals by newest', (done) => {
-      chai.request(server)
-        .get('/meals/newest?offset=0&limit=10')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(2);
-          res.body[0].creator.username.should.equal('jsmith');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
-          res.body[1].creator.username.should.equal('johndoe');
-          res.body[1].name.should.equal('Sandwich');
-          res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(1);
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return meals by oldest', (done) => {
-      chai.request(server)
-        .get('/meals/oldest?offset=0&limit=10')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(2);
-          res.body[1].creator.username.should.equal('jsmith');
-          res.body[1].name.should.equal('Soup');
-          res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(2);
-          res.body[0].creator.username.should.equal('johndoe');
-          res.body[0].name.should.equal('Sandwich');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(1);
-          if(err) done(err);
-          done();
-        });
-    });
-
-  });
-
-
-  describe('GET all meals', () => {
-    it('should return meals A to Z', (done) => {
-      chai.request(server)
-        .get('/meals/names?offset=0&limit=10')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(2);
-          res.body[1].creator.username.should.equal('jsmith');
-          res.body[1].name.should.equal('Soup');
-          res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(2);
-          res.body[0].creator.username.should.equal('johndoe');
-          res.body[0].name.should.equal('Sandwich');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(1);
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return meals Z to A', (done) => {
-      chai.request(server)
-        .get('/meals/namesreverse?offset=0&limit=10')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(2);
-          res.body[0].creator.username.should.equal('jsmith');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
-          res.body[1].creator.username.should.equal('johndoe');
-          res.body[1].name.should.equal('Sandwich');
-          res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(1);
-          if(err) done(err);
-          done();
-        });
-    });
-
-  });
-
-  describe('GET all meals the match ingredients', () => {
-    it('should return meals containing specified ingredients', (done) => {
-      chai.request(server)
-        .get('/meals/byingredients?ingredient=water')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return meals containing specified case insensitive ingredients', (done) => {
-      chai.request(server)
-        .get('/meals/byingredients?ingredient=Water')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return an error message when no meals match the search', (done) => {
-      chai.request(server)
-        .get('/meals/byingredients?ingredient=beef')
-        .end((err, res) => {
-          res.should.have.status(404);
-          res.body.message.should.equal('There are no meals with those ingredients.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-  });
-
-  describe('GET available meal name', () => {
-    it('should return an error message if the meal name is taken', (done) => {
-      chai.request(server)
-        .get('/meals/available?name=Soup')
-        .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal('That name is already taken.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return an error message if the case insensitive meal name is taken', (done) => {
-      chai.request(server)
-        .get('/meals/available?name=soup')
-        .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal('That name is already taken.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return a success message if the meal name is available', (done) => {
-      chai.request(server)
-        .get('/meals/available?name=coffee')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal('That name is available.');
-          if(err) done(err);
-          done();
-        });
-    });
-  });
-
-  describe('GET array of searched meals', () => {
-    it('should return an array of meals that match the searched word', (done) => {
-      chai.request(server)
-        .get('/meals/search?name=s')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(2);
-          res.body[0].should.have.property('id');
-          res.body[0].should.have.property('name');
-          res.body[0].name.should.equal('Sandwich');
-          if(err) done(err);
-          done();
-        });
-    });
-  });
-
   describe('GET specific meal', () => {
     it('should return a meal', (done) => {
       chai.request(server)
@@ -256,6 +71,25 @@ describe('Meals', () => {
           res.body.name.should.equal("Rice");
           res.body.ingredients.should.be.an('array');
           res.body.ingredients.should.have.lengthOf(2);
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return a new meal with lowercase ingredients', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send(utils.meal4)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.name.should.equal("Chicken and Cheese");
+          res.body.ingredients.should.be.an('array');
+          res.body.ingredients.should.have.lengthOf(2);
+          res.body.ingredients[0].should.equal('chicken');
+          res.body.ingredients[1].should.equal('cheese');
           if(err) done(err);
           done();
         });

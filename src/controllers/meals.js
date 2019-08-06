@@ -5,170 +5,7 @@ const Op = require('sequelize').Op;
 const sequelize = require('../models/sequelize').sequelize;
 const offsetLimit = require('../helpers/offsetLimit');
 
-const meals = {
-
-  getByNewest: async (req, res) => {
-    try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkOffset(req.query.limit);
-
-      let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
-        order: [['createdAt', 'DESC']],
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
-
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
-
-      res.status(200).json(meals);
-
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-
-  getByOldest: async (req, res) => {
-    try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkOffset(req.query.limit);
-
-      let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
-        order: ['createdAt'],
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
-
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
-
-      res.status(200).json(meals);
-
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-
-  getMealsAtoZ: async (req, res) => {
-    try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
-      let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
-        order: [sequelize.fn('lower', sequelize.col('name'))],
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
-
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
-
-      res.status(200).json(meals);
-    } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
-    }
-  },
-
-  getMealsZtoA: async (req, res) => {
-    try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
-      let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
-        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
-
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals.' });
-
-      res.status(200).json(meals);
-    } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
-    }
-  },
-
-  getMealsContainingIngredients: async (req, res) => {
-    try {
-      let temp;
-      if (!Array.isArray(req.query.ingredient)) {
-        temp = [req.query.ingredient];
-      } else {
-        temp = req.query.ingredient;
-      }
-      let ingredients = temp.map(val => val.toLowerCase());
-
-      let meals = await Meal.findAll({
-        where: {
-          ingredients: {
-            [Op.contains]: ingredients
-          }
-        },
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
-
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
-
-      res.status(200).json(meals);
-    } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
-    }
-  },
-
-  findAvailableMealName: async (req, res) => {
-    try {
-      let meal = await Meal.findOne({
-        where: sequelize.where(
-          sequelize.fn('lower', sequelize.col('name')), 
-          sequelize.fn('lower', req.query.name)
-        )
-      });
-
-      if (!meal) {
-        res.status(200).json({ message: 'That name is available.' });
-      } else {
-        res.status(500).json({ message: 'That name is already taken.' });
-      }
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-
-  search: async (req, res) => {
-    try {
-      let meals = await Meal.findAll({
-        where: {
-          name: {
-            [Op.iLike]: `%${req.query.name}%`
-          }
-        },
-        attributes: ['id', 'name']
-      });
-
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals that match your search.' });
-
-      res.status(200).json(meals);
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
+module.exports = {
 
   getMeal: async (req, res) => {
     try {
@@ -192,6 +29,7 @@ const meals = {
   create: async (req, res) => {
     try {
       let payload = req.body;
+      payload.ingredients = payload.ingredients.map(val => val.toLowerCase());
       payload.creatorId = req.decoded.id;
       let meal = await Meal.create(payload);
 
@@ -239,5 +77,3 @@ const meals = {
     }
   },
 }
-
-module.exports = meals;

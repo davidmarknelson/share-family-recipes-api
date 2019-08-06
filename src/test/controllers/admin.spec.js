@@ -113,7 +113,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/username?offset=0&limit=10')
+        .get('/admin/username-a-to-z?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -131,7 +131,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/usernamereverse?offset=0&limit=10')
+        .get('/admin/username-z-to-a?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -147,7 +147,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/firstname?offset=0&limit=10')
+        .get('/admin/firstname-a-to-z?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -163,7 +163,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/firstnamereverse?offset=0&limit=10')
+        .get('/admin/firstname-z-to-a?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -179,7 +179,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/lastname?offset=0&limit=10')
+        .get('/admin/lastname-a-to-z?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -195,7 +195,7 @@ describe('Admin', () => {
     let token = `Bearer ${user.jwt}`;
 
     chai.request(server)
-        .get('/admin/lastnamereverse?offset=0&limit=10')
+        .get('/admin/lastname-z-to-a?offset=0&limit=10')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);

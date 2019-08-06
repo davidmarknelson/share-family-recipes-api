@@ -164,9 +164,8 @@ module.exports = {
     creatorId: 2
   },
   meal3: {
-    id: 3,
     name: 'Rice',
-    ingredients: ['water', 'rice'],
+    ingredients: ['Water', 'Rice'],
     instructions: [
       'Wash the rice.', 
       'Put the rice into the rice cooker.',
@@ -189,5 +188,16 @@ module.exports = {
     prepTime: 2,
     cookTime: 20,
     difficulty: 1
-  }
+  },
+  meal4: {
+    name: 'Chicken and Cheese',
+    ingredients: ['Chicken', 'Cheese'],
+    instructions: [
+      'Cook the chicken.',
+      'Put the cheese on the chicken.'
+    ],
+    prepTime: 2,
+    cookTime: 20,
+    difficulty: 1
+  },
 };
