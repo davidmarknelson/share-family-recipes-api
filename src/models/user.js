@@ -81,6 +81,10 @@ module.exports = (sequelize, type) => {
     }
   });
 
+  user.associate = (models) => {
+    user.hasMany(models.meal, {foreignKey: 'creatorId', as: "meals"});
+  };
+
   user.comparePasswords = (reqPassword, dbPassword) => {
     return new Promise((resolve, reject) => {
       bcrypt.compare(reqPassword, dbPassword, (err, res) => {

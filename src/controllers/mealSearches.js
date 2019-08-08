@@ -102,7 +102,7 @@ module.exports = {
     }
   },
 
-  getMealsContainingIngredients: async (req, res) => {
+  getMealsByIngredients: async (req, res) => {
     try {
       if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
 
@@ -125,6 +125,26 @@ module.exports = {
       );
 
       if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of meals." });
+    }
+  },
+
+  getMealsCreatedByUser: async (req, res) => {
+    try {
+      let meals = await User.findOne({
+        where: {          
+          username: req.query.username
+        },
+        attributes: ['username'],
+        include: [
+          'meals'
+        ]
+      });
+
+      if (!meals) return res.status(404).json({ message: 'This user has not created any meals.'});
 
       res.status(200).json(meals);
     } catch (err) {

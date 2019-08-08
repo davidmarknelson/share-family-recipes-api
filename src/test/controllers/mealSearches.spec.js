@@ -189,6 +189,33 @@ describe('Meal searches', () => {
 
   });
 
+  describe('GET all meals by username', () => {
+    it('should return all meals created by a specific user', (done) => {
+      chai.request(server)
+        .get('/meals/search/byuser?username=jsmith')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.username.should.equal('jsmith');
+          res.body.meals.should.be.an('array');
+          res.body.meals.should.have.lengthOf(1);
+          res.body.meals[0].name.should.equal('Soup');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message when there are no meals created by that user', (done) => {
+      chai.request(server)
+        .get('/meals/search/byuser?username=jasonsmith')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.body.message.should.equal('This user has not created any meals.');
+          if(err) done(err);
+          done();
+        });
+    });
+  });
+
   describe('GET available meal name', () => {
     it('should return an error message if the meal name is taken', (done) => {
       chai.request(server)
