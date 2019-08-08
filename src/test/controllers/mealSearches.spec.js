@@ -115,7 +115,6 @@ describe('Meal searches', () => {
           res.body[0].creator.username.should.equal('jsmith');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
           if(err) done(err);
           done();
         });
@@ -131,7 +130,47 @@ describe('Meal searches', () => {
           res.body[0].creator.username.should.equal('jsmith');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return meals containing multiple ingredients', (done) => {
+      chai.request(server)
+        .get('/meals/search/byingredients?ingredient=water&ingredient=meat')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body.should.have.lengthOf(1);
+          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('creator');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return meals containing multiple ingredients where an ingredient is only part of the word', (done) => {
+      chai.request(server)
+        .get('/meals/search/byingredients?ingredient=water&ingredient=veget')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body.should.have.lengthOf(1);
+          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('creator');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message when there are no ingredients in the search', (done) => {
+      chai.request(server)
+        .get('/meals/search/byingredients')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('You must add ingredients to the search.');
           if(err) done(err);
           done();
         });

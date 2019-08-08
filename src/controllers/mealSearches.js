@@ -104,24 +104,25 @@ module.exports = {
 
   getMealsContainingIngredients: async (req, res) => {
     try {
+      if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
+
       let temp;
       if (!Array.isArray(req.query.ingredient)) {
         temp = [req.query.ingredient];
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => val.toLowerCase());
+      let ingredients = temp.map(val => `'%${val.toLowerCase()}%'`);
 
-      let meals = await Meal.findAll({
-        where: {
-          ingredients: {
-            [Op.contains]: ingredients
-          }
-        },
-        include: [
-          { model: User, as: "creator", attributes: ['username']}
-        ]
-      });
+      let meals = await sequelize.query(`
+        SELECT meals.id, meals.name, meals.difficulty, meals.likes, users.username as "creator.username" FROM meals
+        JOIN users ON "meals"."creatorId" = users.id 
+        WHERE array_to_string(ingredients, ',') 
+        like ALL(array[${ingredients}])
+        ;`, {
+          nest: true
+        }
+      );
 
       if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
