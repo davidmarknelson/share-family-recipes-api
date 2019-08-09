@@ -5,6 +5,7 @@ const SavedMeals = require('../models/sequelize').saved_meal;
 const Likes = require('../models/sequelize').like;
 const jwt = require('jsonwebtoken');
 const Verification = require('../models/sequelize').verification_token;
+const Op = require('sequelize').Op;
 const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
@@ -21,7 +22,11 @@ module.exports = {
   findUsername: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { username: req.query.username }
+        where: { 
+          username: {
+            [Op.iLike]: req.query.username 
+          }
+        }
       });
 
       if (!user) {

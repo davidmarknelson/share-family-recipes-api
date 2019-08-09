@@ -124,6 +124,17 @@ describe('Users', () => {
           done();
         });
     });
+
+    it('should show that a username is unavailable regardless of case', (done) => {
+      chai.request(server)
+        .get(`/user/available-username?username=${newUser.user.username.toUpperCase()}`)
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('This username is already in use.');
+          if(err) done(err);
+          done();
+        });
+    });
   
     it('should show that a username is available', (done) => {
       chai.request(server)

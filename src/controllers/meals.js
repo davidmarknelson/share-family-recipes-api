@@ -1,9 +1,6 @@
 'use strict';
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
-const Op = require('sequelize').Op;
-const sequelize = require('../models/sequelize').sequelize;
-const offsetLimit = require('../helpers/offsetLimit');
 
 module.exports = {
 
