@@ -1,7 +1,8 @@
 'use strict';
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
-const savedMeals = require('../models/sequelize').saved_meal;
+const SavedMeals = require('../models/sequelize').saved_meal;
+const Likes = require('../models/sequelize').like;
 const jwt = require('jsonwebtoken');
 const Verification = require('../models/sequelize').verification_token;
 const cryptoRandomString = require('crypto-random-string');
@@ -42,7 +43,7 @@ module.exports = {
         },
         include: [
           'meals', 
-          { model: savedMeals, as: 'savedMeals', attributes: ['mealId'] }
+          { model: SavedMeals, as: 'savedMeals', attributes: ['mealId'] }
         ]
       });
 
@@ -51,7 +52,6 @@ module.exports = {
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
-      console.log(err)
       res.status(500).json({message: 'There was an error getting your profile.'});
     }
   },
@@ -128,7 +128,7 @@ module.exports = {
         where: { email: req.body.email },
         include: [
           'meals', 
-          { model: savedMeals, as: 'savedMeals', attributes: ['mealId'] }
+          { model: SavedMeals, as: 'savedMeals', attributes: ['mealId'] }
         ]
       });
 
@@ -154,7 +154,7 @@ module.exports = {
   update: async (req, res) => {
     try {
       let user = await User.update(req.body, {
-        where: { email: req.decoded.email }
+        where: { id: req.decoded.id }
       });
 
       if (user[0] === 1) {
@@ -171,15 +171,19 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      let meals = Meal.destroy({
-        where: { creatorId: req.decoded.id }
-      });
+      let deleted = await Promise.all([
+        Meal.destroy({where: { creatorId: req.decoded.id }}),
+        Likes.destroy({where: { userId: req.decoded.id }}),
+        SavedMeals.destroy({where: {userId: req.decoded.id }})
+      ]);
+      // User is deleted separately from the others because the userId fields in meal, likes, and saved meal
+      // tables will be set to null and then it will be difficult to delete. Sequelize has an open issue around 
+      // this. There is a workaround, but I'd rather not deal with it for now. The issue can be found 
+      // here https://github.com/sequelize/sequelize/issues/8444
 
-      let user = await User.destroy({
-        where: { email: req.decoded.email }
-      });
+      let user = await User.destroy({where: { email: req.decoded.email }});
 
-      if (user && meals) {
+      if (user) {
         return res.status(200).json({ message: "User successfully deleted." });
       } else {
         return res.status(500).json({ message: "There was an error deleting your profile." });

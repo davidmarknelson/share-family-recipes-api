@@ -1,6 +1,7 @@
 'use strict';
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
+const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
 const sequelize = require('../models/sequelize').sequelize;
 const offsetLimit = require('../helpers/offsetLimit');
@@ -16,7 +17,8 @@ module.exports = {
         limit: limit,
         order: [['createdAt', 'DESC']],
         include: [
-          { model: User, as: "creator", attributes: ['username']}
+          { model: User, as: "creator", attributes: ['username']},
+          { model: Like, attributes: ['userId']}
         ]
       });
 
@@ -66,7 +68,8 @@ module.exports = {
         limit: limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
         include: [
-          { model: User, as: "creator", attributes: ['username']}
+          { model: User, as: "creator", attributes: ['username']},
+          { model: Like, attributes: ['userId']}
         ]
       });
 
@@ -115,7 +118,7 @@ module.exports = {
       let ingredients = temp.map(val => `'%${val.toLowerCase()}%'`);
 
       let meals = await sequelize.query(`
-        SELECT meals.id, meals.name, meals.difficulty, meals.likes, users.username as "creator.username" FROM meals
+        SELECT meals.id, meals.name, meals.difficulty, users.username as "creator.username" FROM meals
         JOIN users ON "meals"."creatorId" = users.id 
         WHERE array_to_string(ingredients, ',') 
         like ALL(array[${ingredients}])

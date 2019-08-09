@@ -7,6 +7,7 @@ const verifyEmails = require('./verifyEmails');
 const passwords = require('./passwords');
 const admin = require('./admin');
 const mealSearches = require('./mealSearches');
+const likes = require('./likes');
 
 // Base route
 router.route('/').get((req, res) => {
@@ -34,8 +35,7 @@ router.use('/verify', verifyEmails);
 // Reset and update password routes
 router.use('/password', passwords);
 
-// Future routes
-// // Liked Meal routes
-// router.use('/like', placeholder);
+// Liked Meal routes
+router.use('/likes', likes);
 
 module.exports = router;

@@ -240,25 +240,6 @@ describe('Users', () => {
         });
     });
 
-    it('should return an error message if there was an error updating', (done) => {
-      let updateduser = newUser.user;
-      updateduser.firstName = 'Jane';
-      updateduser.password = 'password';
-      updateduser.email = 'wrong@email.com';
-      let token = `Bearer ${newUser.jwt}`;
-
-      chai.request(server)
-        .put('/user/update')
-        .set("Authorization", token)
-        .send(updateduser)
-        .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal("There was an error updating your profile.");
-          if(err) done(err);
-          done();
-        });
-    });
-
     it('should return an error message if the username is too short', (done) => {
       let updateduser = newUser.user;
       updateduser.username = 'jane';
@@ -285,7 +266,6 @@ describe('Users', () => {
       chai.request(server)
         .delete('/user/delete')
         .set("Authorization", token)
-        .send({email: utils.userWithCredentials.email})
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully deleted.");

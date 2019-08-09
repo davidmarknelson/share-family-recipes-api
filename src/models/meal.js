@@ -63,19 +63,13 @@ module.exports = (sequelize, type) => {
         }
       }
     },
-    likes: {
-      type: type.INTEGER,
-      defaultValue: 0,
-      validate: {
-        min: 0
-      }
-    },
     createdAt: type.DATE,
     updatedAt: type.DATE
   });
 
   meal.associate = (models) => {
     meal.belongsTo(models.user, {as: "creator"});
+    meal.hasMany(models.like);
   };
 
   return meal;

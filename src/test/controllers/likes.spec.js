@@ -26,78 +26,71 @@ describe('Meals', () => {
           jwt: jwtSignUser(res.dataValues)
         };
       })
-      .then(() => User.create(utils.user2))
       .then(() => Meals.create(utils.meal1))
-      .then(() => Meals.create(utils.meal2))
       .then(() => console.log(`Database, tables, and user created for tests!`));
   });
 
-  describe('GET user saved meals', () => {
-    it('should return an array with the meals', (done) => {
+  describe('POST add like', () => {
+    it('should return a message when a meal is successfully liked', (done) => {
       let token = `Bearer ${user.jwt}`;
       
       chai.request(server)
-      .get('/savedmeals/find')
+      .post('/likes/add')
       .set("Authorization", token)
-      .end((err, res) => {
-        res.should.have.status(404);
-        res.body.message.should.equal('You have not saved any meals.');
-        if(err) done(err);
-        done();
-      });
-    });
-  });
-
-  describe('POST save meal', () => {
-    it('should return a message when a meal is successfully saved', (done) => {
-      let token = `Bearer ${user.jwt}`;
-
-      chai.request(server)
-      .post('/savedmeals/save')
-      .set("Authorization", token)
-      .send({ mealId: 1 })
+      .send({mealId: 1})
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.message.should.equal('Meal successfully saved.');
+        res.body.message.should.equal('Meal successfully liked.');
         if(err) done(err);
         done();
       });
     });
-  });
 
-  describe('GET user saved meals', () => {
-    it('should return an array with the meals', (done) => {
+    it('should return a message when a meal is unsuccessfully liked', (done) => {
       let token = `Bearer ${user.jwt}`;
       
       chai.request(server)
-      .get('/savedmeals/find')
+      .post('/likes/add')
       .set("Authorization", token)
+      .send({mealId: 2})
       .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.an('array');
-        res.body.should.have.lengthOf(1);
-        res.body[0].meal.name.should.equal('Sandwich');
+        res.should.have.status(500);
+        res.body.message.should.equal('There was an error liking the meal.');
         if(err) done(err);
         done();
       });
     });
   });
 
-  describe('DELETE save meal', () => {
-    it('should return a message when a meal is successfully unsaved', (done) => {
+  describe('DELETE remove like', () => {
+    it('should return a message when a meal is successfully unliked', (done) => {
       let token = `Bearer ${user.jwt}`;
-
+      
       chai.request(server)
-      .delete('/savedmeals/unsave')
+      .delete('/likes/remove')
       .set("Authorization", token)
-      .send({ mealId: 1 })
+      .send({mealId: 1})
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.message.should.equal('Meal successfully unsaved.');
+        res.body.message.should.equal('Meal successfully unliked.');
+        if(err) done(err);
+        done();
+      });
+    });
+
+    it('should return a message when a meal is unsuccessfully unliked', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      
+      chai.request(server)
+      .delete('/likes/remove')
+      .set("Authorization", token)
+      .send({mealId: 2})
+      .end((err, res) => {
+        res.should.have.status(500);
+        res.body.message.should.equal('There was an error unliking the meal.');
         if(err) done(err);
         done();
       });
     });
   });
-
 });
