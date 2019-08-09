@@ -1,5 +1,7 @@
 'use strict';
 const User = require('../models/sequelize').user;
+const Meal = require('../models/sequelize').meal;
+const savedMeals = require('../models/sequelize').saved_meal;
 const jwt = require('jsonwebtoken');
 const Verification = require('../models/sequelize').verification_token;
 const cryptoRandomString = require('crypto-random-string');
@@ -37,7 +39,11 @@ module.exports = {
         where: {
           email: req.decoded.email,
           username: req.decoded.username
-        }
+        },
+        include: [
+          'meals', 
+          { model: savedMeals, as: 'savedMeals', attributes: ['mealId'] }
+        ]
       });
 
       res.status(200).json({
@@ -45,6 +51,7 @@ module.exports = {
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
+      console.log(err)
       res.status(500).json({message: 'There was an error getting your profile.'});
     }
   },
@@ -118,7 +125,11 @@ module.exports = {
   login: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { email: req.body.email }
+        where: { email: req.body.email },
+        include: [
+          'meals', 
+          { model: savedMeals, as: 'savedMeals', attributes: ['mealId'] }
+        ]
       });
 
       if (!user) {
@@ -143,7 +154,7 @@ module.exports = {
   update: async (req, res) => {
     try {
       let user = await User.update(req.body, {
-        where: { email: req.body.email }
+        where: { email: req.decoded.email }
       });
 
       if (user[0] === 1) {
@@ -160,11 +171,15 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      let user = await User.destroy({
-        where: { email: req.body.email }
+      let meals = Meal.destroy({
+        where: { creatorId: req.decoded.id }
       });
 
-      if (user) {
+      let user = await User.destroy({
+        where: { email: req.decoded.email }
+      });
+
+      if (user && meals) {
         return res.status(200).json({ message: "User successfully deleted." });
       } else {
         return res.status(500).json({ message: "There was an error deleting your profile." });

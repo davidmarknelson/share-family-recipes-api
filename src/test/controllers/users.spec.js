@@ -5,10 +5,8 @@ const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
-
 describe('Users', () => {
   let newUser;
-  let newUser2;
 
   before(() => {
     return db.sync({force: true})
@@ -65,8 +63,6 @@ describe('Users', () => {
         .post('/user/signup')
         .send(utils.user2)
         .end((err, res) => {
-          newUser2 = res.body;
-
           res.should.have.status(200);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
@@ -162,6 +158,8 @@ describe('Users', () => {
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
+          res.body.user.should.have.property('meals');
+          res.body.user.meals.should.be.an('array');
           if(err) done(err);
           done();
         });
@@ -191,7 +189,37 @@ describe('Users', () => {
         });
     });
   });
-  
+
+  describe('POST /user/profile', () => {
+    it('should get the profile with only a valid jwt', (done) => {
+      let token = `Bearer ${newUser.jwt}`;
+
+      chai.request(server)
+        .get('/user/profile')
+        .set("Authorization", token)
+        .send(utils.userWithCredentials)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('user');
+          res.body.should.have.property('jwt');
+          res.body.user.should.have.property('id', 1);
+          res.body.user.should.have.property('username', 'johndoe');
+          res.body.user.should.have.property('firstName', 'John');
+          res.body.user.should.have.property('lastName', 'Doe');
+          res.body.user.should.have.property('email', 'test@email.com');
+          res.body.user.should.have.property('password');
+          res.body.user.should.have.property('isAdmin', true);
+          res.body.user.should.have.property('createdAt');
+          res.body.user.createdAt.should.be.a.dateString();
+          res.body.user.should.have.property('updatedAt');
+          res.body.user.updatedAt.should.be.a.dateString();
+          res.body.user.should.have.property('meals');
+          res.body.user.meals.should.be.an('array');
+          if(err) done(err);
+          done();
+        });
+    });
+  });
 
   describe('UPDATE /user/update', () => {
     it('should return an updated user object when a new user is created', (done) => {

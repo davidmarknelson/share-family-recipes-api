@@ -83,6 +83,7 @@ module.exports = (sequelize, type) => {
 
   user.associate = (models) => {
     user.hasMany(models.meal, {foreignKey: 'creatorId', as: "meals"});
+    user.hasMany(models.saved_meal, {as: "savedMeals"});
   };
 
   user.comparePasswords = (reqPassword, dbPassword) => {

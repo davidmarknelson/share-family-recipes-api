@@ -26,7 +26,7 @@ router.use('/meals', meals);
 router.use('/meals/search', mealSearches);
 
 // Saved Meal routes
-router.use('/saved', savedMeals);
+router.use('/savedmeals', savedMeals);
 
 // Verify Email routes
 router.use('/verify', verifyEmails);
