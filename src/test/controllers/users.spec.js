@@ -5,7 +5,7 @@ const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
-describe('Users', () => {
+describe.only('Users', () => {
   let newUser;
 
   before(() => {

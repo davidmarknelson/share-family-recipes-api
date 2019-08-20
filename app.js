@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
-app.use(express.static('src/public'));
+app.use('public', express.static('src/public'));
 
 // Routes
 app.use(routes);

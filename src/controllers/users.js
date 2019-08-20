@@ -9,6 +9,7 @@ const Op = require('sequelize').Op;
 const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
 
 function jwtSignUser(user) {
   const oneWeek = 60 * 60 * 24 * 7;
@@ -69,6 +70,10 @@ module.exports = {
         req.body.isAdmin = false;
       }
 
+      if (req.file) {
+        req.body.profilePic = req.file.path;
+      }
+
       let user = await User.create(req.body);
       let token = cryptoRandomString({length: 10, type: 'url-safe'});
       let tokenObj = await Verification.create({
@@ -117,11 +122,13 @@ module.exports = {
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
-      if (err.errors[0].message === 'email must be unique') {
-        return res.status(400).json({ message: 'This email account is already in use.' });
-      }
-      if (err.errors[0].message === 'username must be unique') {
-        return res.status(400).json({ message: 'This username is already in use.' });
+      if (err.errors) {
+        if (err.errors[0].message === 'email must be unique') {
+          return res.status(400).json({ message: 'This email account is already in use.' });
+        }
+        if (err.errors[0].message === 'username must be unique') {
+          return res.status(400).json({ message: 'This username is already in use.' });
+        }
       }
       res.status(500).json({ message: err.message });
     }
@@ -176,10 +183,15 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
+      fs.unlink(req.decoded.profilePic, (err) => {
+        if (err) throw err;
+        console.log('successfully deleted image');
+      });
+
       let deleted = await Promise.all([
         Meal.destroy({where: { creatorId: req.decoded.id }}),
         Likes.destroy({where: { userId: req.decoded.id }}),
-        SavedMeals.destroy({where: {userId: req.decoded.id }})
+        SavedMeals.destroy({where: { userId: req.decoded.id }})
       ]);
       // User is deleted separately from the others because the userId fields in meal, likes, and saved meal
       // tables will be set to null and then it will be difficult to delete. Sequelize has an open issue around 

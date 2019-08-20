@@ -30,6 +30,10 @@ module.exports = (sequelize, type) => {
       primaryKey: true,
       autoIncrement: true
     },
+    profilePic: {
+      type: type.STRING,
+      allowNull: true
+    },
     username: {
       type: type.STRING,
       allowNull: false,
