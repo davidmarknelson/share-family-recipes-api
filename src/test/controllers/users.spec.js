@@ -5,7 +5,7 @@ const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
 
-describe.only('Users', () => {
+describe('Users', () => {
   let newUser;
 
   before(() => {
@@ -291,7 +291,6 @@ describe.only('Users', () => {
       chai.request(server)
         .delete('/user/delete')
         .set("Authorization", token)
-        .send({email: utils.userWithCredentials.email})
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("There was an error deleting your profile.");

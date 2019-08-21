@@ -1,14 +1,19 @@
 'use strict';
-const User = require('../models/sequelize').user;
-const Meal = require('../models/sequelize').meal;
+// Models
+const Verification = require('../models/sequelize').verification_token;
 const SavedMeals = require('../models/sequelize').saved_meal;
 const Likes = require('../models/sequelize').like;
-const jwt = require('jsonwebtoken');
-const Verification = require('../models/sequelize').verification_token;
+const User = require('../models/sequelize').user;
+const Meal = require('../models/sequelize').meal;
+// Sequelize operators
 const Op = require('sequelize').Op;
+// JWT
 const cryptoRandomString = require('crypto-random-string');
+const jwt = require('jsonwebtoken');
+// Email
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
+// File system
 const fs = require('fs');
 
 function jwtSignUser(user) {
@@ -183,11 +188,16 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      fs.unlink(req.decoded.profilePic, (err) => {
-        if (err) throw err;
-        console.log('successfully deleted image');
-      });
-
+      if (req.decoded.profilePic) {
+        fs.stat(req.decoded.profilePic, (err, stats) => {
+          if (stats) {
+            fs.unlink(req.decoded.profilePic, (err) => {
+              if (err) res.status(500).json({ message: 'There was an error deleting your profile picture.' });
+            });
+          }
+        });
+      }
+     
       let deleted = await Promise.all([
         Meal.destroy({where: { creatorId: req.decoded.id }}),
         Likes.destroy({where: { userId: req.decoded.id }}),
@@ -198,7 +208,7 @@ module.exports = {
       // this. There is a workaround, but I'd rather not deal with it for now. The issue can be found 
       // here https://github.com/sequelize/sequelize/issues/8444
 
-      let user = await User.destroy({where: { email: req.decoded.email }});
+      let user = await User.destroy({where: { id: req.decoded.id }});
 
       if (user) {
         return res.status(200).json({ message: "User successfully deleted." });
@@ -206,7 +216,7 @@ module.exports = {
         return res.status(500).json({ message: "There was an error deleting your profile." });
       }
     } catch (err) {
-      res.status(500).json({ message: "There was an error deleting your profile." });
+      res.status(500).json({ message: err.message || "There was an error deleting your profile." });
     }
   }
 };

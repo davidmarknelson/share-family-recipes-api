@@ -1,9 +1,10 @@
 'use strict';
 const multer  = require('multer');
+const Jimp = require('jimp');
 
 const storageProfile = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'src/public/images/profilePics');
+    cb(null, 'public/images/profilePics');
   },
   filename: (req, file, cb) => {
     cb(null, `${req.body.username}.jpeg`);
@@ -12,7 +13,7 @@ const storageProfile = multer.diskStorage({
 
 const storageMeal = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'src/public/images/mealPics');
+    cb(null, 'public/images/mealPics');
   },
   filename: (req, file, cb) => {
     cb(null, `${req.body.name}.jpeg`);
@@ -20,10 +21,10 @@ const storageMeal = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+  if (file.mimetype === 'image/jpeg') {
     cb(null, true);
   } else {
-    cb(new Error('Please upload a jpeg or png image.'), false);
+    cb(new Error('Please upload a JPEG image.'), false);
   }
 };
 
@@ -46,6 +47,19 @@ const uploadMealPic = multer({
 });
 
 module.exports = {
+  resizeImage: async (req, res, next) => {
+    try {
+      if (!req.file) return next();
+      
+      let image = await Jimp.read(req.file.path)
+        .then(image => image.quality(70).write(req.file.path)
+      );
+
+      next();
+    } catch (err) {
+      res.status(500).json({ message: 'There was an error with your image.'})
+    }
+  },
   uploadProfilePic: uploadProfilePic.single('profilePic'),
   uploadMealPic: uploadMealPic.single('mealPic')
 };
