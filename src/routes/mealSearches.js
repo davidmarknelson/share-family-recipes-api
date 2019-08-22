@@ -4,8 +4,8 @@ const meals = require('../controllers/mealSearches');
 
 router.route('/newest').get(meals.getByNewest);
 router.route('/oldest').get(meals.getByOldest);
-router.route('/names-a-to-z').get(meals.getMealsAtoZ);
-router.route('/names-z-to-a').get(meals.getMealsZtoA);
+router.route('/names-a-z').get(meals.getMealsAtoZ);
+router.route('/names-z-a').get(meals.getMealsZtoA);
 router.route('/name').get(meals.searchByName);
 router.route('/byingredients').get(meals.getMealsByIngredients);
 router.route('/byuser').get(meals.getMealsCreatedByUser);

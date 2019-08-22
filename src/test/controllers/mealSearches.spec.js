@@ -64,7 +64,7 @@ describe('Meal searches', () => {
   describe('GET all meals', () => {
     it('should return meals A to Z', (done) => {
       chai.request(server)
-        .get('/meals/search/names-a-to-z?offset=0&limit=10')
+        .get('/meals/search/names-a-z?offset=0&limit=10')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');
@@ -84,7 +84,7 @@ describe('Meal searches', () => {
 
     it('should return meals Z to A', (done) => {
       chai.request(server)
-        .get('/meals/search/names-z-to-a?offset=0&limit=10')
+        .get('/meals/search/names-z-a?offset=0&limit=10')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');

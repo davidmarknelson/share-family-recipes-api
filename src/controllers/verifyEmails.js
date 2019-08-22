@@ -39,13 +39,19 @@ module.exports = {
     }
   },
 
-  resendVerificationEmail: async (req, res) => {
+  sendVerificationEmail: async (req, res) => {
     try {
-      let user = await User.findOne({
-        where: {
-          email: req.body.email
-        }
-      });
+      // ADD JWT VERIFICATION
+      let user;
+      if (!req.decoded) {
+        user = await User.findOne({
+          where: {
+            email: req.body.email
+          }
+        });
+      } else {
+        user = req.decoded;
+      }
 
       let tokenDestroyed = await Verification.destroy({
         where: {
@@ -70,14 +76,14 @@ module.exports = {
         
       let message = helpers.makeVerificationEmail(
         process.env.URL, 
-        req.body.firstName, 
-        req.body.lastName, 
+        user.firstName, 
+        user.lastName, 
         tokenObj.token
       );
 
       const mailOptions = {
         from: `${process.env.EMAIL}`,
-        to: `${req.body.email}`,
+        to: `${user.email}`,
         subject: 'Verify email',
         html: message
       };
@@ -89,7 +95,7 @@ module.exports = {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
       }
 
-      if (email.accepted[0] === `${req.body.email}`) {
+      if (email.accepted[0] === `${user.email}`) {
         return res.status(200).json({ message: "Email has successfully been sent." });
       } else {
         throw Error();

@@ -80,47 +80,6 @@ module.exports = {
       }
 
       let user = await User.create(req.body);
-      let token = cryptoRandomString({length: 10, type: 'url-safe'});
-      let tokenObj = await Verification.create({
-        token: token,
-        userId: user.id
-      });
-
-      let transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PW
-        }
-      });
-        
-      let message = helpers.makeVerificationEmail(
-        process.env.URL, 
-        req.body.firstName, 
-        req.body.lastName, 
-        tokenObj.token
-      );
-
-      const mailOptions = {
-        from: `${process.env.EMAIL}`,
-        to: `${req.body.email}`,
-        subject: 'Verify email',
-        html: message
-      };
-
-      user.dataValues.emailAccepted = false;
-
-      let email = await transporter.sendMail(mailOptions);
-      if (email.accepted[0] === `${req.body.email}`) {
-        user.dataValues.emailAccepted = true;
-      }
-
-      // This is used to get the token string and preview url for tests
-      if (process.env.NODE_ENV === "developement" || "test") {
-        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
-        user.dataValues.token = tokenObj.token
-      }
 
       res.status(200).json({
         user: user,
@@ -188,9 +147,12 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
+      // Checks if there is a profile picture associated with the user
       if (req.decoded.profilePic) {
+        // Checks if the profile picture exists
         fs.stat(req.decoded.profilePic, (err, stats) => {
           if (stats) {
+            // Deletes profile picture
             fs.unlink(req.decoded.profilePic, (err) => {
               if (err) res.status(500).json({ message: 'There was an error deleting your profile picture.' });
             });

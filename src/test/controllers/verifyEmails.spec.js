@@ -71,10 +71,10 @@ describe('Email verification', () => {
     });
   });
 
-  describe('POST resend verification email', () => {
+  describe('POST send verification email', () => {
     it('should send a message if the email was sent', (done) => {
       chai.request(server)
-        .post('/verify/resend')
+        .post('/verify/send')
         .send({ email: "test@email.com" })
         .end((err, res) => {
           res.should.have.status(200);

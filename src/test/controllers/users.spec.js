@@ -83,10 +83,6 @@ describe('Users', () => {
         });
     });
 
-    it('should have a property to show that the verification email has been received by the user', () => {
-      newUser.user.emailAccepted.should.be.true;
-    });
-
     it('should send a message when a username is already being used', (done) => {
       chai.request(server)
         .post('/user/signup')
