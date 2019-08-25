@@ -5,6 +5,14 @@ const trim = require('../../middleware/trim');
 const httpMocks = require('node-mocks-http');
 
 describe('Trim middleware', () => {
+  let response;
+  let nextSpy;
+
+  beforeEach(() => {
+    response = httpMocks.createResponse();
+    nextSpy = chai.spy();
+  });
+
   it('should trim the whitespace from the ends of any sent emails and call next()', () => {
     let request  = httpMocks.createRequest({
       method: 'GET',
@@ -12,10 +20,7 @@ describe('Trim middleware', () => {
       body: {
         email: '   test@email.com   '
       }
-    
     });
-    let response = httpMocks.createResponse();
-    let nextSpy = chai.spy();
 
     trim.trimBodyEmail(request, response, nextSpy);
 
@@ -29,11 +34,8 @@ describe('Trim middleware', () => {
       url: '/',
       body: {
         email: '   tESt@emaiL.coM   '
-      }
-    
+      }   
     });
-    let response = httpMocks.createResponse();
-    let nextSpy = chai.spy();
 
     trim.trimBodyEmail(request, response, nextSpy);
 
@@ -46,8 +48,6 @@ describe('Trim middleware', () => {
       method: 'GET',
       url: '/'
     });
-    let response = httpMocks.createResponse();
-    let nextSpy = chai.spy();
 
     request.body.should.not.have.property('email');
 

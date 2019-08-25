@@ -1,31 +1,21 @@
 'use strict';
+const server = require("../../app");
+
 module.exports = {
-  // User controller test objects
   user: {
     username: "johndoe",
     firstName: "John",
     lastName: "Doe",
     email: "test@email.com",
     password: "password",
-    isAdmin: true,
-    adminCode: "123456789"
+    isAdmin: true
   },
   userNewUsername: {
     username: "johndoe2",
     firstName: "John",
     lastName: "Doe",
     email: "test@email.com",
-    password: "password",
-    isAdmin: true
-  },
-  user2: {
-    username: "jsmith",
-    firstName: "John",
-    lastName: "Smith",
-    email: "smith@email.com",
-    password: "password",
-    isAdmin: false,
-    adminCode: "notValid"
+    password: "password"
   },
   userWithShortUsername: {
     username: "jdoe",
@@ -35,18 +25,100 @@ module.exports = {
     password: "password",
     isAdmin: true
   },
-  userWithCredentials: {
+  loginCredentials: {
     email: "test@email.com",
     password: "password"
   },
-  userWithWrongEmail: {
+  wrongEmailCredentials: {
     email: "wrong@email.com",
     password: "password"
   },
-  userWithWrongPassword: {
+  wrongPasswordCredentials: {
     email: "test@email.com",
     password: "wrongpassword"
   },
+  user2: {
+    username: "jsmith",
+    firstName: "Jack",
+    lastName: "Smith",
+    email: "smith@email.com",
+    password: "password",
+    isAdmin: false,
+    adminCode: "notValid"
+  },
+  meal1: {
+    name: 'Sandwich',
+    ingredients: ['bread', 'cheese', 'meat'],
+    instructions: [
+      'Put the bread on the counter.', 
+      'Put the meat between 2 slices of bread.', 
+      'Put the cheese on the meat.'
+    ],
+    prepTime: 5,
+    cookTime: 0,
+    difficulty: 1,
+    id: 1
+  },
+  meal1Update: {
+    name: 'Sandwich',
+    ingredients: ['bread', 'cheese', 'lettuce', 'meat'],
+    instructions: [
+      'Put the bread on the counter.', 
+      'Put the meat between 2 slices of bread.', 
+      'Put the cheese and lettuce on the meat.'
+    ],
+    prepTime: 5,
+    cookTime: 0,
+    difficulty: 2,
+    id: 1
+  },
+  meal2: {
+    name: 'Soup',
+    ingredients: ['WATER', 'VEGETABLES', 'MEAT'],
+    instructions: [
+      'Cut the veggies.', 
+      'Boil the water.', 
+      'Put veggies and meat in the water until it is cooked.'
+    ],
+    prepTime: 10,
+    cookTime: 20,
+    difficulty: 3,
+    id: 2
+  },
+  createAdmin: () => {
+    return chai.request(server)
+      .post('/user/signup')
+      .send({
+        username: "johndoe",
+        firstName: "John",
+        lastName: "Doe",
+        email: "test@email.com",
+        password: "password",
+        isAdmin: true,
+        adminCode: '123456789'
+      });
+  },
+  createUser: () => {
+    return chai.request(server)
+      .post('/user/signup')
+      .send({
+        username: "jsmith",
+        firstName: "Jack",
+        lastName: "Smith",
+        email: "smith@email.com",
+        password: "password"
+      });
+  },
+  createMeal: (meal, token) => {
+    return chai.request(server)
+      .post('/meals/create')
+      .set("Authorization", `Bearer ${token}`)
+      .send(meal)
+  },
+  //
+
+
+ 
   user3: {
     username: "user3",
     firstName: "Aaaa",
@@ -137,32 +209,7 @@ module.exports = {
     isAdmin: false,
     adminCode: "notValid"
   },
-  meal1: {
-    name: 'Sandwich',
-    ingredients: ['bread', 'cheese', 'meat'],
-    instructions: [
-      'Put the bread on the counter.', 
-      'Put the meat between 2 slices of bread.', 
-      'Put the cheese on the meat.'
-    ],
-    prepTime: 5,
-    cookTime: 0,
-    difficulty: 1,
-    creatorId: 1
-  },
-  meal2: {
-    name: 'Soup',
-    ingredients: ['water', 'vegetables', 'meat'],
-    instructions: [
-      'Cut the veggies.', 
-      'Boil the water.', 
-      'Put veggies and meat in the water until it is cooked.'
-    ],
-    prepTime: 10,
-    cookTime: 20,
-    difficulty: 3,
-    creatorId: 2
-  },
+  
   meal3: {
     name: 'Rice',
     ingredients: ['Water', 'Rice'],

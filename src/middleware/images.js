@@ -50,9 +50,18 @@ module.exports = {
   resizeImage: async (req, res, next) => {
     try {
       if (!req.file) return next();
-      
+
+      let quality;
+      if (req.file.size < 500000) {
+        quality = 70;
+      } else if (req.file.size > 500000 && req.file.size < 1500000) {
+        quality = 45;
+      } else {
+        quality = 20;
+      }
+
       let image = await Jimp.read(req.file.path)
-        .then(image => image.quality(70).write(req.file.path)
+        .then(image => image.quality(quality).write(req.file.path)
       );
 
       next();

@@ -1,12 +1,12 @@
 'use strict';
-const User = require('../models/sequelize').user;
 const ResetPW = require('../models/sequelize').reset_password_token;
+const User = require('../models/sequelize').user;
+const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
-const cryptoRandomString = require('crypto-random-string');
 
 module.exports = {
-  changePassword: async (req, res) => {
+  updatePassword: async (req, res) => {
     try {
       let password = req.body.password;
       let passwordConfirmation = req.body.passwordConfirmation;
@@ -88,6 +88,7 @@ module.exports = {
         throw new Error();
       }
     } catch (err) {
+      console.log(err)
       res.status(500).json({ message: "There was an error sending your password reset email." });
     }
   },
@@ -129,6 +130,7 @@ module.exports = {
 
       res.status(200).json({ message: "Your password was successfully reset." });
     } catch (err) {
+      console.log(err)
       res.status(500).json({ message: "There was an error resetting your password." });
     }
   }

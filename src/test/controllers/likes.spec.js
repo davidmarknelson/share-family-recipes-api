@@ -4,30 +4,14 @@ process.env.NODE_ENV = 'test';
 const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
-const User = require('../../models/sequelize').user;
-const Meals = require('../../models/sequelize').meal;
-const jwt = require('jsonwebtoken');
 
-function jwtSignUser(user) {
-  const oneWeek = 60 * 60 * 24 * 7;
-  return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: oneWeek
-  });
-}
-
-describe('Meals', () => {
+describe('Likes', () => {
   let user;
   before(() => {
     return db.sync({force: true})
-      .then(() => User.create(utils.user))
-      .then(res => {
-        user = {
-          user: res,
-          jwt: jwtSignUser(res.dataValues)
-        };
-      })
-      .then(() => Meals.create(utils.meal1))
-      .then(() => console.log(`Database, tables, and user created for tests!`));
+      .then(() => utils.createAdmin())
+      .then(res => user = res.body)
+      .then(() => utils.createMeal(utils.meal1, user.jwt));
   });
 
   describe('POST add like', () => {
@@ -46,7 +30,7 @@ describe('Meals', () => {
       });
     });
 
-    it('should return a message when a meal is unsuccessfully liked', (done) => {
+    it('should return a message when a meal is unsuccessfully liked because the mealId does not exist', (done) => {
       let token = `Bearer ${user.jwt}`;
       
       chai.request(server)
@@ -78,7 +62,7 @@ describe('Meals', () => {
       });
     });
 
-    it('should return a message when a meal is unsuccessfully unliked', (done) => {
+    it('should return a message when a meal is unsuccessfully unliked because the mealId does not exist', (done) => {
       let token = `Bearer ${user.jwt}`;
       
       chai.request(server)

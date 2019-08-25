@@ -4,18 +4,15 @@ process.env.NODE_ENV = 'test';
 const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
-const User = require('../../models/sequelize').user;
-const Meals = require('../../models/sequelize').meal;
 
 describe('Meal searches', () => {
-
+  let jwt;
   before(() => {
     return db.sync({force: true})
-      .then(() => User.create(utils.user))
-      .then(() => User.create(utils.user2))
-      .then(() => Meals.create(utils.meal1))
-      .then(() => Meals.create(utils.meal2))
-      .then(() => console.log(`Database, tables, and user created for tests!`));
+      .then(() => utils.createAdmin())
+      .then(res => jwt = res.body.jwt)
+      .then(() => utils.createMeal(utils.meal1, jwt))
+      .then(() => utils.createMeal(utils.meal2, jwt));
   });
 
   describe('GET all meals', () => {
@@ -26,10 +23,10 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
+          res.body[0].creatorId.should.equal(1);
           res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Sandwich');
           res.body[1].should.have.property('creator');
@@ -46,10 +43,10 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
-          res.body[1].creator.username.should.equal('jsmith');
+          res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Soup');
           res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(2);
+          res.body[1].creatorId.should.equal(1);
           res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Sandwich');
           res.body[0].should.have.property('creator');
@@ -69,10 +66,10 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
-          res.body[1].creator.username.should.equal('jsmith');
+          res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Soup');
           res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(2);
+          res.body[1].creatorId.should.equal(1);
           res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Sandwich');
           res.body[0].should.have.property('creator');
@@ -89,10 +86,10 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(2);
+          res.body[0].creatorId.should.equal(1);
           res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Sandwich');
           res.body[1].should.have.property('creator');
@@ -112,7 +109,7 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
           if(err) done(err);
@@ -127,7 +124,7 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
           if(err) done(err);
@@ -142,7 +139,7 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
           if(err) done(err);
@@ -157,7 +154,7 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
-          res.body[0].creator.username.should.equal('jsmith');
+          res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Soup');
           res.body[0].should.have.property('creator');
           if(err) done(err);
@@ -192,13 +189,13 @@ describe('Meal searches', () => {
   describe('GET all meals by username', () => {
     it('should return all meals created by a specific user', (done) => {
       chai.request(server)
-        .get('/meals/search/byuser?username=jsmith')
+        .get('/meals/search/byuser?username=johndoe')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.username.should.equal('jsmith');
+          res.body.username.should.equal('johndoe');
           res.body.meals.should.be.an('array');
-          res.body.meals.should.have.lengthOf(1);
-          res.body.meals[0].name.should.equal('Soup');
+          res.body.meals.should.have.lengthOf(2);
+          res.body.meals[0].name.should.equal('Sandwich');
           if(err) done(err);
           done();
         });

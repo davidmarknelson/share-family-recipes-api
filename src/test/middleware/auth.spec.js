@@ -1,35 +1,25 @@
 'use strict';
 process.env.NODE_ENV = 'test';
 
-const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
-const User = require('../../models/sequelize').user;
-const httpMocks = require('node-mocks-http');
 const auth = require('../../middleware/auth');
-const jwt = require('jsonwebtoken');
-
-function jwtSignUser(user) {
-  const oneWeek = 60 * 60 * 24 * 7;
-  return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: oneWeek
-  });
-}
+const httpMocks = require('node-mocks-http');
+const utils = require("../utils");
 
 describe('Auth middleware', () => {
   let user;
+  let response;
+  let nextSpy;
 
   before(() => {
     return db.sync({force: true})
-      .then(() => {
-        return User.create(utils.user);
-      })
-      .then(res => {
-        user = {
-          user: res,
-          jwt: jwtSignUser(res.dataValues)
-        };
-        console.log(`Database, tables, and user created for tests!`)
-      });
+      .then(() => utils.createAdmin())
+      .then(res => user = res.body);
+  });
+
+  beforeEach(() => {
+    response = httpMocks.createResponse();
+    nextSpy = chai.spy();
   });
 
   describe('isAuthenticated()', () => {
@@ -42,8 +32,6 @@ describe('Auth middleware', () => {
           Authorization: token
         }
       });
-      let response = httpMocks.createResponse();
-      let nextSpy = chai.spy();
 
       should.exist(token);
       token.should.be.a('string');
@@ -63,8 +51,6 @@ describe('Auth middleware', () => {
           Authorization: token
         }
       });
-      let response = httpMocks.createResponse();
-      let nextSpy = chai.spy();
 
       should.exist(token);
       token.should.be.a('string');
@@ -85,9 +71,6 @@ describe('Auth middleware', () => {
           Authorization: token
         }
       });
-      let response = httpMocks.createResponse();
-      let nextSpy = chai.spy();
-
 
       should.exist(token);
       token.should.be.a('string');
@@ -108,8 +91,6 @@ describe('Auth middleware', () => {
           Authorization: token
         }
       });
-      let response = httpMocks.createResponse();
-      let nextSpy = chai.spy();
 
       auth.isAuthenticated(request, response, nextSpy);
       expect(response.statusCode).to.equal(403);

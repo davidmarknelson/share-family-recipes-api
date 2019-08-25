@@ -6,7 +6,8 @@ module.exports = function(sequelize, type) {
     id: {
       type: type.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
+      allowNull: false
     },
     token: {
       type: type.STRING,

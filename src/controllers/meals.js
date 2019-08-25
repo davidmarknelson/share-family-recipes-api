@@ -32,13 +32,20 @@ module.exports = {
 
       res.status(200).json(meal);
     } catch (err) {
+      if (err.errors) {
+        console.log(err.errors)
+        return res.status(500).json({ message: err.errors[0].message });
+      }
       res.status(500).json({ message: err.message });
     }
   },
 
   update: async (req, res) => {
     try {
-      let meal = await  Meal.update(req.body, {
+      let payload = req.body;
+      payload.ingredients = payload.ingredients.map(val => val.toLowerCase());
+      
+      let meal = await  Meal.update(payload, {
         where: { 
           id: req.body.id,
           creatorId: req.decoded.id

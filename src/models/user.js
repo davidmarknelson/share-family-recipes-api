@@ -28,7 +28,8 @@ module.exports = (sequelize, type) => {
     id: {
       type: type.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
+      allowNull: false
     },
     profilePic: {
       type: type.STRING,

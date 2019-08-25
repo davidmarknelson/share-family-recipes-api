@@ -38,4 +38,18 @@ router.use('/password', passwords);
 // Liked Meal routes
 router.use('/likes', likes);
 
+// Error handler for 404 pages
+router.use((req, res, next) => {
+  const error = new Error("Looks like what you are searching for does not exist!");
+  error.status = 404;
+  next(error);
+});
+
+// Error handler to pass along error messages
+router.use((err, req, res, next) => {
+  if (err) {
+    res.status(err.status || 500).json({ message: err.message || 'Oops! There was an error'});
+  }
+});
+
 module.exports = router;

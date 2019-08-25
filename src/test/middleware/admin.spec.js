@@ -1,49 +1,26 @@
 'use strict';
 process.env.NODE_ENV = 'test';
 
-const httpMocks = require('node-mocks-http');
+const adminMiddleware = require('../../middleware/admin');
 const db = require('../../models/sequelize').sequelize;
-
-const User = require('../../models/sequelize').user;
+const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
 const utils = require("../utils");
-const adminMiddleware = require('../../middleware/admin');
 
 function jwtSignUser(user) {
-  const oneWeek = 60 * 60 * 24 * 7;
   return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: oneWeek
+    expiresIn: process.env.JWT_EXPIRATION_TIME
   });
 }
 
 describe('Admin middleware', () => {
-  let userAdmin;
-  let userNotAdmin;
 
   before(() => {
-    return db.sync({force: true})
-      .then(() => {
-        return User.create(utils.user);
-      })
-      .then(user => {
-        userAdmin = {
-          user: user,
-          jwt: jwtSignUser(user.dataValues)
-        };
-      })
-      .then(() => {
-        return User.create(utils.user2);
-      })
-      .then(user2 => {
-        userNotAdmin = {
-          user: user2,
-          jwt: jwtSignUser(user2.dataValues)
-        };
-      });
+    return db.sync({force: true});
   });
 
   it('should return an error if the user is not an admin and not call next()', () => {
-    let token = userNotAdmin.jwt;
+    let token = jwtSignUser(utils.user2);
     let request  = httpMocks.createRequest({
       method: 'GET',
       url: '/'
@@ -66,7 +43,7 @@ describe('Admin middleware', () => {
   });
 
   it('should call next() with an admin user', () => {
-    let token = userAdmin.jwt;
+    let token = jwtSignUser(utils.user);
     let request  = httpMocks.createRequest({
       method: 'GET',
       url: '/'

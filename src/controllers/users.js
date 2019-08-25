@@ -17,9 +17,8 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 
 function jwtSignUser(user) {
-  const oneWeek = 60 * 60 * 24 * 7;
   return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: oneWeek
+    expiresIn: process.env.JWT_EXPIRATION_TIME
   });
 }
 

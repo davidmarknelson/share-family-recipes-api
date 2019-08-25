@@ -1,29 +1,23 @@
 'use strict';
 process.env.NODE_ENV = 'test';
 
+const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");
 const utils = require("../utils");
-const db = require('../../models/sequelize').sequelize;
 
 describe('Users', () => {
-  let newUser;
+  let user;
 
   before(() => {
-    return db.sync({force: true})
-      .then(() => {
-        console.log(`Database & tables created for tests!`)
-      });
+    return db.sync({force: true});
   });
 
-
   describe('POST /user/signup', () => {
-    it('should return an error is the username is too short', (done) => {
+    it('should return an error if the username is too short', (done) => {
       chai.request(server)
       .post('/user/signup')
       .send(utils.userWithShortUsername)
       .end((err, res) => {
-        newUser = res.body;
-
         res.should.have.status(500);
         res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
         if(err) done(err);
@@ -31,12 +25,38 @@ describe('Users', () => {
       });
     });
 
-    it('should return an admin user object when a new user is created', (done) => {
+    it('should return an error when the image uploaded is not JPEG', (done) => {
       chai.request(server)
         .post('/user/signup')
-        .send(utils.user)
+        .field('username', 'johndoe')
+        .field('firstName', 'John')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .field('password', 'password')
+        .field('isAdmin', 'true')
+        .field('adminCode', '123456789')
+        .attach('profilePic', 'src/test/testImages/testImagePng.png')
         .end((err, res) => {
-          newUser = res.body;
+          res.should.have.status(500);
+          res.body.message.should.equal('Please upload a JPEG image.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an admin user object when a new user is created with a profile pic', (done) => {
+      chai.request(server)
+        .post('/user/signup')
+        .field('username', 'johndoe')
+        .field('firstName', 'John')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .field('password', 'password')
+        .field('isAdmin', 'true')
+        .field('adminCode', '123456789')
+        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
+        .end((err, res) => {
+          user = res.body;
 
           res.should.have.status(200);
           res.body.should.have.property('user');
@@ -47,8 +67,10 @@ describe('Users', () => {
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
           res.body.user.should.have.property('password');
+          res.body.user.password.should.not.equal('password');
           res.body.user.should.have.property('isAdmin', true);
           res.body.user.should.have.property('createdAt');
+          res.body.user.should.have.property('profilePic', 'public/images/profilePics/johndoe.jpeg');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
@@ -61,17 +83,22 @@ describe('Users', () => {
     it('should return a user object that is not an admin when a new user is created', (done) => {
       chai.request(server)
         .post('/user/signup')
-        .send(utils.user2)
+        .field('username', 'johnsmith')
+        .field('firstName', 'John')
+        .field('lastName', 'Doe')
+        .field('email', 'smith@email.com')
+        .field('password', 'password')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 2);
-          res.body.user.should.have.property('username', 'jsmith');
+          res.body.user.should.have.property('username', 'johnsmith');
           res.body.user.should.have.property('firstName', 'John');
-          res.body.user.should.have.property('lastName', 'Smith');
+          res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'smith@email.com');
           res.body.user.should.have.property('password');
+          res.body.user.password.should.not.equal('password');
           res.body.user.should.have.property('isAdmin', false);
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
@@ -112,7 +139,7 @@ describe('Users', () => {
   describe('GET /user/username', () => {
     it('should show that a username is unavailable', (done) => {
       chai.request(server)
-        .get(`/user/available-username?username=${newUser.user.username}`)
+        .get(`/user/available-username?username=${user.user.username}`)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This username is already in use.');
@@ -123,7 +150,7 @@ describe('Users', () => {
 
     it('should show that a username is unavailable regardless of case', (done) => {
       chai.request(server)
-        .get(`/user/available-username?username=${newUser.user.username.toUpperCase()}`)
+        .get(`/user/available-username?username=${user.user.username.toUpperCase()}`)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This username is already in use.');
@@ -149,7 +176,7 @@ describe('Users', () => {
     it('should login user with correct credentials', (done) => {
       chai.request(server)
         .post('/user/login')
-        .send(utils.userWithCredentials)
+        .send(utils.loginCredentials)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('user');
@@ -160,7 +187,7 @@ describe('Users', () => {
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
           res.body.user.should.have.property('password');
-          res.body.user.should.have.property('isAdmin', true);
+          res.body.user.password.should.not.equal('password');
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
@@ -175,7 +202,7 @@ describe('Users', () => {
     it('should send an error message when wrong email is sent', (done) => {
       chai.request(server)
         .post('/user/login')
-        .send(utils.userWithWrongEmail)
+        .send(utils.wrongEmailCredentials)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.have.property('message', 'The login information was incorrect.');
@@ -187,7 +214,7 @@ describe('Users', () => {
     it('should send an error message when wrong password is sent', (done) => {
       chai.request(server)
         .post('/user/login')
-        .send(utils.userWithWrongPassword)
+        .send(utils.wrongPasswordCredentials)
         .end((err, res) => {
           res.should.have.status(403);
           res.body.should.have.property('message', 'The login information was incorrect.');
@@ -199,7 +226,7 @@ describe('Users', () => {
 
   describe('POST /user/profile', () => {
     it('should get the profile with only a valid jwt', (done) => {
-      let token = `Bearer ${newUser.jwt}`;
+      let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
         .get('/user/profile')
@@ -215,7 +242,7 @@ describe('Users', () => {
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
           res.body.user.should.have.property('password');
-          res.body.user.should.have.property('isAdmin', true);
+          res.body.user.password.should.not.equal('password');
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
@@ -230,15 +257,13 @@ describe('Users', () => {
 
   describe('UPDATE /user/update', () => {
     it('should return an updated user object when a new user is created', (done) => {
-      let updateduser = newUser.user;
-      updateduser.firstName = 'Jane';
-      updateduser.password = 'password';
-      let token = `Bearer ${newUser.jwt}`;
+      let token = `Bearer ${user.jwt}`;
+      user.user.firstName = 'Jane';
 
       chai.request(server)
         .put('/user/update')
         .set("Authorization", token)
-        .send(updateduser)
+        .send(user.user)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully updated.");
@@ -248,14 +273,13 @@ describe('Users', () => {
     });
 
     it('should return an error message if the username is too short', (done) => {
-      let updateduser = newUser.user;
-      updateduser.username = 'jane';
-      let token = `Bearer ${newUser.jwt}`;
-
+      let token = `Bearer ${user.jwt}`;
+      user.user.username = 'jane';
+          
       chai.request(server)
         .put('/user/update')
         .set("Authorization", token)
-        .send(updateduser)
+        .send(user.user)
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
@@ -268,8 +292,8 @@ describe('Users', () => {
 
   describe('DELETE /user/delete', () => {
     it('should return a message when a user is deleted', (done) => {
-      let token = `Bearer ${newUser.jwt}`;
-
+      let token = `Bearer ${user.jwt}`;
+      
       chai.request(server)
         .delete('/user/delete')
         .set("Authorization", token)
@@ -282,7 +306,7 @@ describe('Users', () => {
     });
 
     it('should return a error message when a user is not deleted', (done) => {
-      let token = `Bearer ${newUser.jwt}`;
+      let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
         .delete('/user/delete')

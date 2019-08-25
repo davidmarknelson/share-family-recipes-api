@@ -41,17 +41,11 @@ module.exports = {
 
   sendVerificationEmail: async (req, res) => {
     try {
-      // ADD JWT VERIFICATION
-      let user;
-      if (!req.decoded) {
-        user = await User.findOne({
-          where: {
-            email: req.body.email
-          }
-        });
-      } else {
-        user = req.decoded;
-      }
+      let user = await User.findOne({
+        where: {
+          email: req.body.email
+        }
+      });
 
       let tokenDestroyed = await Verification.destroy({
         where: {
