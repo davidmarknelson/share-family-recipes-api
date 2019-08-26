@@ -57,6 +57,8 @@ module.exports = {
         ]
       });
 
+      delete user.dataValues.password;
+
       res.status(200).json({
         user: user,
         jwt: jwtSignUser(user.dataValues)
@@ -68,6 +70,10 @@ module.exports = {
 
   signup: async (req, res) => {
     try {
+      if (req.body.password !== req.body.passwordConfirmation) {
+        return res.status(400).json({ message: "Passwords do not match." });
+      }
+
       if (req.body.adminCode === process.env.ADMIN_CODE) {
         req.body.isAdmin = true;
       } else {
@@ -78,7 +84,11 @@ module.exports = {
         req.body.profilePic = req.file.path;
       }
 
+      delete req.body.passwordConfirmation;
+
       let user = await User.create(req.body);
+
+      delete user.dataValues.password;
 
       res.status(200).json({
         user: user,
@@ -117,6 +127,8 @@ module.exports = {
         return res.status(403).json({ message: 'The login information was incorrect.'});
       }
 
+      delete user.dataValues.password;
+
       res.status(200).json({
         user: user,
         jwt: jwtSignUser(user.dataValues)
@@ -128,6 +140,12 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      if (req.body.password) delete req.body.password;
+
+      if (req.file) {
+        req.body.profilePic = req.file.path;
+      }
+
       let user = await User.update(req.body, {
         where: { id: req.decoded.id }
       });

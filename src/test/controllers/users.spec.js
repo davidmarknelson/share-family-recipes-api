@@ -2,6 +2,7 @@
 process.env.NODE_ENV = 'test';
 
 const db = require('../../models/sequelize').sequelize;
+const User = require('../../models/sequelize').user;
 const server = require("../../../app");
 const utils = require("../utils");
 
@@ -33,12 +34,33 @@ describe('Users', () => {
         .field('lastName', 'Doe')
         .field('email', 'test@email.com')
         .field('password', 'password')
+        .field('passwordConfirmation', 'password')
         .field('isAdmin', 'true')
         .field('adminCode', '123456789')
         .attach('profilePic', 'src/test/testImages/testImagePng.png')
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal('Please upload a JPEG image.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error when the passwords do not match', (done) => {
+      chai.request(server)
+        .post('/user/signup')
+        .field('username', 'johndoe')
+        .field('firstName', 'John')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .field('password', 'password')
+        .field('passwordConfirmation', 'wrongpassword')
+        .field('isAdmin', 'true')
+        .field('adminCode', '123456789')
+        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('Passwords do not match.');
           if(err) done(err);
           done();
         });
@@ -52,6 +74,7 @@ describe('Users', () => {
         .field('lastName', 'Doe')
         .field('email', 'test@email.com')
         .field('password', 'password')
+        .field('passwordConfirmation', 'password')
         .field('isAdmin', 'true')
         .field('adminCode', '123456789')
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
@@ -66,8 +89,7 @@ describe('Users', () => {
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.have.property('password');
-          res.body.user.password.should.not.equal('password');
+          res.body.user.should.not.have.property('password');
           res.body.user.should.have.property('isAdmin', true);
           res.body.user.should.have.property('createdAt');
           res.body.user.should.have.property('profilePic', 'public/images/profilePics/johndoe.jpeg');
@@ -88,6 +110,7 @@ describe('Users', () => {
         .field('lastName', 'Doe')
         .field('email', 'smith@email.com')
         .field('password', 'password')
+        .field('passwordConfirmation', 'password')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('user');
@@ -97,8 +120,7 @@ describe('Users', () => {
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'smith@email.com');
-          res.body.user.should.have.property('password');
-          res.body.user.password.should.not.equal('password');
+          res.body.user.should.not.have.property('password');
           res.body.user.should.have.property('isAdmin', false);
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
@@ -186,14 +208,15 @@ describe('Users', () => {
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.have.property('password');
-          res.body.user.password.should.not.equal('password');
+          res.body.user.should.not.have.property('password');
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
           res.body.user.should.have.property('meals');
           res.body.user.meals.should.be.an('array');
+          res.body.user.should.have.property('savedMeals');
+          res.body.user.savedMeals.should.be.an('array');
           if(err) done(err);
           done();
         });
@@ -224,7 +247,7 @@ describe('Users', () => {
     });
   });
 
-  describe('POST /user/profile', () => {
+  describe('GET /user/profile', () => {
     it('should get the profile with only a valid jwt', (done) => {
       let token = `Bearer ${user.jwt}`;
 
@@ -241,14 +264,15 @@ describe('Users', () => {
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.have.property('password');
-          res.body.user.password.should.not.equal('password');
+          res.body.user.should.not.have.property('password');
           res.body.user.should.have.property('createdAt');
           res.body.user.createdAt.should.be.a.dateString();
           res.body.user.should.have.property('updatedAt');
           res.body.user.updatedAt.should.be.a.dateString();
           res.body.user.should.have.property('meals');
           res.body.user.meals.should.be.an('array');
+          res.body.user.should.have.property('savedMeals');
+          res.body.user.savedMeals.should.be.an('array');
           if(err) done(err);
           done();
         });
@@ -256,17 +280,43 @@ describe('Users', () => {
   });
 
   describe('UPDATE /user/update', () => {
-    it('should return an updated user object when a new user is created', (done) => {
+    it('should return a message when the user is updated and it includes JPEG image', (done) => {
       let token = `Bearer ${user.jwt}`;
-      user.user.firstName = 'Jane';
 
       chai.request(server)
         .put('/user/update')
         .set("Authorization", token)
-        .send(user.user)
-        .end((err, res) => {
+        .field('username', 'johndoe')
+        .field('firstName', 'Jane')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
+        .then(res => {
           res.should.have.status(200);
           res.body.message.should.equal("User successfully updated.");
+        })
+        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(user => {
+          user.dataValues.firstName.should.equal('Jane');
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('should return an error if the image is PNG', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .field('username', 'johndoe')
+        .field('firstName', 'Jane')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .attach('profilePic', 'src/test/testImages/testImagePng.png')
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal('Please upload a JPEG image.');          
           if(err) done(err);
           done();
         });
@@ -274,12 +324,14 @@ describe('Users', () => {
 
     it('should return an error message if the username is too short', (done) => {
       let token = `Bearer ${user.jwt}`;
-      user.user.username = 'jane';
           
       chai.request(server)
         .put('/user/update')
         .set("Authorization", token)
-        .send(user.user)
+        .field('username', 'jane')
+        .field('firstName', 'Jane')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");

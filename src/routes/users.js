@@ -11,7 +11,7 @@ router.route('/signup').post(trim.trimBodyEmail, images.uploadProfilePic, images
 router.route('/login').post(trim.trimBodyEmail, users.login);
 // This route gets the profile for users who have a valid jwt
 router.route('/profile').get(auth.isAuthenticated, users.profile);
-router.route('/update').put(trim.trimBodyEmail, auth.isAuthenticated, images.uploadProfilePic, users.update);
+router.route('/update').put(trim.trimBodyEmail, auth.isAuthenticated, images.uploadProfilePic, images.resizeImage, users.update);
 router.route('/delete').delete(auth.isAuthenticated, users.delete);
 
 module.exports = router;

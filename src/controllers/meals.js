@@ -32,10 +32,6 @@ module.exports = {
 
       res.status(200).json(meal);
     } catch (err) {
-      if (err.errors) {
-        console.log(err.errors)
-        return res.status(500).json({ message: err.errors[0].message });
-      }
       res.status(500).json({ message: err.message });
     }
   },

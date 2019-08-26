@@ -8,6 +8,7 @@ module.exports = {
     lastName: "Doe",
     email: "test@email.com",
     password: "password",
+    passwordConfirmation: "password",
     isAdmin: true
   },
   userNewUsername: {
@@ -15,7 +16,8 @@ module.exports = {
     firstName: "John",
     lastName: "Doe",
     email: "test@email.com",
-    password: "password"
+    password: "password",
+    passwordConfirmation: "password"
   },
   userWithShortUsername: {
     username: "jdoe",
@@ -23,6 +25,7 @@ module.exports = {
     lastName: "Doe",
     email: "test@email.com",
     password: "password",
+    passwordConfirmation: "password",
     isAdmin: true
   },
   loginCredentials: {
@@ -43,6 +46,7 @@ module.exports = {
     lastName: "Smith",
     email: "smith@email.com",
     password: "password",
+    passwordConfirmation: "password",
     isAdmin: false,
     adminCode: "notValid"
   },
@@ -94,6 +98,7 @@ module.exports = {
         lastName: "Doe",
         email: "test@email.com",
         password: "password",
+        passwordConfirmation: "password",
         isAdmin: true,
         adminCode: '123456789'
       });
@@ -106,7 +111,8 @@ module.exports = {
         firstName: "Jack",
         lastName: "Smith",
         email: "smith@email.com",
-        password: "password"
+        password: "password",
+        passwordConfirmation: "password"
       });
   },
   createMeal: (meal, token) => {

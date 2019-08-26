@@ -8,15 +8,12 @@ const nodemailer = require('nodemailer');
 module.exports = {
   updatePassword: async (req, res) => {
     try {
-      let password = req.body.password;
-      let passwordConfirmation = req.body.passwordConfirmation;
-  
-      if (password !== passwordConfirmation) {
+      if (req.body.password !== req.body.passwordConfirmation) {
         return res.status(400).json({ message: "Passwords do not match." });
       }
   
       let updatedUser = await User.update({
-        password: password
+        password: req.body.password
       }, {
         where: {
           id: req.decoded.id,
@@ -88,7 +85,6 @@ module.exports = {
         throw new Error();
       }
     } catch (err) {
-      console.log(err)
       res.status(500).json({ message: "There was an error sending your password reset email." });
     }
   },
@@ -106,17 +102,14 @@ module.exports = {
         return res.status(404).json({ message: "Password reset token is invalid or has expired." });
       }
 
-      let password = req.body.password;
-      let passwordConfirmation = req.body.passwordConfirmation;
-  
-      if (password !== passwordConfirmation) {
+      if (req.body.password !== req.body.passwordConfirmation) {
         return res.status(400).json({ message: "Passwords do not match." });
       }
 
       let userObj = tokenAndUser.dataValues.user.dataValues;
 
       let updatedUser = await User.update({
-        password: password
+        password: req.body.password
       }, {
         where: {
           id: userObj.id,
@@ -130,7 +123,6 @@ module.exports = {
 
       res.status(200).json({ message: "Your password was successfully reset." });
     } catch (err) {
-      console.log(err)
       res.status(500).json({ message: "There was an error resetting your password." });
     }
   }
