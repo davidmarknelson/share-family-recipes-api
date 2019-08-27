@@ -7,6 +7,10 @@ module.exports = (sequelize, type) => {
       autoIncrement: true,
       allowNull: false
     },
+    mealPic: {
+      type: type.STRING,
+      allowNull: true
+    },
     name: {
       type: type.STRING,
       allowNull: false,

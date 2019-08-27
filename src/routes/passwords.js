@@ -2,10 +2,10 @@
 const router = require('express').Router();
 const auth = require('../middleware/auth');
 const passwords = require('../controllers/passwords');
-const trim = require('../middleware/trim');
+const parse = require('../middleware/parse');
 
 router.route('/change').put(auth.isAuthenticated, passwords.updatePassword);
-router.route('/sendemail').post(trim.trimBodyEmail, passwords.sendResetEmail);
+router.route('/sendemail').post(parse.trimBodyEmail, passwords.sendResetEmail);
 router.route('/reset').put(passwords.resetPassword);
 
 module.exports = router;

@@ -2,18 +2,21 @@
 process.env.NODE_ENV = 'test';
 
 const db = require('../../models/sequelize').sequelize;
-const Meals = require('../../models/sequelize').meal;
 const server = require("../../../app");
 const utils = require("../utils");
 
 describe('Saved meals', () => {
   let token;
+  let user;
 
   before(() => {
     return db.sync({force: true})
       .then(() => utils.createAdmin())
-      .then(res => token = `Bearer ${res.body.jwt}`)
-      .then(() => Meals.create(utils.meal1));
+      .then(res => {
+        token = `Bearer ${res.body.jwt}`;
+        user = res.body;
+      })
+      .then(() => utils.createMeal1(user.jwt));
   });
 
   describe('GET user saved meals', () => {

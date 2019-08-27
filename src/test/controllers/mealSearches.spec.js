@@ -11,8 +11,8 @@ describe('Meal searches', () => {
     return db.sync({force: true})
       .then(() => utils.createAdmin())
       .then(res => jwt = res.body.jwt)
-      .then(() => utils.createMeal(utils.meal1, jwt))
-      .then(() => utils.createMeal(utils.meal2, jwt));
+      .then(() => utils.createMeal1(jwt))
+      .then(() => utils.createMeal2(jwt));
   });
 
   describe('GET all meals', () => {

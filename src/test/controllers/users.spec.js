@@ -66,6 +66,26 @@ describe('Users', () => {
         });
     });
 
+    it('should return an error if the username contains a space', (done) => {
+      chai.request(server)
+        .post('/user/signup')
+        .field('username', 'john doe')
+        .field('firstName', 'John')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .field('password', 'password')
+        .field('passwordConfirmation', 'password')
+        .field('isAdmin', 'true')
+        .field('adminCode', '123456789')
+        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.message.should.equal('Username must not include a space.');
+          if(err) done(err);
+          done();
+        });
+    });
+
     it('should return an admin user object when a new user is created with a profile pic', (done) => {
       chai.request(server)
         .post('/user/signup')

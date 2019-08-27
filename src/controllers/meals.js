@@ -1,6 +1,7 @@
 'use strict';
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
+const fs = require('fs');
 
 module.exports = {
 
@@ -25,10 +26,12 @@ module.exports = {
 
   create: async (req, res) => {
     try {
-      let payload = req.body;
-      payload.ingredients = payload.ingredients.map(val => val.toLowerCase());
-      payload.creatorId = req.decoded.id;
-      let meal = await Meal.create(payload);
+      if (req.file) {
+        req.body.mealPic = req.file.path;
+      }
+
+      req.body.creatorId = req.decoded.id;
+      let meal = await Meal.create(req.body);
 
       res.status(200).json(meal);
     } catch (err) {
@@ -38,10 +41,11 @@ module.exports = {
 
   update: async (req, res) => {
     try {
-      let payload = req.body;
-      payload.ingredients = payload.ingredients.map(val => val.toLowerCase());
-      
-      let meal = await  Meal.update(payload, {
+      if (req.file) {
+        req.body.mealPic = req.file.path;
+      }
+
+      let meal = await  Meal.update(req.body, {
         where: { 
           id: req.body.id,
           creatorId: req.decoded.id
@@ -60,14 +64,33 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      let meal = await Meal.destroy({
+      let meal = await Meal.findOne({
+        where: {
+          name: req.body.name,
+          creatorId: req.decoded.id
+        }
+      });
+
+      if (meal && meal.dataValues.mealPic) {
+        // Checks if the meal picture exists
+        fs.stat(meal.dataValues.mealPic, (err, stats) => {
+          if (stats) {
+            // Deletes meal picture
+            fs.unlink(meal.dataValues.mealPic, (err) => {
+              if (err) res.status(500).json({ message: 'There was an error deleting your meal picture.' });
+            });
+          }
+        });
+      }
+
+      let deleted = await Meal.destroy({
         where: { 
           name: req.body.name,
           creatorId: req.decoded.id
         }
       });
 
-      if (meal) {
+      if (deleted) {
         return res.status(200).json({ message: 'Meal successfully deleted.' });
       } else {
         return res.status(500).json({ message: 'There was an error deleting your meal.' });

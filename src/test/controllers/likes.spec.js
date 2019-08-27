@@ -11,7 +11,7 @@ describe('Likes', () => {
     return db.sync({force: true})
       .then(() => utils.createAdmin())
       .then(res => user = res.body)
-      .then(() => utils.createMeal(utils.meal1, user.jwt));
+      .then(() => utils.createMeal1(user.jwt));
   });
 
   describe('POST add like', () => {

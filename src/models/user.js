@@ -43,6 +43,10 @@ module.exports = (sequelize, type) => {
         len: {
           args: [5, 10],
           msg: "Username must be between 5 and 15 characters."
+        },
+        notContains: {
+          args: ' ',
+          msg: "Username must not contain a space."
         }
       }
     },

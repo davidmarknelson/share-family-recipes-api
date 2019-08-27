@@ -1,9 +1,9 @@
 'use strict';
 const router = require('express').Router();
 const verify = require('../controllers/verifyEmails');
-const trim = require('../middleware/trim');
+const parse = require('../middleware/parse');
 
 router.route('/').post(verify.verifyEmail);
-router.route('/send').post(trim.trimBodyEmail, verify.sendVerificationEmail);
+router.route('/send').post(parse.trimBodyEmail, verify.sendVerificationEmail);
 
 module.exports = router;
