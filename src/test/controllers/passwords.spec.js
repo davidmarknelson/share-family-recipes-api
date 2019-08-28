@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const ResetPW = require('../../models/sequelize').reset_password_token;
 const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");

@@ -4,17 +4,13 @@ const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
 const sequelize = require('../models/sequelize').sequelize;
-const offsetLimit = require('../helpers/offsetLimit');
 
 module.exports = {
   getByNewest: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkOffset(req.query.limit);
-
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: [['createdAt', 'DESC']],
         include: [
@@ -36,12 +32,9 @@ module.exports = {
 
   getByOldest: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkOffset(req.query.limit);
-
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: ['createdAt'],
         include: [
@@ -63,12 +56,9 @@ module.exports = {
 
   getMealsAtoZ: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         include: [
@@ -89,12 +79,9 @@ module.exports = {
 
   getMealsZtoA: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         include: [
@@ -115,9 +102,6 @@ module.exports = {
     try {
       if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
 
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let temp;
       if (!Array.isArray(req.query.ingredient)) {
         temp = [req.query.ingredient];
@@ -127,8 +111,8 @@ module.exports = {
       let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
 
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         where: {
           ingredients: {
             [Op.like]: sequelize.fn('ALL', ingredients)
@@ -154,9 +138,6 @@ module.exports = {
     try {
       if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
 
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let temp;
       if (!Array.isArray(req.query.ingredient)) {
         temp = [req.query.ingredient];
@@ -166,8 +147,8 @@ module.exports = {
       let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
 
       let meals = await Meal.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         where: {
           ingredients: {
             [Op.like]: sequelize.fn('ALL', ingredients)
@@ -200,6 +181,8 @@ module.exports = {
           { 
             model: Meal, as: 'meals', 
             attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+            offset: req.query.offset,
+            limit: req.query.limit,
             include: [
               { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false }

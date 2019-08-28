@@ -1,7 +1,6 @@
 'use strict';
 const User = require('../models/sequelize').user;
 const sequelize = require('../models/sequelize').sequelize;
-const offsetLimit = require('../helpers/offsetLimit');
 
 let attributesArray = [
   'id', 'username', 'firstName', 'lastName', 
@@ -11,12 +10,9 @@ let attributesArray = [
 module.exports = {
   getUsersByNewest: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray,
         order: [['createdAt', 'DESC']]
       });
@@ -29,12 +25,9 @@ module.exports = {
 
   getUsersByOldest: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray,
         order: ['createdAt']
       });
@@ -47,12 +40,9 @@ module.exports = {
 
   getUsersAtoZ: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray,
         order: [sequelize.fn('lower', sequelize.col('username'))]
       });
@@ -65,12 +55,9 @@ module.exports = {
 
   getUsersZtoA: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray, 
         order: [[sequelize.fn('lower', sequelize.col('username')), 'DESC']]
       });
@@ -83,12 +70,9 @@ module.exports = {
 
   getUsersFirstNameAtoZ: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray,
         order: [sequelize.fn('lower', sequelize.col('firstName'))]
       });
@@ -101,12 +85,9 @@ module.exports = {
 
   getUsersFirstNameZtoA: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray, 
         order: [[sequelize.fn('lower', sequelize.col('firstName')), 'DESC']]
       });
@@ -119,12 +100,9 @@ module.exports = {
 
   getUsersLastNameAtoZ: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray,
         order: [sequelize.fn('lower', sequelize.col('lastName'))]
       });
@@ -137,12 +115,9 @@ module.exports = {
 
   getUsersLastNameZtoA: async (req, res) => {
     try {
-      let offset = offsetLimit.checkOffset(req.query.offset);
-      let limit = offsetLimit.checkLimit(req.query.limit);
-
       let users = await User.findAll({
-        offset: offset,
-        limit: limit,
+        offset: req.query.offset,
+        limit: req.query.limit,
         attributes: attributesArray, 
         order: [[sequelize.fn('lower', sequelize.col('lastName')), 'DESC']]
       });

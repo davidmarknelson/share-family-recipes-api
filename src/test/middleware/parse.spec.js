@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const parse = require('../../middleware/parse');
 const httpMocks = require('node-mocks-http');
 
@@ -87,6 +85,58 @@ describe('Parse middleware', () => {
       request.body.ingredients[1].should.equal('meat');
       request.body.ingredients[2].should.equal('vegetables');
       request.body.instructions.should.be.an('array');
+    });
+  });
+
+  describe('parseOffsetAndLimit()', () => {
+    it('should return an offset and limit query when no query is provided', () => {
+      let request  = httpMocks.createRequest({
+        method: 'GET',
+        url: '/'
+      });
+
+      parse.parseOffsetAndLimit(request, response, nextSpy);
+      
+      expect(nextSpy).to.have.been.called();
+      request.query.offset.should.equal(0);
+      request.query.limit.should.equal(5);
+    });
+
+    it('should return an offset and limit query when each query is too small', () => {
+      let request  = httpMocks.createRequest({
+        method: 'GET',
+        url: '/',
+        query: {
+          offset: -1,
+          limit: 0
+        }
+      });
+
+      parse.parseOffsetAndLimit(request, response, nextSpy);
+      
+      expect(nextSpy).to.have.been.called();
+      request.query.offset.should.equal(0);
+      request.query.limit.should.equal(5);
+    });
+
+    it('should not alter appropriate offset and limit queries', () => {
+      let request  = httpMocks.createRequest({
+        method: 'GET',
+        url: '/',
+        query: {
+          offset: 0,
+          limit: 10
+        }
+      });
+
+      request.query.offset.should.equal(0);
+      request.query.limit.should.equal(10);
+
+      parse.parseOffsetAndLimit(request, response, nextSpy);
+      
+      expect(nextSpy).to.have.been.called();
+      request.query.offset.should.equal(0);
+      request.query.limit.should.equal(10);
     });
   });
   

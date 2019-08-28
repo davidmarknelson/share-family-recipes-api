@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const server = require("../../../app");
 
 describe('Not found', () => {

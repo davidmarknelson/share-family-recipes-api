@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const Verification = require('../../models/sequelize').verification_token;
 const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");

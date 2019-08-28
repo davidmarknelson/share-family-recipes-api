@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const db = require('../../models/sequelize').sequelize;
 const auth = require('../../middleware/auth');
 const httpMocks = require('node-mocks-http');

@@ -1,6 +1,4 @@
 'use strict';
-process.env.NODE_ENV = 'test';
-
 const server = require("../../../app");
 const utils = require("../utils");
 const db = require('../../models/sequelize').sequelize;
@@ -309,11 +307,11 @@ describe('Meal searches', () => {
           res.body.meals[0].creator.should.have.property('profilePic', null);
           res.body.meals[0].creatorId.should.equal(1);
           res.body.meals[0].should.have.property('mealPic', null);
-          res.body.meals[0].name.should.equal('Soup');
+          res.body.meals[0].name.should.equal('Sandwich');
           res.body.meals[0].should.have.property('likes');
           res.body.meals[0].likes.should.be.an('array');
-          res.body.meals[0].prepTime.should.equal(10);
-          res.body.meals[0].cookTime.should.equal(20);
+          res.body.meals[0].prepTime.should.equal(5);
+          res.body.meals[0].cookTime.should.equal(0);
           res.body.meals[0].should.not.have.property('ingredients');
           res.body.meals[0].should.not.have.property('instructions');
           res.body.meals[0].should.not.have.property('updatedAt');
