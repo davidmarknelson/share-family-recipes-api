@@ -24,13 +24,22 @@ describe('Meal searches', () => {
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
           res.body[0].creator.username.should.equal('johndoe');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
+          res.body[0].creator.should.have.property('profilePic', null);
           res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');
           res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Sandwich');
           res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(1);
+          res.body[1].should.have.property('likes');
           if(err) done(err);
           done();
         });
@@ -44,13 +53,22 @@ describe('Meal searches', () => {
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
           res.body[1].creator.username.should.equal('johndoe');
-          res.body[1].name.should.equal('Soup');
-          res.body[1].should.have.property('creator');
+          res.body[1].creator.should.have.property('profilePic', null);
           res.body[1].creatorId.should.equal(1);
+          res.body[1].should.have.property('mealPic', null);
+          res.body[1].name.should.equal('Soup');
+          res.body[1].should.have.property('likes');
+          res.body[1].likes.should.be.an('array');
+          res.body[1].prepTime.should.equal(10);
+          res.body[1].cookTime.should.equal(20);
+          res.body[1].should.not.have.property('ingredients');
+          res.body[1].should.not.have.property('instructions');
+          res.body[1].should.not.have.property('updatedAt');
+          res.body[1].should.not.have.property('createdAt');
           res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Sandwich');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('likes');
           if(err) done(err);
           done();
         });
@@ -67,13 +85,22 @@ describe('Meal searches', () => {
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
           res.body[1].creator.username.should.equal('johndoe');
-          res.body[1].name.should.equal('Soup');
-          res.body[1].should.have.property('creator');
+          res.body[1].creator.should.have.property('profilePic', null);
           res.body[1].creatorId.should.equal(1);
+          res.body[1].should.have.property('mealPic', null);
+          res.body[1].name.should.equal('Soup');
+          res.body[1].should.have.property('likes');
+          res.body[1].likes.should.be.an('array');
+          res.body[1].prepTime.should.equal(10);
+          res.body[1].cookTime.should.equal(20);
+          res.body[1].should.not.have.property('ingredients');
+          res.body[1].should.not.have.property('instructions');
+          res.body[1].should.not.have.property('updatedAt');
+          res.body[1].should.not.have.property('createdAt');
           res.body[0].creator.username.should.equal('johndoe');
           res.body[0].name.should.equal('Sandwich');
           res.body[0].should.have.property('creator');
-          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('likes');
           if(err) done(err);
           done();
         });
@@ -87,13 +114,22 @@ describe('Meal searches', () => {
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(2);
           res.body[0].creator.username.should.equal('johndoe');
-          res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
+          res.body[0].creator.should.have.property('profilePic', null);
           res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');
           res.body[1].creator.username.should.equal('johndoe');
           res.body[1].name.should.equal('Sandwich');
           res.body[1].should.have.property('creator');
-          res.body[1].creatorId.should.equal(1);
+          res.body[1].should.have.property('likes');
           if(err) done(err);
           done();
         });
@@ -102,16 +138,59 @@ describe('Meal searches', () => {
   });
 
   describe('GET all meals the match ingredients', () => {
-    it('should return meals containing specified ingredients', (done) => {
+    it('should return meals containing specified ingredients A to Z by name', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients?ingredient=water')
+        .get('/meals/search/byingredients-a-z?ingredient=meat')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');
-          res.body.should.have.lengthOf(1);
+          res.body.should.have.lengthOf(2);
           res.body[0].creator.username.should.equal('johndoe');
-          res.body[0].name.should.equal('Soup');
+          res.body[0].name.should.equal('Sandwich');
           res.body[0].should.have.property('creator');
+          res.body[0].should.have.property('likes');
+          res.body[1].creator.username.should.equal('johndoe');
+          res.body[1].creator.should.have.property('profilePic', null);
+          res.body[1].creatorId.should.equal(1);
+          res.body[1].should.have.property('mealPic', null);
+          res.body[1].name.should.equal('Soup');
+          res.body[1].should.have.property('likes');
+          res.body[1].likes.should.be.an('array');
+          res.body[1].prepTime.should.equal(10);
+          res.body[1].cookTime.should.equal(20);
+          res.body[1].should.not.have.property('ingredients');
+          res.body[1].should.not.have.property('instructions');
+          res.body[1].should.not.have.property('updatedAt');
+          res.body[1].should.not.have.property('createdAt');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return meals containing specified ingredients A to Z by name', (done) => {
+      chai.request(server)
+        .get('/meals/search/byingredients-z-a?ingredient=meat')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('array');
+          res.body.should.have.lengthOf(2);
+          res.body[1].creator.username.should.equal('johndoe');
+          res.body[1].name.should.equal('Sandwich');
+          res.body[1].should.have.property('creator');
+          res.body[1].should.have.property('likes');
+          res.body[0].creator.username.should.equal('johndoe');
+          res.body[0].creator.should.have.property('profilePic', null);
+          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
+          res.body[0].name.should.equal('Soup');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');
           if(err) done(err);
           done();
         });
@@ -119,14 +198,24 @@ describe('Meal searches', () => {
 
     it('should return meals containing specified case insensitive ingredients', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients?ingredient=Water')
+        .get('/meals/search/byingredients-a-z?ingredient=Water')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
           res.body[0].creator.username.should.equal('johndoe');
+          res.body[0].creator.should.have.property('profilePic', null);
+          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
           res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');
           if(err) done(err);
           done();
         });
@@ -134,14 +223,24 @@ describe('Meal searches', () => {
 
     it('should return meals containing multiple ingredients', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients?ingredient=water&ingredient=meat')
+        .get('/meals/search/byingredients-a-z?ingredient=water&ingredient=meat')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
           res.body[0].creator.username.should.equal('johndoe');
+          res.body[0].creator.should.have.property('profilePic', null);
+          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
           res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');       
           if(err) done(err);
           done();
         });
@@ -149,14 +248,24 @@ describe('Meal searches', () => {
 
     it('should return meals containing multiple ingredients where an ingredient is only part of the word', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients?ingredient=water&ingredient=veget')
+        .get('/meals/search/byingredients-a-z?ingredient=water&ingredient=veget')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('array');
           res.body.should.have.lengthOf(1);
           res.body[0].creator.username.should.equal('johndoe');
+          res.body[0].creator.should.have.property('profilePic', null);
+          res.body[0].creatorId.should.equal(1);
+          res.body[0].should.have.property('mealPic', null);
           res.body[0].name.should.equal('Soup');
-          res.body[0].should.have.property('creator');
+          res.body[0].should.have.property('likes');
+          res.body[0].likes.should.be.an('array');
+          res.body[0].prepTime.should.equal(10);
+          res.body[0].cookTime.should.equal(20);
+          res.body[0].should.not.have.property('ingredients');
+          res.body[0].should.not.have.property('instructions');
+          res.body[0].should.not.have.property('updatedAt');
+          res.body[0].should.not.have.property('createdAt');      
           if(err) done(err);
           done();
         });
@@ -164,7 +273,7 @@ describe('Meal searches', () => {
 
     it('should return an error message when there are no ingredients in the search', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients')
+        .get('/meals/search/byingredients-a-z')
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('You must add ingredients to the search.');
@@ -175,7 +284,7 @@ describe('Meal searches', () => {
 
     it('should return an error message when no meals match the search', (done) => {
       chai.request(server)
-        .get('/meals/search/byingredients?ingredient=beef')
+        .get('/meals/search/byingredients-a-z?ingredient=beef')
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('There are no meals with those ingredients.');
@@ -193,9 +302,22 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.username.should.equal('johndoe');
+          res.body.should.have.property('profilePic', null);
           res.body.meals.should.be.an('array');
           res.body.meals.should.have.lengthOf(2);
-          res.body.meals[0].name.should.equal('Sandwich');
+          res.body.meals[0].creator.username.should.equal('johndoe');
+          res.body.meals[0].creator.should.have.property('profilePic', null);
+          res.body.meals[0].creatorId.should.equal(1);
+          res.body.meals[0].should.have.property('mealPic', null);
+          res.body.meals[0].name.should.equal('Soup');
+          res.body.meals[0].should.have.property('likes');
+          res.body.meals[0].likes.should.be.an('array');
+          res.body.meals[0].prepTime.should.equal(10);
+          res.body.meals[0].cookTime.should.equal(20);
+          res.body.meals[0].should.not.have.property('ingredients');
+          res.body.meals[0].should.not.have.property('instructions');
+          res.body.meals[0].should.not.have.property('updatedAt');
+          res.body.meals[0].should.not.have.property('createdAt');
           if(err) done(err);
           done();
         });
@@ -259,6 +381,9 @@ describe('Meal searches', () => {
           res.body[0].should.have.property('id');
           res.body[0].should.have.property('name');
           res.body[0].name.should.equal('Sandwich');
+          res.body[1].should.have.property('id');
+          res.body[1].should.have.property('name');
+          res.body[1].name.should.equal('Soup');
           if(err) done(err);
           done();
         });

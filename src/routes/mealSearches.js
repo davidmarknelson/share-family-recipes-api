@@ -7,7 +7,8 @@ router.route('/oldest').get(meals.getByOldest);
 router.route('/names-a-z').get(meals.getMealsAtoZ);
 router.route('/names-z-a').get(meals.getMealsZtoA);
 router.route('/name').get(meals.searchByName);
-router.route('/byingredients').get(meals.getMealsByIngredients);
+router.route('/byingredients-a-z').get(meals.getMealsByIngredientsAtoZ);
+router.route('/byingredients-z-a').get(meals.getMealsByIngredientsZtoA);
 router.route('/byuser').get(meals.getMealsCreatedByUser);
 router.route('/available-names').get(meals.findAvailableMealName);
 

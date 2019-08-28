@@ -18,6 +18,8 @@ module.exports = {
 
       if (!meal) return res.status(404).json({ message: 'There was an error getting the meal.' });
 
+      meal.ingredients = JSON.parse(meal.ingredients);
+
       res.status(200).json(meal);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -31,10 +33,18 @@ module.exports = {
       }
 
       req.body.creatorId = req.decoded.id;
+
       let meal = await Meal.create(req.body);
+
+      meal.ingredients = JSON.parse(meal.ingredients);
 
       res.status(200).json(meal);
     } catch (err) {
+      if (err.errors) {
+        if (err.errors[0].message === 'name must be unique') {
+          return res.status(400).json({ message: 'This meal name is already in use.' });
+        }
+      }
       res.status(500).json({ message: err.message });
     }
   },
@@ -44,6 +54,8 @@ module.exports = {
       if (req.file) {
         req.body.mealPic = req.file.path;
       }
+
+      req.body.ingredients = JSON.stringify(req.body.ingredients);
 
       let meal = await  Meal.update(req.body, {
         where: { 

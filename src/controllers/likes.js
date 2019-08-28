@@ -4,6 +4,15 @@ const Likes = require('../models/sequelize').like;
 module.exports = {
   addLike: async (req, res) => {
     try {
+      let previousLike = await Likes.findOne({
+        where: {
+          mealId: req.body.mealId,
+          userId: req.decoded.id
+        }
+      });
+
+      if (previousLike) return res.status(400).json({ message: 'You have already liked this meal.' });
+
       let likes = await Likes.create({
         mealId: req.body.mealId,
         userId: req.decoded.id

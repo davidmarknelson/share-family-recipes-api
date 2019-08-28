@@ -15,7 +15,7 @@ describe('Likes', () => {
   });
 
   describe('POST add like', () => {
-    it('should return a message when a meal is successfully liked', (done) => {
+    it('should return a message when a meal is successfully liked.', (done) => {
       let token = `Bearer ${user.jwt}`;
       
       chai.request(server)
@@ -40,6 +40,21 @@ describe('Likes', () => {
       .end((err, res) => {
         res.should.have.status(500);
         res.body.message.should.equal('There was an error liking the meal.');
+        if(err) done(err);
+        done();
+      });
+    });
+
+    it('should return an error message when the meal has already been liked', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      
+      chai.request(server)
+      .post('/likes/add')
+      .set("Authorization", token)
+      .send({mealId: 1})
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.message.should.equal('You have already liked this meal.');
         if(err) done(err);
         done();
       });

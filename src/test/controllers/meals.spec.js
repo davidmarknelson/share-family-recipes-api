@@ -112,7 +112,33 @@ describe('Meals', () => {
           done();
         });
     });
+
+
+    it('should return an error when the meal name is already being used', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .field('name', 'Meat and Cheese Sandwich')
+        .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
+        .field('instructions', JSON.stringify([
+          'Put the bread on the counter.', 
+          'Put the meat between 2 slices of bread.', 
+          'Put the cheese on the meat.'
+        ]))
+        .field('prepTime', 5)
+        .field('cookTime', 0)
+        .field('difficulty', 1)
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('This meal name is already in use.');
+          if(err) done(err);
+          done();
+        });
+    });
   });
+
 
   describe('GET specific meal', () => {
     it('should return a meal', (done) => {

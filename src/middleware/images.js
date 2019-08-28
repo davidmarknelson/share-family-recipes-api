@@ -2,6 +2,16 @@
 const multer  = require('multer');
 const Jimp = require('jimp');
 
+// Multer settings
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(new Error('Please upload a JPEG image.'), false);
+  }
+};
+
+// Multer profile picture settings
 const storageProfile = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/images/profilePics');
@@ -17,6 +27,16 @@ const storageProfile = multer.diskStorage({
   }
 });
 
+const uploadProfilePic = multer({
+  storage: storageProfile,
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+    files: 1
+  },
+  fileFilter: fileFilter
+});
+
+// Multer meal picture settings
 const storageMeal = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'public/images/mealPics');
@@ -32,23 +52,6 @@ const storageMeal = multer.diskStorage({
   }
 });
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg') {
-    cb(null, true);
-  } else {
-    cb(new Error('Please upload a JPEG image.'), false);
-  }
-};
-
-const uploadProfilePic = multer({
-  storage: storageProfile,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-    files: 1
-  },
-  fileFilter: fileFilter
-});
-
 const uploadMealPic = multer({
   storage: storageMeal,
   limits: {
@@ -58,19 +61,25 @@ const uploadMealPic = multer({
   fileFilter: fileFilter
 });
 
+// Jimp image quality functions
+const fileSizeChart = [
+  { minSize: 1500000, quality: 20 },
+  { minSize: 500000, quality: 45 },
+  { minSize: 0, quality: 70 }
+]
+
+function getQuality(fileSize) {
+  let size = fileSizeChart.find((file) => fileSize >= file.minSize);
+
+  return size.quality;
+}
+
 module.exports = {
   resizeImage: async (req, res, next) => {
     try {
       if (!req.file) return next();
 
-      let quality;
-      if (req.file.size < 500000) {
-        quality = 70;
-      } else if (req.file.size > 500000 && req.file.size < 1500000) {
-        quality = 45;
-      } else {
-        quality = 20;
-      }
+      let quality = getQuality(req.file.size);
 
       let image = await Jimp.read(req.file.path)
         .then(image => image.quality(quality).write(req.file.path)

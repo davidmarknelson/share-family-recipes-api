@@ -15,10 +15,11 @@ module.exports = {
       let meals = await Meal.findAll({
         offset: offset,
         limit: limit,
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: [['createdAt', 'DESC']],
         include: [
-          { model: User, as: "creator", attributes: ['username']},
-          { model: Like, attributes: ['userId']}
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
         ]
       });
 
@@ -41,9 +42,11 @@ module.exports = {
       let meals = await Meal.findAll({
         offset: offset,
         limit: limit,
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: ['createdAt'],
         include: [
-          { model: User, as: "creator", attributes: ['username']}
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
         ]
       });
 
@@ -67,9 +70,10 @@ module.exports = {
         offset: offset,
         limit: limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         include: [
-          { model: User, as: "creator", attributes: ['username']},
-          { model: Like, attributes: ['userId']}
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
         ]
       });
 
@@ -91,9 +95,11 @@ module.exports = {
       let meals = await Meal.findAll({
         offset: offset,
         limit: limit,
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         include: [
-          { model: User, as: "creator", attributes: ['username']}
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
         ]
       });
 
@@ -105,9 +111,12 @@ module.exports = {
     }
   },
 
-  getMealsByIngredients: async (req, res) => {
+  getMealsByIngredientsAtoZ: async (req, res) => {
     try {
       if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
+
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
 
       let temp;
       if (!Array.isArray(req.query.ingredient)) {
@@ -115,17 +124,62 @@ module.exports = {
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => `'%${val.toLowerCase()}%'`);
+      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
 
-      let meals = await sequelize.query(`
-        SELECT meals.id, meals.name, meals.difficulty, users.username as "creator.username" FROM meals
-        JOIN users ON "meals"."creatorId" = users.id 
-        WHERE array_to_string(ingredients, ',') 
-        like ALL(array[${ingredients}])
-        ;`, {
-          nest: true
-        }
-      );
+      let meals = await Meal.findAll({
+        offset: offset,
+        limit: limit,
+        where: {
+          ingredients: {
+            [Op.like]: sequelize.fn('ALL', ingredients)
+          }
+        },
+        order: [sequelize.fn('lower', sequelize.col('name'))],
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        include: [
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
+        ]
+      });
+
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: "There was an error getting the list of meals." });
+    }
+  },
+
+  getMealsByIngredientsZtoA: async (req, res) => {
+    try {
+      if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
+
+      let offset = offsetLimit.checkOffset(req.query.offset);
+      let limit = offsetLimit.checkLimit(req.query.limit);
+
+      let temp;
+      if (!Array.isArray(req.query.ingredient)) {
+        temp = [req.query.ingredient];
+      } else {
+        temp = req.query.ingredient;
+      }
+      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+
+      let meals = await Meal.findAll({
+        offset: offset,
+        limit: limit,
+        where: {
+          ingredients: {
+            [Op.like]: sequelize.fn('ALL', ingredients)
+          }
+        },
+        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        include: [
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
+        ]
+      });
 
       if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
@@ -141,8 +195,17 @@ module.exports = {
         where: {          
           username: req.query.username
         },
-        attributes: ['username'],
-        include: ['meals']
+        attributes: ['username', 'profilePic'],
+        include: [
+          { 
+            model: Meal, as: 'meals', 
+            attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+            include: [
+              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false }
+            ]
+          },
+        ]
       });
 
       if (!meals) return res.status(404).json({ message: 'This user has not created any meals.'});
@@ -180,6 +243,8 @@ module.exports = {
             [Op.iLike]: `%${req.query.name}%`
           }
         },
+        limit: 10,
+        order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: ['id', 'name']
       });
 

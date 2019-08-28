@@ -17,7 +17,7 @@ module.exports = (sequelize, type) => {
       unique: true      
     },
     ingredients: {
-      type: type.ARRAY(type.STRING),
+      type: type.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -70,6 +70,22 @@ module.exports = (sequelize, type) => {
     },
     createdAt: type.DATE,
     updatedAt: type.DATE
+  }, {
+    indexes: [
+      { fields: ['ingredients'] }
+    ],
+    hooks: {
+      beforeValidate: function parseIngredients(meal) {
+        if (Array.isArray(meal.ingredients)) {
+          meal.ingredients = JSON.stringify(meal.ingredients);
+        }
+      },
+      beforeBulkUpdate: function parseUpdatedIngredients(meal) {
+        if (Array.isArray(meal.attributes.ingredients)) {
+          meal.attributes.ingredients = JSON.stringify(meal.attributes.ingredients);
+        }
+      }
+    }
   });
 
   meal.associate = (models) => {
