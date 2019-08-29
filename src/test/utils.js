@@ -60,7 +60,6 @@ module.exports = {
         email: "test@email.com",
         password: "password",
         passwordConfirmation: "password",
-        isAdmin: true,
         adminCode: '123456789'
       });
   },

@@ -10,7 +10,7 @@ let attributesArray = [
 module.exports = {
   getUsersByNewest: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
@@ -25,7 +25,7 @@ module.exports = {
 
   getUsersByOldest: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
@@ -40,7 +40,7 @@ module.exports = {
 
   getUsersAtoZ: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
@@ -55,7 +55,7 @@ module.exports = {
 
   getUsersZtoA: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 
@@ -70,7 +70,7 @@ module.exports = {
 
   getUsersFirstNameAtoZ: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
@@ -85,7 +85,7 @@ module.exports = {
 
   getUsersFirstNameZtoA: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 
@@ -100,7 +100,7 @@ module.exports = {
 
   getUsersLastNameAtoZ: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
@@ -115,7 +115,7 @@ module.exports = {
 
   getUsersLastNameZtoA: async (req, res) => {
     try {
-      let users = await User.findAll({
+      let users = await User.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 

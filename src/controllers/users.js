@@ -1,6 +1,5 @@
 'use strict';
 // Models
-const Verification = require('../models/sequelize').verification_token;
 const SavedMeals = require('../models/sequelize').saved_meal;
 const Likes = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
@@ -8,11 +7,7 @@ const Meal = require('../models/sequelize').meal;
 // Sequelize operators
 const Op = require('sequelize').Op;
 // JWT
-const cryptoRandomString = require('crypto-random-string');
 const jwt = require('jsonwebtoken');
-// Email
-const helpers = require('../helpers/email');
-const nodemailer = require('nodemailer');
 // File system
 const fs = require('fs');
 
@@ -48,8 +43,7 @@ module.exports = {
     try {
       let user = await User.findOne({
         where: {
-          email: req.decoded.email,
-          username: req.decoded.username
+          id: req.decoded.id
         },
         include: [
           'meals', 

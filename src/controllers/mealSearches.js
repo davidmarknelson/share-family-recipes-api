@@ -8,7 +8,7 @@ const sequelize = require('../models/sequelize').sequelize;
 module.exports = {
   getByNewest: async (req, res) => {
     try {
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
@@ -19,9 +19,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
 
       res.status(200).json(meals);
 
@@ -32,7 +30,7 @@ module.exports = {
 
   getByOldest: async (req, res) => {
     try {
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
@@ -43,9 +41,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
 
       res.status(200).json(meals);
 
@@ -56,7 +52,7 @@ module.exports = {
 
   getMealsAtoZ: async (req, res) => {
     try {
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
@@ -67,9 +63,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) {
-        return res.status(404).json({ message: 'There are no meals.' });
-      }
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -79,7 +73,7 @@ module.exports = {
 
   getMealsZtoA: async (req, res) => {
     try {
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
@@ -90,7 +84,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -110,7 +104,7 @@ module.exports = {
       }
       let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
 
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         where: {
@@ -126,7 +120,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -146,7 +140,7 @@ module.exports = {
       }
       let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
 
-      let meals = await Meal.findAll({
+      let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
         where: {
@@ -162,7 +156,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -172,7 +166,7 @@ module.exports = {
 
   getMealsCreatedByUser: async (req, res) => {
     try {
-      let meals = await User.findOne({
+      let user = await User.findOne({
         where: {          
           username: req.query.username
         },
@@ -191,9 +185,22 @@ module.exports = {
         ]
       });
 
-      if (!meals) return res.status(404).json({ message: 'This user has not created any meals.'});
+      if (!user) return res.status(404).json({ message: 'This user does not exist.'});
 
-      res.status(200).json(meals);
+      let count = await Meal.count({
+        where: {
+          creatorId: user.id
+        }
+      });
+
+      let userMeals = {
+        id: user.id,
+        username: user.username,
+        profilePic: user.profilePic,
+        count: count,
+        rows: user.meals
+      }
+      res.status(200).json(userMeals);
     } catch (err) {
       res.status(500).json({ message: "There was an error getting the list of meals." });
     }
