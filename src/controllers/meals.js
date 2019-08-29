@@ -1,6 +1,8 @@
 'use strict';
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
+const SavedMeal = require('../models/sequelize').saved_meal;
+const Like = require('../models/sequelize').like;
 const fs = require('fs');
 
 module.exports = {
@@ -95,6 +97,13 @@ module.exports = {
         });
       }
 
+      if (meal) {
+        let deletedRelatedData = await Promise.all([
+          SavedMeal.destroy({where: { mealId: meal.dataValues.id }}),
+          Like.destroy({where: { mealId: meal.dataValues.id }})
+        ]);
+      }
+
       let deleted = await Meal.destroy({
         where: { 
           id: req.body.id,
@@ -108,6 +117,7 @@ module.exports = {
         return res.status(500).json({ message: 'There was an error deleting your meal.' });
       }
     } catch (err) {
+      console.log(err)
       res.status(500).json({ message: err.message });
     }
   },

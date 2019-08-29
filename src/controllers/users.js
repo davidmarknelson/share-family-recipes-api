@@ -1,6 +1,6 @@
 'use strict';
 const SavedMeals = require('../models/sequelize').saved_meal;
-const Likes = require('../models/sequelize').like;
+const Like = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 const Op = require('sequelize').Op;
@@ -166,20 +166,50 @@ module.exports = {
           }
         });
       }
-     
-      let deleted = await Promise.all([
-        Meal.destroy({where: { creatorId: req.decoded.id }}),
-        Likes.destroy({where: { userId: req.decoded.id }}),
-        SavedMeals.destroy({where: { userId: req.decoded.id }})
-      ]);
+
+      let meals = await Meal.findAll({
+        where: {
+          creatorId: req.decoded.id
+        }
+      });
+
+      let mealPics;
+      if (meals) {
+        mealPics = meals.reduce((pictures, meal) => {
+          if (meal.dataValues.mealPic) {
+            pictures.push(meal.dataValues.mealPic);
+          }
+          return pictures;
+        }, []);
+      }
+
+      for (let mealPic of mealPics) {
+        fs.stat(mealPic, (err, stats) => {
+          if (stats) {
+            fs.unlink(mealPic, (err) => {
+              if (err) res.status(500).json({ message: 'There was an error deleting a meal picture.' });
+            });
+          }
+        });
+      }
+      
       // User is deleted separately from the others because the userId fields in meal, likes, and saved meal
       // tables will be set to null and then it will be difficult to delete. Sequelize has an open issue around 
-      // this. There is a workaround, but I'd rather not deal with it for now. The issue can be found 
-      // here https://github.com/sequelize/sequelize/issues/8444
+      // this. The issue can be found here https://github.com/sequelize/sequelize/issues/8444
+      let deleted = await Promise.all([
+        Meal.destroy({where: { creatorId: req.decoded.id }}),
+        Like.destroy({where: { userId: req.decoded.id }}),
+        SavedMeals.destroy({where: { userId: req.decoded.id }})
+      ]);
 
-      let user = await User.destroy({where: { id: req.decoded.id }});
+      let deletedRelatedData = await Promise.all([
+        Like.destroy({where: { mealId: null }}),
+        SavedMeals.destroy({where: { mealId: null }})
+      ]);
 
-      if (user) {
+      let deleteduser = await User.destroy({where: { id: req.decoded.id }});
+
+      if (deleteduser) {
         return res.status(200).json({ message: "User successfully deleted." });
       } else {
         return res.status(500).json({ message: "There was an error deleting your profile." });
