@@ -91,7 +91,7 @@ module.exports = {
           if (stats) {
             // Deletes meal picture
             fs.unlink(meal.dataValues.mealPic, (err) => {
-              if (err) res.status(500).json({ message: 'There was an error deleting your meal picture.' });
+              if (err) return res.status(500).json({ message: 'There was an error deleting your meal picture.' });
             });
           }
         });
@@ -117,7 +117,6 @@ module.exports = {
         return res.status(500).json({ message: 'There was an error deleting your meal.' });
       }
     } catch (err) {
-      console.log(err)
       res.status(500).json({ message: err.message });
     }
   },

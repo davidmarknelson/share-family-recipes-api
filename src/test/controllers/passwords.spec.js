@@ -23,7 +23,7 @@ describe('Password', () => {
         .put('/password/change')
         .set("Authorization", token)
         .send({
-          password: "match",
+          password: "notMatching",
           passwordConfirmation: "notMatch"
         })
         .end((err, res) => {

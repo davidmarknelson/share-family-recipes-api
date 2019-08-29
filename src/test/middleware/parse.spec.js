@@ -140,4 +140,36 @@ describe('Parse middleware', () => {
     });
   });
   
+  describe('checkPasswordValidity()', () => {
+    it('should send an error if the password is too short', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          password: 'short'
+        }
+      });
+
+      parse.checkPasswordValidity(request, response, nextSpy);
+      
+      expect(nextSpy).to.not.have.been.called();
+      response._getData().should.equal('{"message":"Password must be at least 8 characters long."}');
+    });
+
+    it('should call next if password is at least 8 characters long', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          password: 'password'
+        }
+      });
+      request.body.password.should.equal('password');
+
+      parse.checkPasswordValidity(request, response, nextSpy);
+      
+      expect(nextSpy).to.have.been.called();
+      request.body.password.should.equal('password');
+    });
+  });
 });

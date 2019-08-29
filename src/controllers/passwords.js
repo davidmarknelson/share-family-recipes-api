@@ -112,8 +112,7 @@ module.exports = {
         password: req.body.password
       }, {
         where: {
-          id: userObj.id,
-          email: userObj.email
+          id: userObj.id
         }
       });
   

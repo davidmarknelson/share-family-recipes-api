@@ -161,7 +161,7 @@ module.exports = {
           if (stats) {
             // Deletes profile picture
             fs.unlink(req.decoded.profilePic, (err) => {
-              if (err) res.status(500).json({ message: 'There was an error deleting your profile picture.' });
+              if (err) return res.status(500).json({ message: 'There was an error deleting your profile picture.' });
             });
           }
         });
@@ -187,7 +187,7 @@ module.exports = {
         fs.stat(mealPic, (err, stats) => {
           if (stats) {
             fs.unlink(mealPic, (err) => {
-              if (err) res.status(500).json({ message: 'There was an error deleting a meal picture.' });
+              if (err) return res.status(500).json({ message: 'There was an error deleting a meal picture.' });
             });
           }
         });

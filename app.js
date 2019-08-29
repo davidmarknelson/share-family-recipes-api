@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const routes = require('./src/routes/index');
 
 //  App configuration
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(helmet());
