@@ -80,14 +80,14 @@ module.exports = {
       .post('/meals/create')
       .set("Authorization", `Bearer ${token}`)
       .field('name', 'Sandwich')
+      .field('description', 'An easy sandwich for those busy days!')
       .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
       .field('instructions', JSON.stringify([
         'Put the bread on the counter.', 
         'Put the meat between 2 slices of bread.', 
         'Put the cheese on the meat.'
       ]))
-      .field('prepTime', 5)
-      .field('cookTime', 0)
+      .field('cookTime', 5)
       .field('difficulty', 1)
   },
   createMeal2: (token) => {
@@ -95,13 +95,13 @@ module.exports = {
       .post('/meals/create')
       .set("Authorization", `Bearer ${token}`)
       .field('name', 'Soup')
+      .field('description', 'A tasty soup for a cold day!')
       .field('ingredients', JSON.stringify(['water', 'vegetables', 'meat']))
       .field('instructions', JSON.stringify([
         'Cut the veggies.', 
         'Boil the water.', 
         'Put veggies and meat in the water until it is cooked.'
       ]))
-      .field('prepTime', 10)
       .field('cookTime', 20)
       .field('difficulty', 3)
   }

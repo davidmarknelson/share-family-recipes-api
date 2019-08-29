@@ -16,6 +16,10 @@ module.exports = (sequelize, type) => {
       allowNull: false,
       unique: true      
     },
+    description: {
+      type: type.STRING,
+      allowNull: false
+    },
     ingredients: {
       type: type.STRING,
       allowNull: false,
@@ -34,23 +38,13 @@ module.exports = (sequelize, type) => {
         }
       }
     },
-    prepTime: {
-      type: type.INTEGER,
-      defaultValue: 0,
-      validate: {
-        min: {
-          args: [0],
-          msg: "The prep time must be the number of minutes in number form."
-        }
-      }
-    },
     cookTime: {
       type: type.INTEGER,
       defaultValue: 0,
       validate: {
         min: {
           args: [0],
-          msg: "The cook time must be the number of minutes in number form."
+          msg: "The time to make the meal must be the number of minutes in number form."
         }
       }
     },
@@ -67,6 +61,14 @@ module.exports = (sequelize, type) => {
           msg: "The level of difficulty must be between 1 and 5."
         }
       }
+    },
+    originalRecipeUrl: {
+      type: type.STRING,
+      allowNull: true,
+    },
+    youtubeUrl: {
+      type: type.STRING,
+      allowNull: true,
     },
     createdAt: type.DATE,
     updatedAt: type.DATE

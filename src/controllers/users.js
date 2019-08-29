@@ -1,14 +1,10 @@
 'use strict';
-// Models
 const SavedMeals = require('../models/sequelize').saved_meal;
 const Likes = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
-// Sequelize operators
 const Op = require('sequelize').Op;
-// JWT
 const jwt = require('jsonwebtoken');
-// File system
 const fs = require('fs');
 
 function jwtSignUser(user) {
@@ -82,7 +78,7 @@ module.exports = {
 
       let user = await User.create(req.body);
 
-      delete user.dataValues.password;
+        delete user.dataValues.password;
 
       res.status(200).json({
         user: user,

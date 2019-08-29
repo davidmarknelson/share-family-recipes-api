@@ -78,7 +78,7 @@ module.exports = {
     try {
       let meal = await Meal.findOne({
         where: {
-          name: req.body.name,
+          id: req.body.id,
           creatorId: req.decoded.id
         }
       });
@@ -97,7 +97,7 @@ module.exports = {
 
       let deleted = await Meal.destroy({
         where: { 
-          name: req.body.name,
+          id: req.body.id,
           creatorId: req.decoded.id
         }
       });

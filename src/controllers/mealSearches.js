@@ -5,13 +5,15 @@ const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
 const sequelize = require('../models/sequelize').sequelize;
 
+let attributesArray = ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'];
+
 module.exports = {
   getByNewest: async (req, res) => {
     try {
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         order: [['createdAt', 'DESC']],
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
@@ -33,7 +35,7 @@ module.exports = {
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         order: ['createdAt'],
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
@@ -56,7 +58,7 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
@@ -76,7 +78,7 @@ module.exports = {
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
@@ -113,7 +115,7 @@ module.exports = {
           }
         },
         order: [sequelize.fn('lower', sequelize.col('name'))],
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false }
@@ -149,7 +151,7 @@ module.exports = {
           }
         },
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
-        attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+        attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false }
@@ -174,7 +176,7 @@ module.exports = {
         include: [
           { 
             model: Meal, as: 'meals', 
-            attributes: ['id', 'difficulty', 'mealPic', 'name', 'prepTime', 'cookTime', 'creatorId'],
+            attributes: attributesArray,
             offset: req.query.offset,
             limit: req.query.limit,
             include: [

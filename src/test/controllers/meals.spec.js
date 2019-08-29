@@ -31,14 +31,14 @@ describe('Meals', () => {
         .post('/meals/create')
         .set("Authorization", token)
         .field('name', 'Sandwich')
+        .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
         .field('instructions', JSON.stringify([
           'Put the bread on the counter.', 
           'Put the meat between 2 slices of bread.', 
           'Put the cheese on the meat.'
         ]))
-        .field('prepTime', 5)
-        .field('cookTime', 0)
+        .field('cookTime', 5)
         .field('difficulty', 1)
         .attach('mealPic', 'src/test/testImages/testMealPng.png')
         .end((err, res) => {
@@ -56,20 +56,25 @@ describe('Meals', () => {
         .post('/meals/create')
         .set("Authorization", token)
         .field('name', 'Meat and Cheese Sandwich')
+        .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
         .field('instructions', JSON.stringify([
           'Put the bread on the counter.', 
           'Put the meat between 2 slices of bread.', 
           'Put the cheese on the meat.'
         ]))
-        .field('prepTime', 5)
-        .field('cookTime', 0)
+        .field('cookTime', 5)
         .field('difficulty', 1)
+        .field('originalRecipeUrl', 'www.testrecipe.com')
+        .field('youtubeUrl', 'www.testvideo.com')
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.name.should.equal("Meat and Cheese Sandwich");
           res.body.id.should.equal(1)
+          res.body.should.have.property('description');
+          res.body.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
+          res.body.should.have.property('youtubeUrl', 'www.testvideo.com');
           res.body.ingredients.should.be.an('array');
           res.body.ingredients.should.have.lengthOf(3);
           res.body.instructions.should.be.an('array');
@@ -87,19 +92,20 @@ describe('Meals', () => {
         .post('/meals/create')
         .set("Authorization", token)
         .field('name', 'Soup')
+        .field('description', 'A tasty soup for a cold day!')
         .field('ingredients', JSON.stringify(['WATER', 'VEGETABLES', 'MEAT']))
         .field('instructions', JSON.stringify([
           'Cut the veggies.', 
           'Boil the water.', 
           'Put veggies and meat in the water until it is cooked.'
         ]))
-        .field('prepTime', 10)
         .field('cookTime', 20)
         .field('difficulty', 3)
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.name.should.equal("Soup");
+          res.body.should.have.property('description');
           res.body.ingredients.should.be.an('array');
           res.body.ingredients.should.have.lengthOf(3);
           res.body.ingredients[0].should.equal('water');
@@ -119,14 +125,14 @@ describe('Meals', () => {
         .post('/meals/create')
         .set("Authorization", token)
         .field('name', 'Meat and Cheese Sandwich')
+        .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
         .field('instructions', JSON.stringify([
           'Put the bread on the counter.', 
           'Put the meat between 2 slices of bread.', 
           'Put the cheese on the meat.'
         ]))
-        .field('prepTime', 5)
-        .field('cookTime', 0)
+        .field('cookTime', 5)
         .field('difficulty', 1)
         .end((err, res) => {
           res.should.have.status(400);
@@ -173,14 +179,14 @@ describe('Meals', () => {
         .set("Authorization", token)
         .field('id', 1)
         .field('name', 'Meat and Cheese Sandwich')
+        .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'lettuce', 'meat']))
         .field('instructions', JSON.stringify([
           'Put the bread on the counter.', 
           'Put the meat between 2 slices of bread.', 
           'Put the cheese and lettuce on the meat.'
         ]))
-        .field('prepTime', 5)
-        .field('cookTime', 0)
+        .field('cookTime', 5)
         .field('difficulty', 1)
         .attach('mealPic', 'src/test/testImages/testMealPng.png')
         .end((err, res) => {
@@ -199,14 +205,14 @@ describe('Meals', () => {
         .set("Authorization", token)
         .field('id', 1)
         .field('name', 'Sandwich')
+        .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'lettuce', 'meat']))
         .field('instructions', JSON.stringify([
           'Put the bread on the counter.', 
           'Put the meat between 2 slices of bread.', 
           'Put the cheese and lettuce on the meat.'
         ]))
-        .field('prepTime', 5)
-        .field('cookTime', 0)
+        .field('cookTime', 5)
         .field('difficulty', 1)
         .end((err, res) => {
           res.should.have.status(200);
@@ -224,7 +230,7 @@ describe('Meals', () => {
       chai.request(server)
         .delete('/meals/delete')
         .set("Authorization", token)
-        .send({ name: 'Sandwich' })
+        .send({ id: 1 })
         .end((err, res) => {
           res.should.have.status(200);
           res.body.message.should.equal('Meal successfully deleted.');
@@ -239,7 +245,7 @@ describe('Meals', () => {
       chai.request(server)
         .delete('/meals/delete')
         .set("Authorization", token)
-        .send({ name: 'Meat and Cheese Sandwich' })
+        .send({ id: 1 })
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal('There was an error deleting your meal.');
