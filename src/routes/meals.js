@@ -1,9 +1,11 @@
 'use strict';
 const router = require('express').Router();
+// Controller
 const meals = require('../controllers/meals');
-const auth = require('../middleware/auth');
+// Middleware
 const images = require('../middleware/images');
 const parse = require('../middleware/parse');
+const auth = require('../middleware/auth');
 
 router.route('/meal').get(meals.getMeal);
 router.route('/create').post(auth.isAuthenticated, images.uploadMealPic, images.resizeImage, parse.parseMealFields, meals.create);

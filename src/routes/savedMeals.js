@@ -1,8 +1,10 @@
 'use strict';
 const router = require('express').Router();
+// Controller
 const savedMeals = require('../controllers/savedMeals');
-const auth = require('../middleware/auth');
+// Middleware
 const parse = require('../middleware/parse');
+const auth = require('../middleware/auth');
 
 router.route('/find').get(auth.isAuthenticated, parse.parseOffsetAndLimit, savedMeals.findAll);
 router.route('/save').post(auth.isAuthenticated, savedMeals.saveMeal);

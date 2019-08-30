@@ -1,9 +1,9 @@
 'use strict';
-const adminMiddleware = require('../../middleware/admin');
 const db = require('../../models/sequelize').sequelize;
+const utils = require("../utils");
+const adminMiddleware = require('../../middleware/admin');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
-const utils = require("../utils");
 
 function jwtSignUser(user) {
   return jwt.sign(user, process.env.JWT_SECRET, {

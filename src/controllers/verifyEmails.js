@@ -1,9 +1,11 @@
 'use strict';
+// Models
 const Verification = require('../models/sequelize').verification_token;
 const User = require('../models/sequelize').user;
+// For emails
+const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
-const cryptoRandomString = require('crypto-random-string');
 
 module.exports = {
   verifyEmail: async (req, res) => {

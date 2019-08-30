@@ -1,11 +1,17 @@
 'use strict';
 const db = require('../../models/sequelize').sequelize;
-const User = require('../../models/sequelize').user;
 const server = require("../../../app");
 const utils = require("../utils");
+// Models to check database for data
+const SavedMeal = require('../../models/sequelize').saved_meal;
+const User = require('../../models/sequelize').user;
+const Meal = require('../../models/sequelize').meal;
+const Like = require('../../models/sequelize').like;
+
 
 describe('Users', () => {
   let user;
+  let user2;
 
   before(() => {
     return db.sync({force: true});
@@ -130,6 +136,8 @@ describe('Users', () => {
         .field('password', 'password')
         .field('passwordConfirmation', 'password')
         .end((err, res) => {
+          user2 = res.body;
+
           res.should.have.status(201);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
@@ -361,18 +369,51 @@ describe('Users', () => {
   
 
   describe('DELETE /user/delete', () => {
-    it('should return a message when a user is deleted', (done) => {
+    it('should return a message when a user and the user created content is deleted', (done) => {
       let token = `Bearer ${user.jwt}`;
-      
-      chai.request(server)
-        .delete('/user/delete')
-        .set("Authorization", token)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal("User successfully deleted.");
-          if(err) done(err);
-          done();
-        });
+      let token2 = `Bearer ${user2.jwt}`;
+
+      // user 1 creates meal
+      utils.createMeal1(user.jwt)
+        // user 1 saves meal
+        .then(() => chai.request(server)
+          .post('/savedmeals/save')
+          .set("Authorization", token)
+          .send({ mealId: 1 }))
+        // user 1 likes meal
+        .then(() => chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", token)
+          .send({mealId: 1}))
+        // user 2 saves meal
+        .then(() => chai.request(server)
+          .post('/savedmeals/save')
+          .set("Authorization", token2)
+          .send({ mealId: 1 }))
+        // user 2 likes meal
+        .then(() => chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", token)
+          .send({mealId: 1}))
+        // user 1 deletes profile
+        .then(() => chai.request(server)
+          .delete('/user/delete')
+          .set("Authorization", token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.message.should.equal("User successfully deleted.");
+          }))
+        // Check if this has also deleted user 2 likes and saves related to user 1 created content
+        .then(() => User.findOne({where: {id: 1}}))
+        .then(user => expect(user).to.equal(null))
+        .then(() => Like.findAll())
+        .then(likes => expect(likes.length).to.equal(0))
+        .then(() => Meal.findAll())
+        .then(meals => expect(meals.length).to.equal(0))
+        .then(() => SavedMeal.findAll())
+        .then(savedMeals => expect(savedMeals.length).to.equal(0))
+        .then(() => done())
+        .catch(err => done(err));
     });
 
     it('should return a error message when a user is not deleted', (done) => {

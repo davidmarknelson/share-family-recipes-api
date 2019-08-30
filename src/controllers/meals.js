@@ -1,8 +1,10 @@
 'use strict';
+// Models
+const SavedMeal = require('../models/sequelize').saved_meal;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
-const SavedMeal = require('../models/sequelize').saved_meal;
 const Like = require('../models/sequelize').like;
+// File system
 const fs = require('fs');
 
 module.exports = {

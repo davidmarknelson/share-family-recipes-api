@@ -1,9 +1,10 @@
 'use strict';
+// Models, operators, and database function helpers
+const sequelize = require('../models/sequelize').sequelize;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
-const sequelize = require('../models/sequelize').sequelize;
 
 let attributesArray = ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'];
 

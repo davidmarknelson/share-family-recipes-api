@@ -1,7 +1,12 @@
 'use strict';
+const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");
 const utils = require("../utils");
-const db = require('../../models/sequelize').sequelize;
+// Models to check database for data
+const SavedMeal = require('../../models/sequelize').saved_meal;
+const Like = require('../../models/sequelize').like;
+const Meal = require('../../models/sequelize').meal;
+// File system to delete pictures
 const fs = require('fs');
 
 describe('Meals', () => {
@@ -224,19 +229,37 @@ describe('Meals', () => {
   });
 
   describe('DELETE meal', () => {
-    it('should return a success message when the meal is deleted', (done) => {
+    it('should return a success message when the meal, related savedMeals, and likes are deleted', (done) => {
       let token = `Bearer ${user.jwt}`;
 
+      // user 1 saves meal
       chai.request(server)
-        .delete('/meals/delete')
+        .post('/savedmeals/save')
         .set("Authorization", token)
-        .send({ id: 1 })
-        .end((err, res) => {
+        .send({ mealId: 1 })
+        // user 1 likes meal
+        .then(() => chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", token)
+          .send({mealId: 1}))
+        // user deletes meal
+        .then(() => chai.request(server)
+          .delete('/meals/delete')
+          .set("Authorization", token)
+          .send({ id: 1 })
+        .then(res => {
           res.should.have.status(200);
           res.body.message.should.equal('Meal successfully deleted.');
-          if(err) done(err);
-          done();
-        });
+        }))
+        // check if meal, saved meal, and likes are deleted
+        .then(() => Like.findAll())
+        .then(likes => expect(likes.length).to.equal(0))
+        .then(() => Meal.findOne({where: {id: 1}}))
+        .then(meal => expect(meal).to.equal(null))
+        .then(() => SavedMeal.findAll())
+        .then(savedMeals => expect(savedMeals.length).to.equal(0))
+        .then(() => done())
+        .catch(err => done(err));
     });
 
     it('should return an error message when there is no meal to delete', (done) => {

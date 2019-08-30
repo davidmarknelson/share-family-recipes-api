@@ -25,13 +25,10 @@ sequelize
   });
 
 
-fs
-  .readdirSync(__dirname)
-  .filter((file) =>
-    file !== 'sequelize.js'
-  )
-  .forEach((file) => {
-    const model = sequelize.import(path.join(__dirname, file))
+fs.readdirSync(__dirname)
+  .filter(file => file !== 'sequelize.js')
+  .forEach(file => {
+    let model = sequelize.import(path.join(__dirname, file));
     db[model.name] = model
   });
 
@@ -39,7 +36,7 @@ Object.keys(db).forEach((modelName) => {
   if ('associate' in db[modelName]) {
     db[modelName].associate(db)
   }
-})
+});
 
 // For development
 if (process.env.NODE_ENV === "development") {

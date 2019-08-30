@@ -1,7 +1,7 @@
 'use strict';
+const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");
 const utils = require("../utils");
-const db = require('../../models/sequelize').sequelize;
 
 describe('Meal searches', () => {
   let jwt;

@@ -1,10 +1,11 @@
 'use strict';
-const Likes = require('../models/sequelize').like;
+// Model
+const Like = require('../models/sequelize').like;
 
 module.exports = {
   addLike: async (req, res) => {
     try {
-      let previousLike = await Likes.findOne({
+      let previousLike = await Like.findOne({
         where: {
           mealId: req.body.mealId,
           userId: req.decoded.id
@@ -13,12 +14,12 @@ module.exports = {
 
       if (previousLike) return res.status(400).json({ message: 'You have already liked this meal.' });
 
-      let likes = await Likes.create({
+      let like = await Like.create({
         mealId: req.body.mealId,
         userId: req.decoded.id
       });
 
-      if (!likes) throw Error();
+      if (!like) throw Error();
 
       res.status(201).json({ message: 'Meal successfully liked.' });
     } catch (err) {
@@ -28,14 +29,14 @@ module.exports = {
 
   removeLike: async (req, res) => {
     try {
-      let likes = await Likes.destroy({
+      let like = await Like.destroy({
         where: {
           mealId: req.body.mealId,
           userId: req.decoded.id
         }
       });
 
-      if (likes) {
+      if (like) {
         res.status(200).json({ message: "Meal successfully unliked." });
       } else {
         throw Error();

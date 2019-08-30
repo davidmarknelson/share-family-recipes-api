@@ -1,9 +1,11 @@
 'use strict';
 const router = require('express').Router();
+// Controller
 const admin = require('../controllers/admin');
-const auth = require('../middleware/auth');
+// Middleware
 const adminAccess = require('../middleware/admin');
 const parse = require('../middleware/parse');
+const auth = require('../middleware/auth');
 
 router.route('/newusers').get(auth.isAuthenticated, adminAccess.isAdmin, parse.parseOffsetAndLimit, admin.getUsersByNewest);
 router.route('/oldusers').get(auth.isAuthenticated, adminAccess.isAdmin, parse.parseOffsetAndLimit, admin.getUsersByOldest);

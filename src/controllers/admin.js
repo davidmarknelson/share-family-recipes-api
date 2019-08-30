@@ -1,6 +1,7 @@
 'use strict';
-const User = require('../models/sequelize').user;
+// Model and database funtion helpers
 const sequelize = require('../models/sequelize').sequelize;
+const User = require('../models/sequelize').user;
 
 let attributesArray = [
   'id', 'username', 'firstName', 'lastName', 

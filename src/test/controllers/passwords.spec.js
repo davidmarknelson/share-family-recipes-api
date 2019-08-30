@@ -1,8 +1,9 @@
 'use strict';
-const ResetPW = require('../../models/sequelize').reset_password_token;
 const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");
 const utils = require("../utils");
+// Model used to create tokens for tests
+const ResetPW = require('../../models/sequelize').reset_password_token;
 
 describe('Password', () => {
   let user;

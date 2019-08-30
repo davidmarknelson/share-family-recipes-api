@@ -1,8 +1,10 @@
 'use strict';
-const Verification = require('../../models/sequelize').verification_token;
 const db = require('../../models/sequelize').sequelize;
 const server = require("../../../app");
 const utils = require("../utils");
+// Model used to create tokens for tests
+const Verification = require('../../models/sequelize').verification_token;
+
 
 describe('Email verification', () => {
   before(() => {

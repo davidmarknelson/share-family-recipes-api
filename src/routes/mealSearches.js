@@ -1,6 +1,8 @@
 'use strict';
 const router = require('express').Router();
+// Controller
 const meals = require('../controllers/mealSearches');
+// Middleware
 const parse = require('../middleware/parse');
 
 router.route('/newest').get(parse.parseOffsetAndLimit, meals.getByNewest);

@@ -1,9 +1,11 @@
 'use strict';
+// Models and operators
 const SavedMeals = require('../models/sequelize').saved_meal;
 const Like = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 const Op = require('sequelize').Op;
+// JWT and file system
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 

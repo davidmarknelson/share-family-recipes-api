@@ -1,6 +1,8 @@
 'use strict';
+// Models
 const ResetPW = require('../models/sequelize').reset_password_token;
 const User = require('../models/sequelize').user;
+// For emails
 const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');

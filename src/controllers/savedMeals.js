@@ -1,9 +1,10 @@
 'use strict';
+// Models and database function helpers
+const sequelize = require('../models/sequelize').sequelize;
 const SavedMeal = require('../models/sequelize').saved_meal;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 const Like = require('../models/sequelize').like;
-const sequelize = require('../models/sequelize').sequelize;
 
 module.exports = {
   findAll: async (req, res) => {

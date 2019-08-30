@@ -1,9 +1,11 @@
 'use strict';
 const router = require('express').Router();
+// Controller
 const users = require('../controllers/users');
-const auth = require('../middleware/auth');
-const parse = require('../middleware/parse');
+// Middleware
 const images = require('../middleware/images');
+const parse = require('../middleware/parse');
+const auth = require('../middleware/auth');
 
 // This route checks if a username is available
 router.route('/available-username').get(users.findUsername);

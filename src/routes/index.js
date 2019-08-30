@@ -1,12 +1,13 @@
 'use strict';
 const router = require('express').Router();
+// Controllers
+const mealSearches = require('./mealSearches');
+const verifyEmails = require('./verifyEmails');
+const savedMeals = require('./savedMeals');
+const passwords = require('./passwords');
 const users = require('./users');
 const meals = require('./meals');
-const savedMeals = require('./savedMeals');
-const verifyEmails = require('./verifyEmails');
-const passwords = require('./passwords');
 const admin = require('./admin');
-const mealSearches = require('./mealSearches');
 const likes = require('./likes');
 
 // Base route
