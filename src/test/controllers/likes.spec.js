@@ -21,7 +21,7 @@ describe('Likes', () => {
       .set("Authorization", token)
       .send({mealId: 1})
       .end((err, res) => {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.message.should.equal('Meal successfully liked.');
         if(err) done(err);
         done();

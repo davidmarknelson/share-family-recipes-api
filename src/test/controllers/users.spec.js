@@ -99,7 +99,7 @@ describe('Users', () => {
         .end((err, res) => {
           user = res.body;
 
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 1);
@@ -130,7 +130,7 @@ describe('Users', () => {
         .field('password', 'password')
         .field('passwordConfirmation', 'password')
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.should.have.property('user');
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 2);
@@ -310,7 +310,7 @@ describe('Users', () => {
         .field('email', 'test@email.com')
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .then(res => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.message.should.equal("User successfully updated.");
         })
         .then(() => User.findOne({where: { id: user.user.id }}))

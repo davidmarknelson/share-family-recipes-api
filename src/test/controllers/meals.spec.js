@@ -69,7 +69,7 @@ describe('Meals', () => {
         .field('youtubeUrl', 'www.testvideo.com')
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.name.should.equal("Meat and Cheese Sandwich");
           res.body.id.should.equal(1)
           res.body.should.have.property('description');
@@ -103,7 +103,7 @@ describe('Meals', () => {
         .field('difficulty', 3)
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.name.should.equal("Soup");
           res.body.should.have.property('description');
           res.body.ingredients.should.be.an('array');
@@ -215,7 +215,7 @@ describe('Meals', () => {
         .field('cookTime', 5)
         .field('difficulty', 1)
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.message.should.equal('Meal successfully updated.');
           if(err) done(err);
           done();

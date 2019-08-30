@@ -38,7 +38,7 @@ describe('Saved meals', () => {
       .set("Authorization", token)
       .send({ mealId: 1 })
       .end((err, res) => {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.message.should.equal('Meal successfully saved.');
         if(err) done(err);
         done();
@@ -53,9 +53,18 @@ describe('Saved meals', () => {
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(1);
-          res.body[0].meal.name.should.equal('Sandwich');
+          res.body.count.should.equal(1);
+          res.body.rows.should.be.an('array');
+          res.body.rows.should.have.lengthOf(1);
+          res.body.rows[0].id.should.equal(1);
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].difficulty.should.equal(1);
+          res.body.rows[0].should.have.property('mealPic', null);
+          res.body.rows[0].cookTime.should.equal(5);
+          res.body.rows[0].creatorId.should.equal(1);
+          res.body.rows[0].creator.username.should.equal('johndoe');
+          res.body.rows[0].creator.should.have.property('profilePic', null);
+          res.body.rows[0].likes.should.be.an('array');
           if(err) done(err);
           done();
         });

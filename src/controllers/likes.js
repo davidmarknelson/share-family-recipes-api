@@ -20,7 +20,7 @@ module.exports = {
 
       if (!likes) throw Error();
 
-      res.status(200).json({ message: 'Meal successfully liked.' });
+      res.status(201).json({ message: 'Meal successfully liked.' });
     } catch (err) {
       res.status(500).json({ message: 'There was an error liking the meal.' });
     }

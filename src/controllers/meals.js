@@ -40,7 +40,7 @@ module.exports = {
 
       meal.ingredients = JSON.parse(meal.ingredients);
 
-      res.status(200).json(meal);
+      res.status(201).json(meal);
     } catch (err) {
       if (err.errors) {
         if (err.errors[0].message === 'name must be unique') {
@@ -67,7 +67,7 @@ module.exports = {
       });
 
       if (meal[0] === 1) {
-        return res.status(200).json({ message: 'Meal successfully updated.' });
+        return res.status(201).json({ message: 'Meal successfully updated.' });
       } else {
         return res.status(500).json({ message: 'There was an error updating your meal.' });
       }

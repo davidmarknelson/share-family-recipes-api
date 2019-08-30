@@ -80,7 +80,7 @@ module.exports = {
 
         delete user.dataValues.password;
 
-      res.status(200).json({
+      res.status(201).json({
         user: user,
         jwt: jwtSignUser(user.dataValues)
       });
@@ -141,9 +141,9 @@ module.exports = {
       });
 
       if (user[0] === 1) {
-        return res.status(200).json({ message: "User successfully updated." });
+        return res.status(201).json({ message: "User successfully updated." });
       } else if (user[0] === 0) {
-        return res.status(500).json({ message: "There was an error updating your profile." });
+        throw Error();
       }
     } catch (err) {
       res.status(500).json({
