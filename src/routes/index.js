@@ -49,6 +49,9 @@ router.use((req, res, next) => {
 // Error handler to pass along error messages
 router.use((err, req, res, next) => {
   if (err) {
+    if (err.message === 'Please upload a JPEG image.') err.status = 415;
+    if (err.message === 'Username must not include a space.') err.status = 400;
+    if (err.message === 'Username must be between 5 and 15 characters.') err.status = 400;
     res.status(err.status || 500).json({ message: err.message || 'Oops! There was an error'});
   }
 });

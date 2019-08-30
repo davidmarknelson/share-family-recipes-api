@@ -25,7 +25,7 @@ module.exports = {
   
       if (updatedUser[0] === 0) throw Error('There was an error updating your password.');
 
-      res.status(200).json({ message: "Your password was successfully updated." });
+      res.status(201).json({ message: "Your password was successfully updated." });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
@@ -122,7 +122,7 @@ module.exports = {
         return res.status(404).json({ message: 'There was an error updating your password.' });
       }
 
-      res.status(200).json({ message: "Your password was successfully reset." });
+      res.status(201).json({ message: "Your password was successfully reset." });
     } catch (err) {
       res.status(500).json({ message: "There was an error resetting your password." });
     }

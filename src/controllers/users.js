@@ -110,13 +110,13 @@ module.exports = {
       });
 
       if (!user) {
-        return res.status(403).json({ message: 'The login information was incorrect.'});
+        return res.status(400).json({ message: 'The login information was incorrect.'});
       }
 
       let passwordsMatch = await User.comparePasswords(req.body.password, user.password);
 
       if (!passwordsMatch) {
-        return res.status(403).json({ message: 'The login information was incorrect.'});
+        return res.status(400).json({ message: 'The login information was incorrect.'});
       }
 
       delete user.dataValues.password;
@@ -214,7 +214,7 @@ module.exports = {
       if (deleteduser) {
         return res.status(200).json({ message: "User successfully deleted." });
       } else {
-        return res.status(500).json({ message: "There was an error deleting your profile." });
+        throw Error();
       }
     } catch (err) {
       res.status(500).json({ message: err.message || "There was an error deleting your profile." });

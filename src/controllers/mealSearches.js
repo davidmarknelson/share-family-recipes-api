@@ -209,25 +209,6 @@ module.exports = {
     }
   },
 
-  findAvailableMealName: async (req, res) => {
-    try {
-      let meal = await Meal.findOne({
-        where: sequelize.where(
-          sequelize.fn('lower', sequelize.col('name')), 
-          sequelize.fn('lower', req.query.name)
-        )
-      });
-
-      if (!meal) {
-        res.status(200).json({ message: 'That name is available.' });
-      } else {
-        res.status(500).json({ message: 'That name is already taken.' });
-      }
-    } catch (err) {
-      res.status(500).json({ message: err.message });
-    }
-  },
-
   searchByName: async (req, res) => {
     try {
       let meals = await Meal.findAll({

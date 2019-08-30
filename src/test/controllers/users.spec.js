@@ -43,7 +43,7 @@ describe('Users', () => {
         .field('adminCode', '123456789')
         .attach('profilePic', 'src/test/testImages/testImagePng.png')
         .end((err, res) => {
-          res.should.have.status(500);
+          res.should.have.status(415);
           res.body.message.should.equal('Please upload a JPEG image.');
           if(err) done(err);
           done();
@@ -83,7 +83,7 @@ describe('Users', () => {
         .field('adminCode', '123456789')
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .end((err, res) => {
-          res.should.have.status(500);
+          res.should.have.status(400);
           res.body.message.should.equal('Username must not include a space.');
           if(err) done(err);
           done();
@@ -253,7 +253,7 @@ describe('Users', () => {
         .post('/user/login')
         .send(utils.wrongEmailCredentials)
         .end((err, res) => {
-          res.should.have.status(403);
+          res.should.have.status(400);
           res.body.should.have.property('message', 'The login information was incorrect.');
           if(err) done(err);
           done();
@@ -265,7 +265,7 @@ describe('Users', () => {
         .post('/user/login')
         .send(utils.wrongPasswordCredentials)
         .end((err, res) => {
-          res.should.have.status(403);
+          res.should.have.status(400);
           res.body.should.have.property('message', 'The login information was incorrect.');
           if(err) done(err);
           done();
@@ -341,7 +341,7 @@ describe('Users', () => {
         .field('email', 'test@email.com')
         .attach('profilePic', 'src/test/testImages/testImagePng.png')
         .end((err, res) => {
-          res.should.have.status(500);
+          res.should.have.status(415);
           res.body.message.should.equal('Please upload a JPEG image.');          
           if(err) done(err);
           done();

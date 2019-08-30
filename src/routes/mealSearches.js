@@ -12,7 +12,6 @@ router.route('/names-z-a').get(parse.parseOffsetAndLimit, meals.getMealsZtoA);
 router.route('/byingredients-a-z').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsAtoZ);
 router.route('/byingredients-z-a').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsZtoA);
 router.route('/byuser').get(parse.parseOffsetAndLimit, meals.getMealsCreatedByUser);
-router.route('/available-names').get(meals.findAvailableMealName);
 router.route('/name').get(meals.searchByName);
 
 module.exports = router;

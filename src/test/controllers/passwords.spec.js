@@ -46,7 +46,7 @@ describe('Password', () => {
           passwordConfirmation: "theyMatch"
         })
         .end((err, res) => {
-          res.should.have.status(200);
+          res.should.have.status(201);
           res.body.message.should.equal("Your password was successfully updated.");
           if(err) done(err);
           done();
@@ -130,7 +130,7 @@ describe('Password', () => {
           });
       })
       .then(res => {
-        res.should.have.status(200);
+        res.should.have.status(201);
         res.body.message.should.equal("Your password was successfully reset.");
         done();
       })

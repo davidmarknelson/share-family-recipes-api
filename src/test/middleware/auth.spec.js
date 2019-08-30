@@ -87,7 +87,7 @@ describe('Auth middleware', () => {
       });
 
       auth.isAuthenticated(request, response, nextSpy);
-      expect(response.statusCode).to.equal(403);
+      expect(response.statusCode).to.equal(401);
       response._getData().should.equal('{"message":"No token provided!"}');
       expect(nextSpy).to.not.have.been.called();
     });

@@ -351,41 +351,6 @@ describe('Meal searches', () => {
     });
   });
 
-  describe('GET available meal name', () => {
-    it('should return an error message if the meal name is taken', (done) => {
-      chai.request(server)
-        .get('/meals/search/available-names?name=Soup')
-        .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal('That name is already taken.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return an error message if the case insensitive meal name is taken', (done) => {
-      chai.request(server)
-        .get('/meals/search/available-names?name=soup')
-        .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal('That name is already taken.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return a success message if the meal name is available', (done) => {
-      chai.request(server)
-        .get('/meals/search/available-names?name=coffee')
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal('That name is available.');
-          if(err) done(err);
-          done();
-        });
-    });
-  });
-
   describe('GET array of searched meals', () => {
     it('should return an array of meals that match the searched word', (done) => {
       chai.request(server)

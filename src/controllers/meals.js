@@ -1,5 +1,6 @@
 'use strict';
-// Models
+// Models and database function helpers
+const sequelize = require('../models/sequelize').sequelize;
 const SavedMeal = require('../models/sequelize').saved_meal;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
@@ -25,6 +26,25 @@ module.exports = {
       meal.ingredients = JSON.parse(meal.ingredients);
 
       res.status(200).json(meal);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  findAvailableMealName: async (req, res) => {
+    try {
+      let meal = await Meal.findOne({
+        where: sequelize.where(
+          sequelize.fn('lower', sequelize.col('name')), 
+          sequelize.fn('lower', req.query.name)
+        )
+      });
+
+      if (!meal) {
+        res.status(200).json({ message: 'That name is available.' });
+      } else {
+        res.status(400).json({ message: 'That name is already taken.' });
+      }
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

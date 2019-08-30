@@ -47,7 +47,7 @@ describe('Meals', () => {
         .field('difficulty', 1)
         .attach('mealPic', 'src/test/testImages/testMealPng.png')
         .end((err, res) => {
-          res.should.have.status(500);
+          res.should.have.status(415);
           res.body.message.should.equal('Please upload a JPEG image.');
           if(err) done(err);
           done();
@@ -148,6 +148,41 @@ describe('Meals', () => {
     });
   });
 
+  describe('GET available meal name', () => {
+    it('should return an error message if the meal name is taken', (done) => {
+      chai.request(server)
+        .get('/meals/available-names?name=Soup')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('That name is already taken.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message if the case insensitive meal name is taken', (done) => {
+      chai.request(server)
+        .get('/meals/available-names?name=soup')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('That name is already taken.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return a success message if the meal name is available', (done) => {
+      chai.request(server)
+        .get('/meals/available-names?name=coffee')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.message.should.equal('That name is available.');
+          if(err) done(err);
+          done();
+        });
+    });
+  });
+
 
   describe('GET specific meal', () => {
     it('should return a meal', (done) => {
@@ -195,7 +230,7 @@ describe('Meals', () => {
         .field('difficulty', 1)
         .attach('mealPic', 'src/test/testImages/testMealPng.png')
         .end((err, res) => {
-          res.should.have.status(500);
+          res.should.have.status(415);
           res.body.message.should.equal('Please upload a JPEG image.');
           if(err) done(err);
           done();
