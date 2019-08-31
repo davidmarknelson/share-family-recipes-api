@@ -7,13 +7,49 @@ const Meal = require('../models/sequelize').meal;
 const Like = require('../models/sequelize').like;
 
 module.exports = {
-  findAll: async (req, res) => {
+  findAllAtoZ: async (req, res) => {
     try {
       let savedMeals = await SavedMeal.findAndCountAll({
         where: { userId: req.decoded.id },
         offset: req.query.offset,
         limit: req.query.limit,
         order: [[sequelize.fn('lower', sequelize.col('name'))]],
+        attributes: [],
+        include: [
+          { 
+            model: Meal, 
+            attributes: ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'], 
+            duplicating: false, 
+            include: [
+              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false }
+            ]
+          }
+        ]
+      });
+
+      if (savedMeals.rows.length === 0) return res.status(404).json({ message: 'You have not saved any meals.' });
+
+      let meals = savedMeals.rows.reduce((mealArray, object) => {
+        mealArray.push(object.dataValues.meal.dataValues);
+        return mealArray;
+      }, []);
+
+      savedMeals.rows = meals;
+
+      res.status(200).json(savedMeals);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  findAllZtoA: async (req, res) => {
+    try {
+      let savedMeals = await SavedMeal.findAndCountAll({
+        where: { userId: req.decoded.id },
+        offset: req.query.offset,
+        limit: req.query.limit,
+        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         attributes: [],
         include: [
           { 

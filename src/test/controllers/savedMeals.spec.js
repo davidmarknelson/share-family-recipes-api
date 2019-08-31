@@ -14,13 +14,14 @@ describe('Saved meals', () => {
         token = `Bearer ${res.body.jwt}`;
         user = res.body;
       })
-      .then(() => utils.createMeal1(user.jwt));
+      .then(() => utils.createMeal1(user.jwt))
+      .then(() => utils.createMeal2(user.jwt));
   });
 
   describe('GET user saved meals', () => {
     it('should return an array with the meals', (done) => {
       chai.request(server)
-      .get('/savedmeals/find')
+      .get('/savedmeals/a-z')
       .set("Authorization", token)
       .end((err, res) => {
         res.should.have.status(404);
@@ -49,22 +50,49 @@ describe('Saved meals', () => {
   describe('GET user saved meals', () => {
     it('should return an array with the meals', (done) => {
       chai.request(server)
-        .get('/savedmeals/find')
+        .post('/savedmeals/save')
+        .set("Authorization", token)
+        .send({ mealId: 2 })
+      .then(() => chai.request(server)
+        .get('/savedmeals/a-z')
+        .set("Authorization", token))
+      .then(res => {
+        res.should.have.status(200);
+        res.body.count.should.equal(2);
+        res.body.rows.should.be.an('array');
+        res.body.rows.should.have.lengthOf(2);
+        res.body.rows[0].id.should.equal(1);
+        res.body.rows[0].name.should.equal('Sandwich');
+        res.body.rows[0].difficulty.should.equal(1);
+        res.body.rows[0].should.have.property('mealPic', null);
+        res.body.rows[0].cookTime.should.equal(5);
+        res.body.rows[0].creatorId.should.equal(1);
+        res.body.rows[0].creator.username.should.equal('johndoe');
+        res.body.rows[0].creator.should.have.property('profilePic', null);
+        res.body.rows[0].likes.should.be.an('array');
+        done();
+      })
+      .catch(err => done(err));
+    });
+
+    it('should return an array with the meals', (done) => {
+      chai.request(server)
+        .get('/savedmeals/z-a')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.count.should.equal(1);
+          res.body.count.should.equal(2);
           res.body.rows.should.be.an('array');
-          res.body.rows.should.have.lengthOf(1);
-          res.body.rows[0].id.should.equal(1);
-          res.body.rows[0].name.should.equal('Sandwich');
-          res.body.rows[0].difficulty.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
-          res.body.rows[0].cookTime.should.equal(5);
-          res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
-          res.body.rows[0].likes.should.be.an('array');
+          res.body.rows.should.have.lengthOf(2);
+          res.body.rows[1].id.should.equal(1);
+          res.body.rows[1].name.should.equal('Sandwich');
+          res.body.rows[1].difficulty.should.equal(1);
+          res.body.rows[1].should.have.property('mealPic', null);
+          res.body.rows[1].cookTime.should.equal(5);
+          res.body.rows[1].creatorId.should.equal(1);
+          res.body.rows[1].creator.username.should.equal('johndoe');
+          res.body.rows[1].creator.should.have.property('profilePic', null);
+          res.body.rows[1].likes.should.be.an('array');
           if(err) done(err);
           done();
         });

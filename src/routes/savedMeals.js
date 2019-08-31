@@ -6,7 +6,8 @@ const savedMeals = require('../controllers/savedMeals');
 const parse = require('../middleware/parse');
 const auth = require('../middleware/auth');
 
-router.route('/find').get(auth.isAuthenticated, parse.parseOffsetAndLimit, savedMeals.findAll);
+router.route('/a-z').get(auth.isAuthenticated, parse.parseOffsetAndLimit, savedMeals.findAllAtoZ);
+router.route('/z-a').get(auth.isAuthenticated, parse.parseOffsetAndLimit, savedMeals.findAllZtoA);
 router.route('/save').post(auth.isAuthenticated, savedMeals.saveMeal);
 router.route('/unsave').delete(auth.isAuthenticated, savedMeals.unsaveMeal);
 
