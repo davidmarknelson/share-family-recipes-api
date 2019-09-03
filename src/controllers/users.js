@@ -1,6 +1,6 @@
 'use strict';
 // Models and operators
-const SavedMeals = require('../models/sequelize').saved_meal;
+const SavedMeal = require('../models/sequelize').saved_meal;
 const Like = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
@@ -44,8 +44,8 @@ module.exports = {
           id: req.decoded.id
         },
         include: [
-          'meals', 
-          { model: SavedMeals, as: 'savedMeals', attributes: ['mealId'] }
+          { model: Meal, as: 'meals', attributes: ['id'] }, 
+          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'] }
         ]
       });
 
@@ -76,11 +76,13 @@ module.exports = {
         req.body.profilePic = req.file.path;
       }
 
+      req.body.originalUsername = req.body.username;
+
       delete req.body.passwordConfirmation;
 
       let user = await User.create(req.body);
 
-        delete user.dataValues.password;
+      delete user.dataValues.password;
 
       res.status(201).json({
         user: user,
@@ -104,8 +106,8 @@ module.exports = {
       let user = await User.findOne({
         where: { email: req.body.email },
         include: [
-          'meals', 
-          { model: SavedMeals, as: 'savedMeals', attributes: ['mealId'] }
+          { model: Meal, as: 'meals', attributes: ['id'] }, 
+          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'] }
         ]
       });
 
@@ -148,9 +150,15 @@ module.exports = {
         throw Error();
       }
     } catch (err) {
-      res.status(500).json({
-        message: err.message || "There was an error updating your profile."
-      });
+      if (err.errors) {
+        if (err.errors[0].message === 'email must be unique') {
+          return res.status(400).json({ message: 'This email account is already in use.' });
+        }
+        if (err.errors[0].message === 'username must be unique') {
+          return res.status(400).json({ message: 'This username is already in use.' });
+        }
+      }
+      res.status(500).json({ message: err.message || "There was an error updating your profile." });
     }
   },
 
@@ -201,12 +209,12 @@ module.exports = {
       let deleted = await Promise.all([
         Meal.destroy({where: { creatorId: req.decoded.id }}),
         Like.destroy({where: { userId: req.decoded.id }}),
-        SavedMeals.destroy({where: { userId: req.decoded.id }})
+        SavedMeal.destroy({where: { userId: req.decoded.id }})
       ]);
 
       let deletedRelatedData = await Promise.all([
         Like.destroy({where: { mealId: null }}),
-        SavedMeals.destroy({where: { mealId: null }})
+        SavedMeal.destroy({where: { mealId: null }})
       ]);
 
       let deleteduser = await User.destroy({where: { id: req.decoded.id }});

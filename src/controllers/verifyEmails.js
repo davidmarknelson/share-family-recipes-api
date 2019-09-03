@@ -29,15 +29,15 @@ module.exports = {
         isVerified: true
       }, {
         where: {
-          email: userAndToken.user.email
+          id: userAndToken.user.id
         }
       });
 
-      if (verifiedUser[0] === 0) throw new Error('There was an error verifying your email.');
+      if (verifiedUser[0] === 0) throw new Error();
 
       return res.status(200).json({ message: "Your email is now verified." });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error verifying your email.' });
     }
   },
 

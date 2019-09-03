@@ -17,13 +17,15 @@ const storageProfile = multer.diskStorage({
     cb(null, 'public/images/profilePics');
   },
   filename: (req, file, cb) => {
-    if (req.body.username.includes(' ')) {
-      cb(new Error('Username must not include a space.'), false);
-    } else if (req.body.username.length < 5 || req.body.username.length > 15) {
-      cb(new Error('Username must be between 5 and 15 characters.'), false);
-    } else {
-      cb(null, `${req.body.username}.jpeg`);
-    }  
+    if (req.body.username) {
+      if (req.body.username.includes(' ')) {
+        return cb(new Error('Username must not include a space.'), false);
+      } else if (req.body.username.length < 5 || req.body.username.length > 15) {
+        return cb(new Error('Username must be between 5 and 15 characters.'), false);
+      }
+    }
+    let name = (req.decoded) ? req.decoded.originalUsername : req.body.username;
+    cb(null, `${name}.jpeg`);  
   }
 });
 
@@ -43,10 +45,14 @@ const storageMeal = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     let name;
-    if (req.body.name.includes(' ')) {
-      name = req.body.name.replace(/\s+/g, '-');
+    if (req.body.originalName) {
+      name = req.body.originalName;
     } else {
-      name = req.body.name;
+      if (req.body.name.includes(' ')) {
+        name = req.body.name.replace(/\s+/g, '-');
+      } else {
+        name = req.body.name;
+      }
     }
     cb(null, `${name}.jpeg`);
   }

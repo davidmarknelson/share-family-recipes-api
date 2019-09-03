@@ -9,20 +9,14 @@ module.exports = {
     next();
   },
   parseMealFields: (req, res, next) => {
-    if (req.body.name) {
-      req.body.name = req.body.name.trim();
-    }
-    req.body.ingredients = JSON.parse(req.body.ingredients.toLowerCase());
-    req.body.instructions = JSON.parse(req.body.instructions);
+    if (req.body.name) req.body.name = req.body.name.trim();
+    if (req.body.ingredients) req.body.ingredients = JSON.parse(req.body.ingredients.toLowerCase());
+    if (req.body.instructions) req.body.instructions = JSON.parse(req.body.instructions);
     next();
   },
   parseOffsetAndLimit: (req, res, next) => {
-    if (req.query.offset < 0 || !req.query.offset) {
-      req.query.offset = 0;
-    }
-    if (req.query.limit <= 0 || !req.query.limit) {
-      req.query.limit = 5;
-    }
+    if (req.query.offset < 0 || !req.query.offset) req.query.offset = 0;
+    if (req.query.limit <= 0 || !req.query.limit) req.query.limit = 5;
     next();
   },
   checkPasswordValidity: (req, res, next) => {

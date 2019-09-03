@@ -110,6 +110,7 @@ describe('Users', () => {
           res.body.should.have.property('jwt');
           res.body.user.should.have.property('id', 1);
           res.body.user.should.have.property('username', 'johndoe');
+          res.body.user.should.have.property('originalUsername', 'johndoe');
           res.body.user.should.have.property('firstName', 'John');
           res.body.user.should.have.property('lastName', 'Doe');
           res.body.user.should.have.property('email', 'test@email.com');
@@ -306,7 +307,7 @@ describe('Users', () => {
   });
 
   describe('UPDATE /user/update', () => {
-    it('should return a message when the user is updated and it includes JPEG image', (done) => {
+    it('should return a success message when the user is updated and it includes JPEG image', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
@@ -329,6 +330,47 @@ describe('Users', () => {
         .catch(err => done(err));
     });
 
+    it('should not change the originalUsername property if the user changes their username', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .field('username', 'thejohndoe')
+        .then(res => {
+          res.should.have.status(201);
+          res.body.message.should.equal("User successfully updated.");
+        })
+        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(user => {
+          user.dataValues.username.should.equal('thejohndoe');
+          user.dataValues.originalUsername.should.equal('johndoe');
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('should not change the name of the uploaded profile picture if the user has changed their username', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
+        .then(res => {
+          res.should.have.status(201);
+          res.body.message.should.equal("User successfully updated.");
+        })
+        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(user => {
+          user.dataValues.username.should.equal('thejohndoe');
+          user.dataValues.originalUsername.should.equal('johndoe');
+          user.dataValues.profilePic.should.equal('public/images/profilePics/johndoe.jpeg');
+          done();
+        })
+        .catch(err => done(err));
+    });
+
     it('should return an error if the image is PNG', (done) => {
       let token = `Bearer ${user.jwt}`;
 
@@ -343,6 +385,39 @@ describe('Users', () => {
         .end((err, res) => {
           res.should.have.status(415);
           res.body.message.should.equal('Please upload a JPEG image.');          
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message if the username is already in use', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .field('username', 'johnsmith')
+        .field('firstName', 'Jane')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('This username is already in use.');          
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message if the email is already in use', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .field('firstName', 'Jane')
+        .field('lastName', 'Doe')
+        .field('email', 'smith@email.com')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('This email account is already in use.');          
           if(err) done(err);
           done();
         });

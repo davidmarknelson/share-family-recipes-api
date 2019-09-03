@@ -6,7 +6,9 @@ const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
 
-let attributesArray = ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'];
+const attributesArray = ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'];
+
+const errorMessage = 'There was an error getting the list of meals.';
 
 module.exports = {
   getByNewest: async (req, res) => {
@@ -27,7 +29,7 @@ module.exports = {
       res.status(200).json(meals);
 
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -47,9 +49,8 @@ module.exports = {
       if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
 
       res.status(200).json(meals);
-
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -70,7 +71,7 @@ module.exports = {
 
       res.status(200).json(meals);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -91,7 +92,7 @@ module.exports = {
 
       res.status(200).json(meals);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -127,7 +128,7 @@ module.exports = {
 
       res.status(200).json(meals);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -163,7 +164,7 @@ module.exports = {
 
       res.status(200).json(meals);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -205,7 +206,7 @@ module.exports = {
       }
       res.status(200).json(userMeals);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of meals." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -226,7 +227,7 @@ module.exports = {
 
       res.status(200).json(meals);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: errorMessage });
     }
   }
 }

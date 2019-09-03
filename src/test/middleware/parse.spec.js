@@ -86,6 +86,22 @@ describe('Parse middleware', () => {
       request.body.ingredients[2].should.equal('vegetables');
       request.body.instructions.should.be.an('array');
     });
+
+    it('should call next() if name, ingredients, and instructions are not included', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/'
+      });
+
+      request.body.should.not.have.property('ingredients');
+      request.body.should.not.have.property('instructions');
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.have.been.called();
+      request.body.should.not.have.property('ingredients');
+      request.body.should.not.have.property('instructions');
+    });
   });
 
   describe('parseOffsetAndLimit()', () => {

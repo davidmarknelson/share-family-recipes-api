@@ -50,6 +50,10 @@ module.exports = (sequelize, type) => {
         }
       }
     },
+    originalUsername: {
+      type: type.STRING,
+      allowNull: false
+    },
     firstName: {
       type: type.STRING,
       allowNull: false

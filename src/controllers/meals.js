@@ -21,13 +21,13 @@ module.exports = {
         ]
       });
 
-      if (!meal) return res.status(404).json({ message: 'There was an error getting the meal.' });
+      if (!meal) return res.status(404).json({ message: 'That meal does not exist.' });
 
       meal.ingredients = JSON.parse(meal.ingredients);
 
       res.status(200).json(meal);
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error getting the meal.' });
     }
   },
 
@@ -46,7 +46,7 @@ module.exports = {
         res.status(400).json({ message: 'That name is already taken.' });
       }
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error finding available meal names.' });
     }
   },
 
@@ -57,6 +57,12 @@ module.exports = {
       }
 
       req.body.creatorId = req.decoded.id;
+      
+      if (req.body.name.includes(' ')) {
+        req.body.originalName = req.body.name.replace(/\s+/g, '-');
+      } else {
+        req.body.originalName = req.body.name;
+      }
 
       let meal = await Meal.create(req.body);
 
@@ -69,7 +75,7 @@ module.exports = {
           return res.status(400).json({ message: 'This meal name is already in use.' });
         }
       }
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error creating your meal.' });
     }
   },
 
@@ -94,7 +100,12 @@ module.exports = {
         return res.status(500).json({ message: 'There was an error updating your meal.' });
       }
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      if (err.errors) {
+        if (err.errors[0].message === 'name must be unique') {
+          return res.status(400).json({ message: 'This meal name is already in use.' });
+        }
+      }
+      res.status(500).json({ message: 'There was an error updating your meal.' });
     }
   },
 
@@ -136,10 +147,10 @@ module.exports = {
       if (deleted) {
         return res.status(200).json({ message: 'Meal successfully deleted.' });
       } else {
-        return res.status(500).json({ message: 'There was an error deleting your meal.' });
+        throw Error();
       }
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error deleting your meal.' });
     }
   },
 }

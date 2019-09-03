@@ -18,16 +18,15 @@ module.exports = {
         password: req.body.password
       }, {
         where: {
-          id: req.decoded.id,
-          email: req.decoded.email
+          id: req.decoded.id
         }
       });
   
-      if (updatedUser[0] === 0) throw Error('There was an error updating your password.');
+      if (updatedUser[0] === 0) throw Error();
 
       res.status(201).json({ message: "Your password was successfully updated." });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error updating your password.' });
     }
   },
 

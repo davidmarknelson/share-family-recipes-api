@@ -76,6 +76,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(201);
           res.body.name.should.equal("Meat and Cheese Sandwich");
+          res.body.originalName.should.equal("Meat-and-Cheese-Sandwich");
           res.body.id.should.equal(1)
           res.body.should.have.property('description');
           res.body.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
@@ -203,7 +204,7 @@ describe('Meals', () => {
         .get('/meals/meal?name=coffee')
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.message.should.equal('There was an error getting the meal.');
+          res.body.message.should.equal('That meal does not exist.');
           if(err) done(err);
           done();
         });
@@ -211,6 +212,22 @@ describe('Meals', () => {
   });
 
   describe('PUT update meal', () => {
+    it('should return an error message when updated name is already taken', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/meals/update')
+        .set("Authorization", token)
+        .field('id', 1)
+        .field('name', 'Soup')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('This meal name is already in use.');
+          if(err) done(err);
+          done();
+        });
+    });
+
     it('should return an error message when the uploaded picture is PNG', (done) => {
       let token = `Bearer ${user.jwt}`;
 
@@ -219,6 +236,7 @@ describe('Meals', () => {
         .set("Authorization", token)
         .field('id', 1)
         .field('name', 'Meat and Cheese Sandwich')
+        .field('originalName', 'Meat-and-Cheese-Sandwich')
         .field('description', 'An easy sandwich for those busy days!')
         .field('ingredients', JSON.stringify(['bread', 'cheese', 'lettuce', 'meat']))
         .field('instructions', JSON.stringify([
@@ -237,7 +255,7 @@ describe('Meals', () => {
         });
     });
 
-    it('should return a success message when the meal is updated', (done) => {
+    it('should return a success message when the meal is updated and use the originalName of the picture name', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
@@ -245,21 +263,20 @@ describe('Meals', () => {
         .set("Authorization", token)
         .field('id', 1)
         .field('name', 'Sandwich')
-        .field('description', 'An easy sandwich for those busy days!')
-        .field('ingredients', JSON.stringify(['bread', 'cheese', 'lettuce', 'meat']))
-        .field('instructions', JSON.stringify([
-          'Put the bread on the counter.', 
-          'Put the meat between 2 slices of bread.', 
-          'Put the cheese and lettuce on the meat.'
-        ]))
+        .field('originalName', 'Meat-and-Cheese-Sandwich')
         .field('cookTime', 5)
-        .field('difficulty', 1)
-        .end((err, res) => {
+        .field('difficulty', 2)
+        .then(res => {
           res.should.have.status(201);
           res.body.message.should.equal('Meal successfully updated.');
-          if(err) done(err);
-          done();
-        });
+        })
+        .then(() => Meal.findOne({where: {id: 1}}))
+        .then(meal => {
+          meal.dataValues.mealPic.should.equal('public/images/mealPics/Meat-and-Cheese-Sandwich.jpeg');
+          meal.dataValues.difficulty.should.equal(2);
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
   });
 

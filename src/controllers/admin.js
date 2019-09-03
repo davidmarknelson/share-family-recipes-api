@@ -3,10 +3,12 @@
 const sequelize = require('../models/sequelize').sequelize;
 const User = require('../models/sequelize').user;
 
-let attributesArray = [
+const attributesArray = [
   'id', 'username', 'firstName', 'lastName', 
   'email', 'isVerified', 'isAdmin', 'createdAt'
 ];
+
+const errorMessage = 'There was an error getting the list of users.';
 
 module.exports = {
   getUsersByNewest: async (req, res) => {
@@ -20,7 +22,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -35,7 +37,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -50,7 +52,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -65,7 +67,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -80,7 +82,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -95,7 +97,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -110,7 +112,7 @@ module.exports = {
 
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   },
 
@@ -125,7 +127,7 @@ module.exports = {
       
       res.status(200).json(users);
     } catch (err) {
-      res.status(500).json({ message: "There was an error getting the list of users." });
+      res.status(500).json({ message: errorMessage });
     }
   }
 }
