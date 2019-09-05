@@ -1,5 +1,14 @@
 # Food Auth Api
 
+### Installation Guide
+Download or clone project.  
+Run `npm install`.  
+Create an `.env` file. Copy variables from `.env.default` to your `.env` file.  
+Create an account at SendGrid, or Ethereal for testing and development, and fill in the related environment variables.
+Create a test and development database and have them running in a separate window.  
+Add a code to `ADMIN_CODE` and a time in millisecond to `JWT_EXPIRATION_TIME`.  
+Run `npm run api-dev` for development.
+
 ### Environment Variables
 `NODE_ENV` is set to `development` or `production`.  
 `PORT` is set to whatever port you want.  
@@ -19,15 +28,6 @@
 `EMAIL_PORT` email port.  
 `ADMIN_CODE` is the code to give to users to add to the signup process to become admins.  
 `JWT_EXPIRATION_TIME` set time in milliseconds.  
-
-### Installation Guide
-Download or clone project.  
-Run `npm install`.  
-Create an `.env` file. Copy variables from `.env.default` to your `.env` file.  
-Create an account at SendGrid, or Ethereal for testing and development, and fill in the related environment variables.
-Create a test and development database and have them running in a separate window.  
-Add a code to `ADMIN_CODE` and a time in millisecond to `JWT_EXPIRATION_TIME`.  
-Run `npm run api-dev` for development.
 
 ### Running tests
 Run `npm run test` to execute tests.  

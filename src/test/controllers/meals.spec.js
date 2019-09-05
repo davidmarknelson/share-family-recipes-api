@@ -142,7 +142,7 @@ describe('Meals', () => {
         .field('difficulty', 1)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This meal name is already in use.');
+          res.body.message.should.equal('This meal name is already taken.');
           if(err) done(err);
           done();
         });
@@ -155,7 +155,7 @@ describe('Meals', () => {
         .get('/meals/available-names?name=Soup')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('That name is already taken.');
+          res.body.message.should.equal('This meal name is already taken.');
           if(err) done(err);
           done();
         });
@@ -166,7 +166,7 @@ describe('Meals', () => {
         .get('/meals/available-names?name=soup')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('That name is already taken.');
+          res.body.message.should.equal('This meal name is already taken.');
           if(err) done(err);
           done();
         });
@@ -177,7 +177,7 @@ describe('Meals', () => {
         .get('/meals/available-names?name=coffee')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.message.should.equal('That name is available.');
+          res.body.message.should.equal('This meal name is available.');
           if(err) done(err);
           done();
         });
@@ -189,6 +189,19 @@ describe('Meals', () => {
     it('should return a meal', (done) => {
       chai.request(server)
         .get('/meals/meal?name=Soup')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('id');
+          res.body.should.have.property('name', 'Soup');
+          res.body.creator.username.should.equal('johndoe');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return a meal regardless of capitalization', (done) => {
+      chai.request(server)
+        .get('/meals/meal?name=soUp')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('id');
@@ -222,7 +235,7 @@ describe('Meals', () => {
         .field('name', 'Soup')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This meal name is already in use.');
+          res.body.message.should.equal('This meal name is already taken.');
           if(err) done(err);
           done();
         });

@@ -21,10 +21,32 @@ describe('Users', () => {
     it('should return an error if the username is too short', (done) => {
       chai.request(server)
       .post('/user/signup')
-      .send(utils.userWithShortUsername)
+      .field('username', 'john')
+      .field('firstName', 'John')
+      .field('lastName', 'Doe')
+      .field('email', 'test@email.com')
+      .field('password', 'password')
+      .field('passwordConfirmation', 'password')
       .end((err, res) => {
-        res.should.have.status(500);
-        res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
+        res.should.have.status(400);
+        res.body.message.should.equal("Username must be 5 to 15 characters.");
+        if(err) done(err);
+        done();
+      });
+    });
+
+    it('should return an error if the username is too long', (done) => {
+      chai.request(server)
+      .post('/user/signup')
+      .field('username', '1234567890123456')
+      .field('firstName', 'John')
+      .field('lastName', 'Doe')
+      .field('email', 'test@email.com')
+      .field('password', 'password')
+      .field('passwordConfirmation', 'password')
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.message.should.equal("Username must be 5 to 15 characters.");
         if(err) done(err);
         done();
       });
@@ -165,7 +187,7 @@ describe('Users', () => {
         .send(utils.user)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already in use.');
+          res.body.message.should.equal('This username is already taken.');
           if(err) done(err);
           done();
         });
@@ -191,7 +213,7 @@ describe('Users', () => {
         .get(`/user/available-username?username=${user.user.username}`)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already in use.');
+          res.body.message.should.equal('This username is already taken.');
           if(err) done(err);
           done();
         });
@@ -202,7 +224,7 @@ describe('Users', () => {
         .get(`/user/available-username?username=${user.user.username.toUpperCase()}`)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already in use.');
+          res.body.message.should.equal('This username is already taken.');
           if(err) done(err);
           done();
         });
@@ -400,7 +422,7 @@ describe('Users', () => {
         .field('firstName', 'Jane')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already in use.');          
+          res.body.message.should.equal('This username is already taken.');          
           if(err) done(err);
           done();
         });
@@ -434,8 +456,26 @@ describe('Users', () => {
         .field('lastName', 'Doe')
         .field('email', 'test@email.com')
         .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal("Validation error: Username must be between 5 and 15 characters.");
+          res.should.have.status(400);
+          res.body.message.should.equal("Username must be 5 to 15 characters.");
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message if the username is too long', (done) => {
+      let token = `Bearer ${user.jwt}`;
+          
+      chai.request(server)
+        .put('/user/update')
+        .set("Authorization", token)
+        .field('username', '1234567890123456')
+        .field('firstName', 'Jane')
+        .field('lastName', 'Doe')
+        .field('email', 'test@email.com')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal("Username must be 5 to 15 characters.");
           if(err) done(err);
           done();
         });

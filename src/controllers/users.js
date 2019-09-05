@@ -30,7 +30,7 @@ module.exports = {
       if (!user) {
         return res.status(200).json({ message: 'This username is available.' });
       } else {
-        return res.status(400).json({ message: 'This username is already in use.' });
+        return res.status(400).json({ message: 'This username is already taken.' });
       }
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -93,11 +93,14 @@ module.exports = {
         if (err.errors[0].message === 'email must be unique') {
           return res.status(400).json({ message: 'This email account is already in use.' });
         }
+        if (err.errors[0].message === 'Username must be 5 to 15 characters.') {
+          return res.status(400).json({ message: 'Username must be 5 to 15 characters.' });
+        }
         if (err.errors[0].message === 'username must be unique') {
-          return res.status(400).json({ message: 'This username is already in use.' });
+          return res.status(400).json({ message: 'This username is already taken.' });
         }
       }
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: err.message || 'There was an error signing up. Please try again.' });
     }
   },
 
@@ -128,7 +131,7 @@ module.exports = {
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
-      res.status(500).json({ message: err.message });
+      res.status(500).json({ message: 'There was an error logging in.' });
     }
   },
 
@@ -154,8 +157,11 @@ module.exports = {
         if (err.errors[0].message === 'email must be unique') {
           return res.status(400).json({ message: 'This email account is already in use.' });
         }
+        if (err.errors[0].message === 'Username must be 5 to 15 characters.') {
+          return res.status(400).json({ message: 'Username must be 5 to 15 characters.' });
+        }
         if (err.errors[0].message === 'username must be unique') {
-          return res.status(400).json({ message: 'This username is already in use.' });
+          return res.status(400).json({ message: 'This username is already taken.' });
         }
       }
       res.status(500).json({ message: err.message || "There was an error updating your profile." });

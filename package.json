@@ -1,7 +1,7 @@
 {
-  "name": "food-auth-api",
+  "name": "share-family-recipes-api",
   "version": "1.0.0",
-  "description": "An api for authentication.",
+  "description": "An api for authentication and sharing recipes.",
   "main": "app.js",
   "scripts": {
     "test": "mocha --opts src/test/mocha.opts --exit",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dnel9281/food-auth-api"
+    "url": "git+https://github.com/Dnel9281/share-family-recipes-api"
   },
   "keywords": [
     "Auth"

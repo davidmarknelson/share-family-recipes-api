@@ -115,7 +115,7 @@ describe('Parse middleware', () => {
       
       expect(nextSpy).to.have.been.called();
       request.query.offset.should.equal(0);
-      request.query.limit.should.equal(5);
+      request.query.limit.should.equal(10);
     });
 
     it('should return an offset and limit query when each query is too small', () => {
@@ -132,7 +132,7 @@ describe('Parse middleware', () => {
       
       expect(nextSpy).to.have.been.called();
       request.query.offset.should.equal(0);
-      request.query.limit.should.equal(5);
+      request.query.limit.should.equal(10);
     });
 
     it('should not alter appropriate offset and limit queries', () => {

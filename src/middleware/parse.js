@@ -16,7 +16,7 @@ module.exports = {
   },
   parseOffsetAndLimit: (req, res, next) => {
     if (req.query.offset < 0 || !req.query.offset) req.query.offset = 0;
-    if (req.query.limit <= 0 || !req.query.limit) req.query.limit = 5;
+    if (req.query.limit <= 0 || !req.query.limit) req.query.limit = 10;
     next();
   },
   checkPasswordValidity: (req, res, next) => {
@@ -24,7 +24,7 @@ module.exports = {
       fs.stat(`public/images/profilePics/${req.body.username}.jpeg`, (err, stats) => {
         if (stats) {
           fs.unlink(`public/images/profilePics/${req.body.username}.jpeg`, (err) => {
-            if (err) return res.status(500).json({ message: 'There was an error deleting your profile picture.' });
+            if (err) return res.status(500).json({ message: 'There was an error removing your profile picture.' });
           });
         }
       });

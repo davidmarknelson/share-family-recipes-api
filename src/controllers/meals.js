@@ -13,9 +13,10 @@ module.exports = {
   getMeal: async (req, res) => {
     try {
       let meal = await Meal.findOne({
-        where: {
-          name: req.query.name
-        },
+        where: sequelize.where(
+          sequelize.fn('lower', sequelize.col('name')), 
+          sequelize.fn('lower', req.query.name)
+        ),
         include: [
           { model: User, as: "creator", attributes: ['username']}
         ]
@@ -41,9 +42,9 @@ module.exports = {
       });
 
       if (!meal) {
-        res.status(200).json({ message: 'That name is available.' });
+        res.status(200).json({ message: 'This meal name is available.' });
       } else {
-        res.status(400).json({ message: 'That name is already taken.' });
+        res.status(400).json({ message: 'This meal name is already taken.' });
       }
     } catch (err) {
       res.status(500).json({ message: 'There was an error finding available meal names.' });
@@ -72,7 +73,7 @@ module.exports = {
     } catch (err) {
       if (err.errors) {
         if (err.errors[0].message === 'name must be unique') {
-          return res.status(400).json({ message: 'This meal name is already in use.' });
+          return res.status(400).json({ message: 'This meal name is already taken.' });
         }
       }
       res.status(500).json({ message: 'There was an error creating your meal.' });
@@ -102,7 +103,7 @@ module.exports = {
     } catch (err) {
       if (err.errors) {
         if (err.errors[0].message === 'name must be unique') {
-          return res.status(400).json({ message: 'This meal name is already in use.' });
+          return res.status(400).json({ message: 'This meal name is already taken.' });
         }
       }
       res.status(500).json({ message: 'There was an error updating your meal.' });

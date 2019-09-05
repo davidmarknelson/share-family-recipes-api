@@ -41,8 +41,8 @@ module.exports = (sequelize, type) => {
       unique: true,
       validate: {
         len: {
-          args: [5, 10],
-          msg: "Username must be between 5 and 15 characters."
+          args: [5, 15],
+          msg: "Username must be 5 to 15 characters."
         },
         notContains: {
           args: ' ',

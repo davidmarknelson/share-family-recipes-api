@@ -12,7 +12,7 @@ const likes = require('./likes');
 
 // Base route
 router.route('/').get((req, res) => {
-  res.status(200).json('Auth api works!');
+  res.status(200).json('share-family-recipes-api works!');
 });
 
 // User routes

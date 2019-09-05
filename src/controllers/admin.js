@@ -2,9 +2,10 @@
 // Model and database funtion helpers
 const sequelize = require('../models/sequelize').sequelize;
 const User = require('../models/sequelize').user;
+const Meal = require('../models/sequelize').meal;
 
 const attributesArray = [
-  'id', 'username', 'firstName', 'lastName', 
+  'id', 'username', 'profilePic', 'firstName', 'lastName', 
   'email', 'isVerified', 'isAdmin', 'createdAt'
 ];
 
@@ -17,7 +18,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: [['createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -32,7 +37,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: ['createdAt']
+        order: ['createdAt'],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -47,7 +56,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: [sequelize.fn('lower', sequelize.col('username'))]
+        order: [sequelize.fn('lower', sequelize.col('username'))],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -62,7 +75,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 
-        order: [[sequelize.fn('lower', sequelize.col('username')), 'DESC']]
+        order: [[sequelize.fn('lower', sequelize.col('username')), 'DESC']],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -77,7 +94,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: [sequelize.fn('lower', sequelize.col('firstName'))]
+        order: [sequelize.fn('lower', sequelize.col('firstName'))],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -92,7 +113,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 
-        order: [[sequelize.fn('lower', sequelize.col('firstName')), 'DESC']]
+        order: [[sequelize.fn('lower', sequelize.col('firstName')), 'DESC']],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -107,7 +132,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: [sequelize.fn('lower', sequelize.col('lastName'))]
+        order: [sequelize.fn('lower', sequelize.col('lastName'))],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
 
       res.status(200).json(users);
@@ -122,7 +151,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray, 
-        order: [[sequelize.fn('lower', sequelize.col('lastName')), 'DESC']]
+        order: [[sequelize.fn('lower', sequelize.col('lastName')), 'DESC']],
+        distinct: true,
+        include: [
+          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+        ]
       });
       
       res.status(200).json(users);

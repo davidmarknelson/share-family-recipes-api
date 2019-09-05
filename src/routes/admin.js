@@ -16,5 +16,4 @@ router.route('/firstname-z-a').get(auth.isAuthenticated, adminAccess.isAdmin, pa
 router.route('/lastname-a-z').get(auth.isAuthenticated, adminAccess.isAdmin, parse.parseOffsetAndLimit, admin.getUsersLastNameAtoZ);
 router.route('/lastname-z-a').get(auth.isAuthenticated, adminAccess.isAdmin, parse.parseOffsetAndLimit, admin.getUsersLastNameZtoA);
 
-
 module.exports = router;

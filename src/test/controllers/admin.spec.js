@@ -4,18 +4,19 @@ const server = require("../../../app");
 const utils = require("../utils");
 
 describe('Admin', () => {
-  let user;
+  let token;
 
   before(() => {
     return db.sync({force: true})
       .then(() => utils.createAdmin())
-      .then(res => user = res.body)
+      .then(res => {
+        token = `Bearer ${res.body.jwt}`;
+        return utils.createMeal1(res.body.jwt);
+      })
       .then(() => utils.createUser());
   });
 
   it('should get users from newest to oldest with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/newusers')
         .set("Authorization", token)
@@ -31,6 +32,7 @@ describe('Admin', () => {
           res.body.rows[0].isVerified.should.equal(false);
           res.body.rows[0].isAdmin.should.equal(false);
           res.body.rows[0].createdAt.should.be.a.dateString();
+          res.body.rows[0].meals.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           if(err) done(err);
           done();
@@ -38,8 +40,6 @@ describe('Admin', () => {
   });
 
   it('should get users from newest to oldest', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/newusers?offset=0&limit=10')
         .set("Authorization", token)
@@ -56,8 +56,6 @@ describe('Admin', () => {
   });
 
   it('should get users from oldest to newest with no offest and limit params', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/oldusers')
         .set("Authorization", token)
@@ -74,8 +72,6 @@ describe('Admin', () => {
   });
 
   it('should get users from oldest to newest', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/oldusers?offset=1&limit=1')
         .set("Authorization", token)
@@ -92,8 +88,6 @@ describe('Admin', () => {
   });
 
   it('should get users by username A to Z', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/username-a-z?offset=0&limit=10')
         .set("Authorization", token)
@@ -111,8 +105,6 @@ describe('Admin', () => {
 
 
   it('should get users by username Z to A', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/username-z-a?offset=0&limit=10')
         .set("Authorization", token)
@@ -128,8 +120,6 @@ describe('Admin', () => {
   });
 
   it('should get users by first name A to Z', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/firstname-a-z?offset=0&limit=10')
         .set("Authorization", token)
@@ -145,8 +135,6 @@ describe('Admin', () => {
   });
   
   it('should get users by first name Z to A', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/firstname-z-a?offset=0&limit=10')
         .set("Authorization", token)
@@ -162,8 +150,6 @@ describe('Admin', () => {
   });
 
   it('should get users by last name A to Z', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/lastname-a-z?offset=0&limit=10')
         .set("Authorization", token)
@@ -179,8 +165,6 @@ describe('Admin', () => {
   });
 
   it('should get users by last name Z to A', (done) => {
-    let token = `Bearer ${user.jwt}`;
-
     chai.request(server)
         .get('/admin/lastname-z-a?offset=0&limit=10')
         .set("Authorization", token)
