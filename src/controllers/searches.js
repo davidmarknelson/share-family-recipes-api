@@ -168,7 +168,7 @@ module.exports = {
     }
   },
 
-  getMealsCreatedByUser: async (req, res) => {
+  getMealsCreatedByUserAtoZ: async (req, res) => {
     try {
       let user = await User.findOne({
         where: {          
@@ -181,6 +181,50 @@ module.exports = {
             attributes: attributesArray,
             offset: req.query.offset,
             limit: req.query.limit,
+            order: [[sequelize.fn('lower', sequelize.col('name'))]],
+            include: [
+              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false }
+            ]
+          },
+        ]
+      });
+
+      if (!user) return res.status(404).json({ message: 'This user does not exist.'});
+
+      let count = await Meal.count({
+        where: {
+          creatorId: user.id
+        }
+      });
+
+      let userMeals = {
+        id: user.id,
+        username: user.username,
+        profilePic: user.profilePic,
+        count: count,
+        rows: user.meals
+      }
+      res.status(200).json(userMeals);
+    } catch (err) {
+      res.status(500).json({ message: errorMessage });
+    }
+  },
+
+  getMealsCreatedByUserZtoA: async (req, res) => {
+    try {
+      let user = await User.findOne({
+        where: {          
+          username: req.query.username
+        },
+        attributes: ['username', 'profilePic'],
+        include: [
+          { 
+            model: Meal, as: 'meals', 
+            attributes: attributesArray,
+            offset: req.query.offset,
+            limit: req.query.limit,
+            order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
             include: [
               { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false }
@@ -222,8 +266,6 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: ['id', 'name']
       });
-
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals that match your search.' });
 
       res.status(200).json(meals);
     } catch (err) {

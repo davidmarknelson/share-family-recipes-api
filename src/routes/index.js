@@ -1,7 +1,7 @@
 'use strict';
 const router = require('express').Router();
 // Controllers
-const mealSearches = require('./mealSearches');
+const mealSearches = require('./searches');
 const verifyEmails = require('./verifyEmails');
 const savedMeals = require('./savedMeals');
 const passwords = require('./passwords');
@@ -18,6 +18,12 @@ router.route('/').get((req, res) => {
 // User routes
 router.use('/user', users);
 
+// Verify Email routes
+router.use('/verify', verifyEmails);
+
+// Reset and update password routes
+router.use('/password', passwords);
+
 // Admin routes
 router.use('/admin', admin);
 
@@ -25,16 +31,10 @@ router.use('/admin', admin);
 router.use('/meals', meals);
 
 // Search meal routes
-router.use('/meals/search', mealSearches);
+router.use('/search', mealSearches);
 
 // Saved Meal routes
-router.use('/savedmeals', savedMeals);
-
-// Verify Email routes
-router.use('/verify', verifyEmails);
-
-// Reset and update password routes
-router.use('/password', passwords);
+router.use('/saved', savedMeals);
 
 // Liked Meal routes
 router.use('/likes', likes);

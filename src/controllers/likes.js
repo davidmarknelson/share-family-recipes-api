@@ -23,7 +23,7 @@ module.exports = {
 
       res.status(201).json({ message: 'Meal successfully liked.' });
     } catch (err) {
-      res.status(500).json({ message: 'There was an error liking the meal.' });
+      res.status(500).json({ message: 'There was an error liking this meal.' });
     }
   },
 
@@ -42,7 +42,7 @@ module.exports = {
         throw Error();
       }
     } catch (err) {
-      res.status(500).json({ message: "There was an error unliking the meal." });      
+      res.status(500).json({ message: "There was an error unliking this meal." });      
     }
   }
 };

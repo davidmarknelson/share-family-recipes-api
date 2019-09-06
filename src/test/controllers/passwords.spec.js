@@ -21,7 +21,7 @@ describe('Password', () => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
-        .put('/password/change')
+        .put('/password/update')
         .set("Authorization", token)
         .send({
           password: "notMatching",
@@ -35,11 +35,29 @@ describe('Password', () => {
         });
     });
 
+    it('should send an error message if passwords are too short', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/password/update')
+        .set("Authorization", token)
+        .send({
+          password: "short",
+          passwordConfirmation: "short"
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal("Password must be at least 8 characters long.");
+          if(err) done(err);
+          done();
+        });
+    });
+
     it('should send a message when the password is updated', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
-        .put('/password/change')
+        .put('/password/update')
         .set("Authorization", token)
         .send({
           password: "theyMatch",
@@ -57,7 +75,7 @@ describe('Password', () => {
   describe('POST send reset password email', () => {
     it('should send an error message when the email is not in the database', (done) => {
       chai.request(server)
-        .post('/password/sendemail')
+        .post('/password/send')
         .send({ email: 'wrong@email.com' })
         .end((err, res) => {
           res.should.have.status(404);
@@ -69,7 +87,7 @@ describe('Password', () => {
 
     it('should send a message when the email has been received', (done) => {
       chai.request(server)
-        .post('/password/sendemail')
+        .post('/password/send')
         .send({ email: 'test@email.com' })
         .end((err, res) => {
           res.should.have.status(200);

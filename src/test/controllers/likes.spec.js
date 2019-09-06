@@ -37,7 +37,7 @@ describe('Likes', () => {
       .send({mealId: 2})
       .end((err, res) => {
         res.should.have.status(500);
-        res.body.message.should.equal('There was an error liking the meal.');
+        res.body.message.should.equal('There was an error liking this meal.');
         if(err) done(err);
         done();
       });
@@ -84,7 +84,7 @@ describe('Likes', () => {
       .send({mealId: 2})
       .end((err, res) => {
         res.should.have.status(500);
-        res.body.message.should.equal('There was an error unliking the meal.');
+        res.body.message.should.equal('There was an error unliking this meal.');
         if(err) done(err);
         done();
       });

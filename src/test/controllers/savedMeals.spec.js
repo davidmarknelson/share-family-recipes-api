@@ -21,7 +21,7 @@ describe('Saved meals', () => {
   describe('GET user saved meals', () => {
     it('should return an array with the meals', (done) => {
       chai.request(server)
-      .get('/savedmeals/a-z')
+      .get('/saved/a-z')
       .set("Authorization", token)
       .end((err, res) => {
         res.should.have.status(404);
@@ -35,7 +35,7 @@ describe('Saved meals', () => {
   describe('POST save meal', () => {
     it('should return a message when a meal is successfully saved', (done) => {
       chai.request(server)
-      .post('/savedmeals/save')
+      .post('/saved/save')
       .set("Authorization", token)
       .send({ mealId: 1 })
       .end((err, res) => {
@@ -50,11 +50,11 @@ describe('Saved meals', () => {
   describe('GET user saved meals', () => {
     it('should return an array with the meals', (done) => {
       chai.request(server)
-        .post('/savedmeals/save')
+        .post('/saved/save')
         .set("Authorization", token)
         .send({ mealId: 2 })
       .then(() => chai.request(server)
-        .get('/savedmeals/a-z')
+        .get('/saved/a-z')
         .set("Authorization", token))
       .then(res => {
         res.should.have.status(200);
@@ -77,7 +77,7 @@ describe('Saved meals', () => {
 
     it('should return an array with the meals', (done) => {
       chai.request(server)
-        .get('/savedmeals/z-a')
+        .get('/saved/z-a')
         .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
@@ -102,7 +102,7 @@ describe('Saved meals', () => {
   describe('DELETE save meal', () => {
     it('should return a message when a meal is successfully unsaved', (done) => {
       chai.request(server)
-        .delete('/savedmeals/unsave')
+        .delete('/saved/unsave')
         .set("Authorization", token)
         .send({ mealId: 1 })
         .end((err, res) => {

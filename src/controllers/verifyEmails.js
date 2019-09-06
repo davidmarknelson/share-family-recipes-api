@@ -17,13 +17,7 @@ module.exports = {
         include: [User]
       });
 
-      if (!userAndToken) throw Error('There was an error verifying your email.');
-
-      let tokenDestroyed = await Verification.destroy({
-        where: {
-          token: req.body.token
-        }
-      });
+      if (!userAndToken) return res.status(404).json({ message: 'The token has expired. Please send another verification email.' });
 
       let verifiedUser = await User.update({
         isVerified: true
@@ -35,9 +29,15 @@ module.exports = {
 
       if (verifiedUser[0] === 0) throw new Error();
 
+      let tokenDestroyed = await Verification.destroy({
+        where: {
+          token: req.body.token
+        }
+      });
+
       return res.status(200).json({ message: "Your email is now verified." });
     } catch (err) {
-      res.status(500).json({ message: 'There was an error verifying your email.' });
+      res.status(500).json({ message: err.message || 'There was an error verifying your email.' });
     }
   },
 

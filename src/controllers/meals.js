@@ -67,9 +67,10 @@ module.exports = {
 
       let meal = await Meal.create(req.body);
 
-      meal.ingredients = JSON.parse(meal.ingredients);
-
-      res.status(201).json(meal);
+      res.status(201).json({
+        id: meal.id,
+        message: "Meal successfully created."
+      });
     } catch (err) {
       if (err.errors) {
         if (err.errors[0].message === 'name must be unique') {

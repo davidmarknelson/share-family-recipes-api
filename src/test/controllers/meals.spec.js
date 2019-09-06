@@ -73,22 +73,26 @@ describe('Meals', () => {
         .field('originalRecipeUrl', 'www.testrecipe.com')
         .field('youtubeUrl', 'www.testvideo.com')
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
-        .end((err, res) => {
+        .then(res => {
           res.should.have.status(201);
-          res.body.name.should.equal("Meat and Cheese Sandwich");
-          res.body.originalName.should.equal("Meat-and-Cheese-Sandwich");
-          res.body.id.should.equal(1)
-          res.body.should.have.property('description');
-          res.body.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
-          res.body.should.have.property('youtubeUrl', 'www.testvideo.com');
-          res.body.ingredients.should.be.an('array');
-          res.body.ingredients.should.have.lengthOf(3);
-          res.body.instructions.should.be.an('array');
-          res.body.instructions.should.have.lengthOf(3);
-          res.body.mealPic.should.equal('public/images/mealPics/Meat-and-Cheese-Sandwich.jpeg');
-          if(err) done(err);
-          done();
-        });
+          res.body.id.should.equal(1);
+          res.body.message.should.equal('Meal successfully created.')
+        })
+        .then(() => Meal.findOne({ where: { id: 1 }}))
+        .then(meal => {
+          meal.name.should.equal("Meat and Cheese Sandwich");
+          meal.originalName.should.equal("Meat-and-Cheese-Sandwich");
+          meal.id.should.equal(1)
+          meal.should.have.property('description');
+          meal.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
+          meal.should.have.property('youtubeUrl', 'www.testvideo.com');
+          meal.ingredients.should.not.be.an('array');
+          meal.instructions.should.be.an('array');
+          meal.instructions.should.have.lengthOf(3);
+          meal.mealPic.should.equal('public/images/mealPics/Meat-and-Cheese-Sandwich.jpeg');
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
 
     it('should return a new meal with lowercase ingredients when received ingredients are uppercase', (done) => {
@@ -110,14 +114,8 @@ describe('Meals', () => {
         .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
         .end((err, res) => {
           res.should.have.status(201);
-          res.body.name.should.equal("Soup");
-          res.body.should.have.property('description');
-          res.body.ingredients.should.be.an('array');
-          res.body.ingredients.should.have.lengthOf(3);
-          res.body.ingredients[0].should.equal('water');
-          res.body.ingredients[1].should.equal('vegetables');
-          res.body.ingredients[2].should.equal('meat');
           res.body.id.should.equal(2);
+          res.body.message.should.equal('Meal successfully created.')
           if(err) done(err);
           done();
         });

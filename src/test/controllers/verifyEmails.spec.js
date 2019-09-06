@@ -25,8 +25,8 @@ describe('Email verification', () => {
         .post('/verify')
         .send({token: 'wrongtoken'})
         .then(res => {
-          res.should.have.status(500);
-          res.body.message.should.equal('There was an error verifying your email.');
+          res.should.have.status(404);
+          res.body.message.should.equal('The token has expired. Please send another verification email.');
         })
         .then(() => {
           return Verification.findAll();
