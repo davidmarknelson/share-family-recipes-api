@@ -1,5 +1,9 @@
 # Food Auth Api
 
+The documentation is running live at https://dnel9281.github.io/share-family-recipes-api-docs/
+
+Or you can get the documentation to run locally at https://github.com/Dnel9281/share-family-recipes-documentation
+
 ### Installation Guide
 Download or clone project.  
 Run `npm install`.  
