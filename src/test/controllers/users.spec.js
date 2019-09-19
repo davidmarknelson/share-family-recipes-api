@@ -213,7 +213,7 @@ describe('Users', () => {
         .get(`/user/available-username?username=${user.user.username}`)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already taken.');
+          res.body.should.not.have.property('message');
           if(err) done(err);
           done();
         });
@@ -224,7 +224,7 @@ describe('Users', () => {
         .get(`/user/available-username?username=${user.user.username.toUpperCase()}`)
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This username is already taken.');
+          res.body.should.not.have.property('message');          
           if(err) done(err);
           done();
         });
@@ -234,8 +234,8 @@ describe('Users', () => {
       chai.request(server)
         .get('/user/available-username?username=newname')
         .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal('This username is available.');
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
           if(err) done(err);
           done();
         });

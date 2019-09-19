@@ -42,9 +42,9 @@ module.exports = {
       });
 
       if (!meal) {
-        res.status(200).json({ message: 'This meal name is available.' });
+        res.status(204).json();
       } else {
-        res.status(400).json({ message: 'This meal name is already taken.' });
+        res.status(400).json();
       }
     } catch (err) {
       res.status(500).json({ message: 'There was an error finding available meal names.' });
@@ -91,13 +91,16 @@ module.exports = {
 
       let meal = await  Meal.update(req.body, {
         where: { 
-          id: req.body.id,
+          id: Number(req.body.id),
           creatorId: req.decoded.id
         }
       });
 
       if (meal[0] === 1) {
-        return res.status(201).json({ message: 'Meal successfully updated.' });
+        return res.status(201).json({ 
+          id: Number(req.body.id),
+          message: 'Meal successfully updated.' 
+        });
       } else {
         return res.status(500).json({ message: 'There was an error updating your meal.' });
       }

@@ -11,6 +11,8 @@ router.route('/names-a-z').get(parse.parseOffsetAndLimit, meals.getMealsAtoZ);
 router.route('/names-z-a').get(parse.parseOffsetAndLimit, meals.getMealsZtoA);
 router.route('/byingredients-a-z').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsAtoZ);
 router.route('/byingredients-z-a').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsZtoA);
+router.route('/byingredients-newest').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsNewest);
+router.route('/byingredients-oldest').get(parse.parseOffsetAndLimit, meals.getMealsByIngredientsOldest);
 router.route('/byuser-a-z').get(parse.parseOffsetAndLimit, meals.getMealsCreatedByUserAtoZ);
 router.route('/byuser-z-a').get(parse.parseOffsetAndLimit, meals.getMealsCreatedByUserZtoA);
 router.route('/name').get(meals.searchByName);

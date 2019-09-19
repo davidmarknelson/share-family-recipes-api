@@ -28,9 +28,9 @@ module.exports = {
       });
 
       if (!user) {
-        return res.status(200).json({ message: 'This username is available.' });
+        return res.status(204).json();
       } else {
-        return res.status(400).json({ message: 'This username is already taken.' });
+        return res.status(400).json();
       }
     } catch (err) {
       res.status(500).json({ message: err.message });

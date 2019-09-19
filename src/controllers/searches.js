@@ -6,7 +6,9 @@ const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
 const Op = require('sequelize').Op;
 
-const attributesArray = ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'];
+const attributesArray = [
+  'id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId', 'description', 'createdAt', 'updatedAt'
+];
 
 const errorMessage = 'There was an error getting the list of meals.';
 
@@ -153,6 +155,78 @@ module.exports = {
           }
         },
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+        attributes: attributesArray,
+        include: [
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
+        ]
+      });
+
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: errorMessage });
+    }
+  },
+
+  getMealsByIngredientsNewest: async (req, res) => {
+    try {
+      if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
+
+      let temp;
+      if (!Array.isArray(req.query.ingredient)) {
+        temp = [req.query.ingredient];
+      } else {
+        temp = req.query.ingredient;
+      }
+      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+
+      let meals = await Meal.findAndCountAll({
+        offset: req.query.offset,
+        limit: req.query.limit,
+        where: {
+          ingredients: {
+            [Op.like]: sequelize.fn('ALL', ingredients)
+          }
+        },
+        order: [['createdAt', 'DESC']],
+        attributes: attributesArray,
+        include: [
+          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false }
+        ]
+      });
+
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+
+      res.status(200).json(meals);
+    } catch (err) {
+      res.status(500).json({ message: errorMessage });
+    }
+  },
+
+  getMealsByIngredientsOldest: async (req, res) => {
+    try {
+      if (!req.query.ingredient) return res.status(400).json({ message: 'You must add ingredients to the search.' });
+
+      let temp;
+      if (!Array.isArray(req.query.ingredient)) {
+        temp = [req.query.ingredient];
+      } else {
+        temp = req.query.ingredient;
+      }
+      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+
+      let meals = await Meal.findAndCountAll({
+        offset: req.query.offset,
+        limit: req.query.limit,
+        where: {
+          ingredients: {
+            [Op.like]: sequelize.fn('ALL', ingredients)
+          }
+        },
+        order: ['createdAt'],
         attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },

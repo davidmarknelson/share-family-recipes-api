@@ -153,7 +153,7 @@ describe('Meals', () => {
         .get('/meals/available-names?name=Soup')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This meal name is already taken.');
+          res.body.should.not.have.property('message');
           if(err) done(err);
           done();
         });
@@ -164,7 +164,7 @@ describe('Meals', () => {
         .get('/meals/available-names?name=soup')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This meal name is already taken.');
+          res.body.should.not.have.property('message');          
           if(err) done(err);
           done();
         });
@@ -174,8 +174,8 @@ describe('Meals', () => {
       chai.request(server)
         .get('/meals/available-names?name=coffee')
         .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal('This meal name is available.');
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');          
           if(err) done(err);
           done();
         });
@@ -279,6 +279,7 @@ describe('Meals', () => {
         .field('difficulty', 2)
         .then(res => {
           res.should.have.status(201);
+          res.body.id.should.equal(1);
           res.body.message.should.equal('Meal successfully updated.');
         })
         .then(() => Meal.findOne({where: {id: 1}}))
