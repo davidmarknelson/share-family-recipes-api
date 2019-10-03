@@ -6,6 +6,8 @@ const User = require('../models/sequelize').user;
 const cryptoRandomString = require('crypto-random-string');
 const helpers = require('../helpers/email');
 const nodemailer = require('nodemailer');
+// config
+const config = require('../../config');
 
 module.exports = {
   verifyEmail: async (req, res) => {
@@ -62,23 +64,23 @@ module.exports = {
       });
 
       let transporter = nodemailer.createTransport({
-        host: process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
+        host: config.EMAIL_HOST,
+        port: config.EMAIL_PORT,
         auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PW
+          user: config.EMAIL_USER,
+          pass: config.EMAIL_PW
         }
       });
         
       let message = helpers.makeVerificationEmail(
-        process.env.URL, 
+        config.URL, 
         user.firstName, 
         user.lastName, 
         tokenObj.token
       );
 
       const mailOptions = {
-        from: `${process.env.EMAIL}`,
+        from: `${config.EMAIL}`,
         to: `${user.email}`,
         subject: 'Verify email',
         html: message
@@ -87,7 +89,7 @@ module.exports = {
       let email = await transporter.sendMail(mailOptions);
 
       // This is used to get the preview url for tests
-      if (process.env.NODE_ENV === "developement" || "test") {
+      if (config.NODE_ENV === "developement" || "test") {
         console.log('Preview URL: %s', nodemailer.getTestMessageUrl(email));
       }
 

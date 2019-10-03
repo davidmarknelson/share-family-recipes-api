@@ -8,10 +8,12 @@ const Op = require('sequelize').Op;
 // JWT and file system
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+// Config
+const config = require('../../config');
 
 function jwtSignUser(user) {
-  return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION_TIME
+  return jwt.sign(user, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRATION_TIME
   });
 }
 
@@ -40,19 +42,12 @@ module.exports = {
   profile: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: {
-          id: req.decoded.id
-        },
-        include: [
-          { model: Meal, as: 'meals', attributes: ['id'] }, 
-          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'] }
-        ]
+        where: { id: req.decoded.id }
       });
 
       delete user.dataValues.password;
 
       res.status(200).json({
-        user: user,
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
@@ -66,7 +61,7 @@ module.exports = {
         return res.status(400).json({ message: "Passwords do not match." });
       }
 
-      if (req.body.adminCode === process.env.ADMIN_CODE) {
+      if (req.body.adminCode === config.ADMIN_CODE) {
         req.body.isAdmin = true;
       } else {
         req.body.isAdmin = false;
@@ -83,12 +78,26 @@ module.exports = {
       let user = await User.create(req.body);
 
       delete user.dataValues.password;
-
+      
       res.status(201).json({
-        user: user,
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {
+       // This deletes any profile picture a user uploaded during an attempt that had
+       // an error. This is deleted so if they change their username on any following 
+       // attempts, there won't be an unused picture.
+       if (req.body.profilePic) {
+        // Checks if the profile picture exists
+        fs.stat(req.body.profilePic, (err, stats) => {
+          if (stats) {
+            // Deletes profile picture
+            fs.unlink(req.body.profilePic, (err) => {
+              if (err) return res.status(500).json({ message: 'There was an error.' });
+            });
+          }
+        });
+      }
+
       if (err.errors) {
         if (err.errors[0].message === 'email must be unique') {
           return res.status(400).json({ message: 'This email account is already in use.' });
@@ -99,7 +108,11 @@ module.exports = {
         if (err.errors[0].message === 'username must be unique') {
           return res.status(400).json({ message: 'This username is already taken.' });
         }
+        if (err.errors[0].message === 'Username must not contain a space.') {
+          return res.status(400).json({ message: 'Username must not contain a space.' });
+        }
       }
+      
       res.status(500).json({ message: err.message || 'There was an error signing up. Please try again.' });
     }
   },
@@ -107,11 +120,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { email: req.body.email },
-        include: [
-          { model: Meal, as: 'meals', attributes: ['id'] }, 
-          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'] }
-        ]
+        where: { email: req.body.email }
       });
 
       if (!user) {
@@ -127,7 +136,6 @@ module.exports = {
       delete user.dataValues.password;
 
       res.status(200).json({
-        user: user,
         jwt: jwtSignUser(user.dataValues)
       });
     } catch (err) {

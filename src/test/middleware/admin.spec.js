@@ -4,10 +4,12 @@ const utils = require("../utils");
 const adminMiddleware = require('../../middleware/admin');
 const httpMocks = require('node-mocks-http');
 const jwt = require('jsonwebtoken');
+// Config
+const config = require('../../../config');
 
 function jwtSignUser(user) {
-  return jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION_TIME
+  return jwt.sign(user, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRATION_TIME
   });
 }
 
@@ -25,7 +27,7 @@ describe('Admin middleware', () => {
     });
     
     let nextSpy = chai.spy();
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
       if (decoded) {
         request.decoded = decoded;
       }
@@ -48,7 +50,7 @@ describe('Admin middleware', () => {
     });
     
     let nextSpy = chai.spy();
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
       if (decoded) {
         request.decoded = decoded;
       }

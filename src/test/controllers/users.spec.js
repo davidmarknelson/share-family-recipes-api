@@ -128,22 +128,7 @@ describe('Users', () => {
           user = res.body;
 
           res.should.have.status(201);
-          res.body.should.have.property('user');
           res.body.should.have.property('jwt');
-          res.body.user.should.have.property('id', 1);
-          res.body.user.should.have.property('username', 'johndoe');
-          res.body.user.should.have.property('originalUsername', 'johndoe');
-          res.body.user.should.have.property('firstName', 'John');
-          res.body.user.should.have.property('lastName', 'Doe');
-          res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.not.have.property('password');
-          res.body.user.should.have.property('isAdmin', true);
-          res.body.user.should.have.property('createdAt');
-          res.body.user.should.have.property('profilePic', 'public/images/profilePics/johndoe.jpeg');
-          res.body.user.createdAt.should.be.a.dateString();
-          res.body.user.should.have.property('updatedAt');
-          res.body.user.updatedAt.should.be.a.dateString();
-          res.body.user.createdAt.should.equal(res.body.user.updatedAt);
           if(err) done(err);
           done();
         });
@@ -162,20 +147,7 @@ describe('Users', () => {
           user2 = res.body;
 
           res.should.have.status(201);
-          res.body.should.have.property('user');
           res.body.should.have.property('jwt');
-          res.body.user.should.have.property('id', 2);
-          res.body.user.should.have.property('username', 'johnsmith');
-          res.body.user.should.have.property('firstName', 'John');
-          res.body.user.should.have.property('lastName', 'Doe');
-          res.body.user.should.have.property('email', 'smith@email.com');
-          res.body.user.should.not.have.property('password');
-          res.body.user.should.have.property('isAdmin', false);
-          res.body.user.should.have.property('createdAt');
-          res.body.user.createdAt.should.be.a.dateString();
-          res.body.user.should.have.property('updatedAt');
-          res.body.user.updatedAt.should.be.a.dateString();
-          res.body.user.createdAt.should.equal(res.body.user.updatedAt);
           if(err) done(err);
           done();
         });
@@ -210,7 +182,7 @@ describe('Users', () => {
   describe('GET /user/username', () => {
     it('should show that a username is unavailable', (done) => {
       chai.request(server)
-        .get(`/user/available-username?username=${user.user.username}`)
+        .get(`/user/available-username?username=johndoe`)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.not.have.property('message');
@@ -221,7 +193,7 @@ describe('Users', () => {
 
     it('should show that a username is unavailable regardless of case', (done) => {
       chai.request(server)
-        .get(`/user/available-username?username=${user.user.username.toUpperCase()}`)
+        .get(`/user/available-username?username=JOHNDOE`)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.not.have.property('message');          
@@ -250,22 +222,7 @@ describe('Users', () => {
         .send(utils.loginCredentials)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('user');
           res.body.should.have.property('jwt');
-          res.body.user.should.have.property('id', 1);
-          res.body.user.should.have.property('username', 'johndoe');
-          res.body.user.should.have.property('firstName', 'John');
-          res.body.user.should.have.property('lastName', 'Doe');
-          res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.not.have.property('password');
-          res.body.user.should.have.property('createdAt');
-          res.body.user.createdAt.should.be.a.dateString();
-          res.body.user.should.have.property('updatedAt');
-          res.body.user.updatedAt.should.be.a.dateString();
-          res.body.user.should.have.property('meals');
-          res.body.user.meals.should.be.an('array');
-          res.body.user.should.have.property('savedMeals');
-          res.body.user.savedMeals.should.be.an('array');
           if(err) done(err);
           done();
         });
@@ -306,22 +263,7 @@ describe('Users', () => {
         .send(utils.userWithCredentials)
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('user');
           res.body.should.have.property('jwt');
-          res.body.user.should.have.property('id', 1);
-          res.body.user.should.have.property('username', 'johndoe');
-          res.body.user.should.have.property('firstName', 'John');
-          res.body.user.should.have.property('lastName', 'Doe');
-          res.body.user.should.have.property('email', 'test@email.com');
-          res.body.user.should.not.have.property('password');
-          res.body.user.should.have.property('createdAt');
-          res.body.user.createdAt.should.be.a.dateString();
-          res.body.user.should.have.property('updatedAt');
-          res.body.user.updatedAt.should.be.a.dateString();
-          res.body.user.should.have.property('meals');
-          res.body.user.meals.should.be.an('array');
-          res.body.user.should.have.property('savedMeals');
-          res.body.user.savedMeals.should.be.an('array');
           if(err) done(err);
           done();
         });
@@ -344,7 +286,7 @@ describe('Users', () => {
           res.should.have.status(201);
           res.body.message.should.equal("User successfully updated.");
         })
-        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(() => User.findOne({where: { id: 1}}))
         .then(user => {
           user.dataValues.firstName.should.equal('Jane');
           done();
@@ -363,7 +305,7 @@ describe('Users', () => {
           res.should.have.status(201);
           res.body.message.should.equal("User successfully updated.");
         })
-        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(() => User.findOne({where: { id: 1 }}))
         .then(user => {
           user.dataValues.username.should.equal('thejohndoe');
           user.dataValues.originalUsername.should.equal('johndoe');
@@ -383,7 +325,7 @@ describe('Users', () => {
           res.should.have.status(201);
           res.body.message.should.equal("User successfully updated.");
         })
-        .then(() => User.findOne({where: { id: user.user.id }}))
+        .then(() => User.findOne({where: { id: 1 }}))
         .then(user => {
           user.dataValues.username.should.equal('thejohndoe');
           user.dataValues.originalUsername.should.equal('johndoe');

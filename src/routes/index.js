@@ -9,6 +9,7 @@ const users = require('./users');
 const meals = require('./meals');
 const admin = require('./admin');
 const likes = require('./likes');
+const tests = require('./tests');
 
 // Base route
 router.route('/').get((req, res) => {
@@ -38,6 +39,9 @@ router.use('/saved', savedMeals);
 
 // Liked Meal routes
 router.use('/likes', likes);
+
+// Test routes for deleting and seeding the database
+router.use('/tests', tests);
 
 // Error handler for 404 pages
 router.use((req, res, next) => {

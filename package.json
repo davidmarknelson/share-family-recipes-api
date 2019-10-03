@@ -4,8 +4,9 @@
   "description": "An api for authentication and sharing recipes.",
   "main": "app.js",
   "scripts": {
-    "test": "mocha --opts src/test/mocha.opts --exit",
-    "api-dev": "nodemon -r dotenv/config app.js"
+    "test": "cross-env NODE_ENV=test UNIT_TEST=true mocha --opts src/test/mocha.opts --exit",
+    "api-dev": "cross-env NODE_ENV=development nodemon app.js",
+    "api-test": "cross-env NODE_ENV=test nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -36,7 +37,7 @@
     "chai-date-string": "^0.1.0",
     "chai-http": "^4.3.0",
     "chai-spies": "^1.0.0",
-    "dotenv": "^8.0.0",
+    "cross-env": "^6.0.0",
     "mocha": "^6.2.0",
     "node-mocks-http": "^1.7.6"
   }

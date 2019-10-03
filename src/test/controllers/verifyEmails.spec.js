@@ -10,10 +10,10 @@ describe('Email verification', () => {
   before(() => {
     return db.sync({force: true})
       .then(() => utils.createAdmin())
-      .then(res => {
+      .then(() => {
         return Verification.create({
           token: '123456789',
-          userId: res.body.user.id
+          userId: 1
         });
       });
   });

@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const routes = require('./src/routes/index');
+const config = require('./config');
 
 //  App configuration
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,9 +17,6 @@ app.use('/public', express.static('public'));
 // Routes
 app.use(routes);
 
-if (process.env.NODE_ENV === "test") {
-  process.env.PORT = 3001;
-}
-app.listen(process.env.PORT || 8083, () => console.log('food-auth-api is running.'));
+app.listen(config.PORT || 8083, () => console.log('share-family-recipes-api is running.'));
 
 module.exports = app;

@@ -1,3 +1,3 @@
---require dotenv/config src/test/common.js
+--require src/test/common.js
 --recursive 'src/test/**/*.spec.js'
 --timeout 10000

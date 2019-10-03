@@ -3,20 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const db = {};
+// Config
+const config = require('../../config');
 
 // Database configuration
-let DB;
-(process.env.NODE_ENV === "test") ? DB = process.env.DB_TEST : DB = process.env.DB;
-const sequelize = new Sequelize(DB, process.env.DB_USER, process.env.DB_PW, {
-    host: process.env.HOST,
-    dialect: 'postgres',
-    logging: false
+const sequelize = new Sequelize(config.DB, config.DB_USER, config.DB_PW, {
+  host: config.HOST,
+  dialect: 'postgres',
+  logging: false
 });
 
 sequelize
   .authenticate()
   .then(() => {
-    if ((process.env.NODE_ENV !== "test")) {
+    if (process.env.UNIT_TEST !== "true") {
       console.log('Connection has been established successfully.');
     }
   })
@@ -38,16 +38,17 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
-// For development
-if (process.env.NODE_ENV === "development") {
+// For testing
+if (process.env.NODE_ENV === "test" && process.env.UNIT_TEST !== "true") {
   sequelize.sync({ force: true })
     .then(() => {
       console.log(`Database & tables created!`)
     });
 }
 
-// For production
-if (process.env.NODE_ENV === "production") {
+// For production and development
+// if (process.env.NODE_ENV === ("production" || "development")) {
+if (process.env.NODE_ENV !== 'test') {
   sequelize.sync()
     .then(() => {
       console.log(`Database & tables created!`)

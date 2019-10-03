@@ -88,7 +88,7 @@ module.exports = {
         'Put the cheese on the meat.'
       ]))
       .field('cookTime', 5)
-      .field('difficulty', 1)
+      .field('difficulty', 1);
   },
   createMeal2: (token) => {
     return chai.request(server)
@@ -103,6 +103,6 @@ module.exports = {
         'Put veggies and meat in the water until it is cooked.'
       ]))
       .field('cookTime', 20)
-      .field('difficulty', 3)
+      .field('difficulty', 3);
   }
 };

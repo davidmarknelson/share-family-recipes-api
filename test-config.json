@@ -1,0 +1,18 @@
+{
+  "PORT": 3001,
+  "HOST": "localhost",
+  "DB": "food_auth_db_test",
+  "DB_PORT": 5432,
+  "DB_USER": "dmnelson",
+  "DB_PW": null,
+  "JWT_SECRET": "secret",
+  "SG_API_KEY": "",
+  "URL": "http://localhost:3001/",
+  "EMAIL": "dev@email.com",
+  "EMAIL_HOST": "smtp.ethereal.email",
+  "EMAIL_USER": "trenton.wyman55@ethereal.email",
+  "EMAIL_PW": "Z8aayAKj64Tz3kcEc3",
+  "EMAIL_PORT": 587,
+  "ADMIN_CODE": "123456789",
+  "JWT_EXPIRATION_TIME": 604800000
+}

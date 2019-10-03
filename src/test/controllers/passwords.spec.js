@@ -113,7 +113,7 @@ describe('Password', () => {
 
     it('should send an error if the passwords do not match', (done) => {
       ResetPW.create({
-        userId: user.user.id,
+        userId: 1,
         token: "123456789"
       })
       .then(token => {
@@ -135,7 +135,7 @@ describe('Password', () => {
 
     it('should send a success message if the password was reset', (done) => {
       ResetPW.create({
-        userId: user.user.id,
+        userId: 1,
         token: "123456789"
       })
       .then(token => {
