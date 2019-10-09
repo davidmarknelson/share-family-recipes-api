@@ -39,6 +39,27 @@ module.exports = {
     }
   },
 
+  renewJwt: async (req, res) => {
+    try {
+      let user = await User.findOne({
+        where: { id: req.decoded.id }
+      });
+
+      let userToken = {
+        id: user.dataValues.id,
+        isAdmin: user.dataValues.isAdmin,
+        username: user.dataValues.username,
+        originalUsername: user.dataValues.originalUsername
+      };
+
+      res.status(200).json({
+        jwt: jwtSignUser(userToken)
+      });
+    } catch (err) {
+      res.status(500).json({message: 'There was an error getting your authentication token.'});
+    }
+  },
+
   profile: async (req, res) => {
     try {
       let user = await User.findOne({
@@ -47,9 +68,7 @@ module.exports = {
 
       delete user.dataValues.password;
 
-      res.status(200).json({
-        jwt: jwtSignUser(user.dataValues)
-      });
+      res.status(200).json(user.dataValues);
     } catch (err) {
       res.status(500).json({message: 'There was an error getting your profile.'});
     }
@@ -77,10 +96,15 @@ module.exports = {
 
       let user = await User.create(req.body);
 
-      delete user.dataValues.password;
+      let userToken = {
+        id: user.dataValues.id,
+        isAdmin: user.dataValues.isAdmin,
+        username: user.dataValues.username,
+        originalUsername: user.dataValues.originalUsername
+      };
       
       res.status(201).json({
-        jwt: jwtSignUser(user.dataValues)
+        jwt: jwtSignUser(userToken)
       });
     } catch (err) {
        // This deletes any profile picture a user uploaded during an attempt that had
@@ -133,10 +157,15 @@ module.exports = {
         return res.status(400).json({ message: 'The login information was incorrect.'});
       }
 
-      delete user.dataValues.password;
+      let userToken = {
+        id: user.dataValues.id,
+        isAdmin: user.dataValues.isAdmin,
+        username: user.dataValues.username,
+        originalUsername: user.dataValues.originalUsername
+      };
 
       res.status(200).json({
-        jwt: jwtSignUser(user.dataValues)
+        jwt: jwtSignUser(userToken)
       });
     } catch (err) {
       res.status(500).json({ message: 'There was an error logging in.' });
@@ -150,6 +179,8 @@ module.exports = {
       if (req.file) {
         req.body.profilePic = req.file.path;
       }
+
+      if (req.body.email) req.body.isVerified = false;
 
       let user = await User.update(req.body, {
         where: { id: req.decoded.id }
@@ -171,6 +202,9 @@ module.exports = {
         if (err.errors[0].message === 'username must be unique') {
           return res.status(400).json({ message: 'This username is already taken.' });
         }
+        if (err.errors[0].message === 'Username must not contain a space.') {
+          return res.status(400).json({ message: 'Username must not contain a space.' });
+        }
       }
       res.status(500).json({ message: err.message || "There was an error updating your profile." });
     }
@@ -178,13 +212,15 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
+      let user = await User.findOne({ where: { id: req.decoded.id }});
+
       // Checks if there is a profile picture associated with the user
-      if (req.decoded.profilePic) {
+      if (user && user.dataValues.profilePic) {
         // Checks if the profile picture exists
-        fs.stat(req.decoded.profilePic, (err, stats) => {
+        fs.stat(user.dataValues.profilePic, (err, stats) => {
           if (stats) {
             // Deletes profile picture
-            fs.unlink(req.decoded.profilePic, (err) => {
+            fs.unlink(user.dataValues.profilePic, (err) => {
               if (err) return res.status(500).json({ message: 'There was an error deleting your profile picture.' });
             });
           }

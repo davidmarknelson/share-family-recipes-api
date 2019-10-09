@@ -1,5 +1,5 @@
 {
-  "PORT": 3001,
+  "PORT": 3000,
   "HOST": "localhost",
   "DB": "food_auth_db_test",
   "DB_PORT": 5432,
@@ -7,7 +7,7 @@
   "DB_PW": null,
   "JWT_SECRET": "secret",
   "SG_API_KEY": "",
-  "URL": "http://localhost:3001/",
+  "URL": "http://localhost:3000/",
   "EMAIL": "dev@email.com",
   "EMAIL_HOST": "smtp.ethereal.email",
   "EMAIL_USER": "trenton.wyman55@ethereal.email",

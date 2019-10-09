@@ -260,7 +260,32 @@ describe('Users', () => {
       chai.request(server)
         .get('/user/profile')
         .set("Authorization", token)
-        .send(utils.userWithCredentials)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('id');
+          res.body.should.have.property('username');
+          res.body.should.have.property('firstName');
+          res.body.should.have.property('lastName');
+          res.body.should.have.property('email');
+          res.body.should.have.property('originalUsername');
+          res.body.should.have.property('isVerified');
+          res.body.should.have.property('isAdmin');
+          res.body.should.have.property('profilePic');
+          res.body.should.have.property('createdAt');
+          res.body.should.have.property('updatedAt');
+          if(err) done(err);
+          done();
+        });
+    });
+  });
+
+  describe('GET /user/renew', () => {
+    it('should return a jwt when given a valid jwt', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .get('/user/renew')
+        .set("Authorization", token)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('jwt');
@@ -280,7 +305,6 @@ describe('Users', () => {
         .field('username', 'johndoe')
         .field('firstName', 'Jane')
         .field('lastName', 'Doe')
-        .field('email', 'test@email.com')
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .then(res => {
           res.should.have.status(201);
@@ -289,6 +313,30 @@ describe('Users', () => {
         .then(() => User.findOne({where: { id: 1}}))
         .then(user => {
           user.dataValues.firstName.should.equal('Jane');
+          user.dataValues.email.should.equal('test@email.com');
+          user.dataValues.isVerified.should.equal(false);
+          done();
+        })
+        .catch(err => done(err));
+    });
+
+    it('should change isVerified to false when the user changes their email', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      User.update({isVerified: true}, {where: { id: 1}, returning: true })
+        .then(user => user[1][0].dataValues.isVerified.should.equal(true))
+        .then(() => chai.request(server)
+          .put('/user/update')
+          .set("Authorization", token)
+          .field('email', 'email@email.com'))
+        .then(res => {
+          res.should.have.status(201);
+          res.body.message.should.equal("User successfully updated.");
+        })
+        .then(() => User.findOne({where: { id: 1}}))
+        .then(user => {
+          user.dataValues.email.should.equal('email@email.com');
+          user.dataValues.isVerified.should.equal(false);
           done();
         })
         .catch(err => done(err));
