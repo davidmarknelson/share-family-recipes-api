@@ -30,7 +30,7 @@
     "nodemailer": "^6.3.0",
     "pg": "^7.11.0",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^5.10.1"
+    "sequelize": "^5.15.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
