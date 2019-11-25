@@ -4,7 +4,7 @@ const Meal = require('../../models/sequelize').meal;
 const User = require('../../models/sequelize').user;
 const server = require("../../../app");
 
-describe('Meal searches', () => {
+describe('Tests', () => {
 
   before(() => {
     return db.sync({force: true});
@@ -46,8 +46,6 @@ describe('Meal searches', () => {
           res.should.have.status(200);
           res.body.message.should.equal('The database was successfully seeded.');
         })
-        .then(() => Meal.findAll())
-        .then(meals => expect(meals.length).to.equal(1))
         .then(() => User.findAll())
         .then(users => expect(users.length).to.equal(1))
         .then(() => done())

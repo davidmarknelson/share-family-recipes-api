@@ -105,7 +105,7 @@ describe('Password', () => {
         .send({ token: '' })
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.message.should.equal("Password reset token is invalid or has expired.");
+          res.body.message.should.equal("Password reset token is invalid or has expired. Resend reset email.");
           if(err) done(err);
           done();
         });

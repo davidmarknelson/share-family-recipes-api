@@ -4,6 +4,7 @@ const SavedMeal = require('../models/sequelize').saved_meal;
 const Like = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
+const ProfilePic = require('../models/sequelize').profile_pic;
 const Op = require('sequelize').Op;
 // JWT and file system
 const jwt = require('jsonwebtoken');
@@ -48,8 +49,7 @@ module.exports = {
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username,
-        originalUsername: user.dataValues.originalUsername
+        username: user.dataValues.username
       };
 
       res.status(200).json({
@@ -63,12 +63,17 @@ module.exports = {
   profile: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { id: req.decoded.id }
+        where: { 
+          id: req.decoded.id
+        },
+        include: [
+          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
+        ]
       });
 
       delete user.dataValues.password;
 
-      res.status(200).json(user.dataValues);
+      res.status(200).json(user);
     } catch (err) {
       res.status(500).json({message: 'There was an error getting your profile.'});
     }
@@ -76,46 +81,47 @@ module.exports = {
 
   signup: async (req, res) => {
     try {
+      
       if (req.body.password !== req.body.passwordConfirmation) {
-        return res.status(400).json({ message: "Passwords do not match." });
+        throw new Error('Passwords do not match.')
       }
-
+      
       if (req.body.adminCode === config.ADMIN_CODE) {
         req.body.isAdmin = true;
       } else {
         req.body.isAdmin = false;
       }
-
-      if (req.file) {
-        req.body.profilePic = req.file.path;
-      }
-
-      req.body.originalUsername = req.body.username;
-
+      
       delete req.body.passwordConfirmation;
-
+      
       let user = await User.create(req.body);
-
+      
+      if (req.file) {
+        let profilePic = await ProfilePic.create({
+          userId: user.dataValues.id,
+          profilePicName: req.file.filename
+        });
+      }
+      
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
         username: user.dataValues.username,
-        originalUsername: user.dataValues.originalUsername
       };
       
       res.status(201).json({
         jwt: jwtSignUser(userToken)
       });
     } catch (err) {
-       // This deletes any profile picture a user uploaded during an attempt that had
-       // an error. This is deleted so if they change their username on any following 
-       // attempts, there won't be an unused picture.
-       if (req.body.profilePic) {
+      // This deletes any profile picture a user uploaded during an attempt that had
+      // an error. This is deleted so if they change their username on any following 
+      // attempts, there won't be an unused picture.
+      if (req.file) {
         // Checks if the profile picture exists
-        fs.stat(req.body.profilePic, (err, stats) => {
+        fs.stat(`public/images/profilePics/${req.file.filename}`, (err, stats) => {
           if (stats) {
             // Deletes profile picture
-            fs.unlink(req.body.profilePic, (err) => {
+            fs.unlink(`public/images/profilePics/${req.file.filename}`, (err) => {
               if (err) return res.status(500).json({ message: 'There was an error.' });
             });
           }
@@ -136,6 +142,11 @@ module.exports = {
           return res.status(400).json({ message: 'Username must not contain a space.' });
         }
       }
+
+      if (err.message === 'Passwords do not match.') {
+        return res.status(400).json({ message: "Passwords do not match." });
+      }
+
       res.status(500).json({ message: err.message || 'There was an error signing up. Please try again.' });
     }
   },
@@ -159,8 +170,7 @@ module.exports = {
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username,
-        originalUsername: user.dataValues.originalUsername
+        username: user.dataValues.username
       };
 
       res.status(200).json({
@@ -175,22 +185,58 @@ module.exports = {
     try {
       if (req.body.password) delete req.body.password;
 
-      if (req.file) {
-        req.body.profilePic = req.file.path;
-      }
-
       if (req.body.email) req.body.isVerified = false;
 
       let user = await User.update(req.body, {
         where: { id: req.decoded.id }
       });
 
-      if (user[0] === 1) {
+      let profilePic;
+
+      // This deletes the old profile pic and creates the new one
+      if (req.file) {
+        let deletePic = await ProfilePic.findOne({
+          where: { userId: req.decoded.id }
+        });
+
+        if (deletePic) {
+          // Checks if the profile picture exists
+          fs.stat(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err, stats) => {
+            if (stats) {
+              // Deletes profile picture
+              fs.unlink(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err) => {
+                if (err) return res.status(500).json({ message: 'There was an error.' });
+              });
+            }
+          });
+        }
+
+        let deleted = ProfilePic.destroy({where: { userId: req.decoded.id }});
+
+        profilePic = await ProfilePic.create({
+          userId: req.decoded.id,
+          profilePicName: req.file.filename
+        });
+      }
+
+      if (user[0] === 1 || profilePic) {
         return res.status(201).json({ message: "Profile successfully updated." });
       } else if (user[0] === 0) {
         throw Error();
       }
     } catch (err) {
+      if (req.file) {
+        // Checks if the profile picture exists
+        fs.stat(`public/images/profilePics/${req.file.filename}`, (err, stats) => {
+          if (stats) {
+            // Deletes profile picture
+            fs.unlink(`public/images/profilePics/${req.file.filename}`, (err) => {
+              if (err) return res.status(500).json({ message: 'There was an error.' });
+            });
+          }
+        });
+      }
+
       if (err.errors) {
         if (err.errors[0].message === 'email must be unique') {
           return res.status(400).json({ message: 'This email account is already in use.' });
@@ -211,16 +257,21 @@ module.exports = {
 
   delete: async (req, res) => {
     try {
-      let user = await User.findOne({ where: { id: req.decoded.id }});
+      let user = await User.findOne({ 
+        where: { id: req.decoded.id }
+      });
 
-      // Checks if there is a profile picture associated with the user
-      if (user && user.dataValues.profilePic) {
+      let deletePic = await ProfilePic.findOne({
+        where: { userId: req.decoded.id }
+      });
+
+      if (deletePic) {
         // Checks if the profile picture exists
-        fs.stat(user.dataValues.profilePic, (err, stats) => {
+        fs.stat(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err, stats) => {
           if (stats) {
             // Deletes profile picture
-            fs.unlink(user.dataValues.profilePic, (err) => {
-              if (err) return res.status(500).json({ message: 'There was an error deleting your profile picture.' });
+            fs.unlink(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err) => {
+              if (err) return res.status(500).json({ message: 'There was an error.' });
             });
           }
         });

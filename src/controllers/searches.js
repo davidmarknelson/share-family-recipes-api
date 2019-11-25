@@ -4,10 +4,12 @@ const sequelize = require('../models/sequelize').sequelize;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
+const ProfilePic = require('../models/sequelize').profile_pic;
+const MealPic = require('../models/sequelize').meal_pic;
 const Op = require('sequelize').Op;
 
 const attributesArray = [
-  'id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId', 'description', 'createdAt', 'updatedAt'
+  'id', 'difficulty', 'name', 'cookTime', 'creatorId', 'description', 'createdAt', 'updatedAt'
 ];
 
 const errorMessage = 'There was an error getting the list of meals.';
@@ -21,8 +23,9 @@ module.exports = {
         attributes: attributesArray,
         order: [['createdAt', 'DESC']],
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -43,8 +46,9 @@ module.exports = {
         attributes: attributesArray,
         order: ['createdAt'],
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -64,8 +68,9 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: attributesArray,
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -85,8 +90,9 @@ module.exports = {
         attributes: attributesArray,
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -121,8 +127,9 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: attributesArray,
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -157,8 +164,9 @@ module.exports = {
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         attributes: attributesArray,
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -193,8 +201,9 @@ module.exports = {
         order: [['createdAt', 'DESC']],
         attributes: attributesArray,
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -229,8 +238,9 @@ module.exports = {
         order: ['createdAt'],
         attributes: attributesArray,
         include: [
-          { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: User, as: "creator", attributes: ['username'], duplicating: false },
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
 
@@ -248,7 +258,7 @@ module.exports = {
         where: {          
           username: req.query.username
         },
-        attributes: ['username', 'profilePic'],
+        attributes: ['username'],
         include: [
           { 
             model: Meal, as: 'meals', 
@@ -257,28 +267,25 @@ module.exports = {
             limit: req.query.limit,
             order: [[sequelize.fn('lower', sequelize.col('name'))]],
             include: [
-              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-              { model: Like, attributes: ['userId'], duplicating: false }
+              { model: User, as: "creator", attributes: ['username'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false },
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           },
+          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
         ]
       });
 
       if (!user) return res.status(404).json({ message: 'This user does not exist.'});
 
-      let count = await Meal.count({
-        where: {
-          creatorId: user.id
-        }
-      });
-
       let userMeals = {
         id: user.id,
         username: user.username,
         profilePic: user.profilePic,
-        count: count,
+        count: user.meals.length,
         rows: user.meals
       }
+
       res.status(200).json(userMeals);
     } catch (err) {
       res.status(500).json({ message: errorMessage });
@@ -291,7 +298,7 @@ module.exports = {
         where: {          
           username: req.query.username
         },
-        attributes: ['username', 'profilePic'],
+        attributes: ['username'],
         include: [
           { 
             model: Meal, as: 'meals', 
@@ -300,26 +307,22 @@ module.exports = {
             limit: req.query.limit,
             order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
             include: [
-              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-              { model: Like, attributes: ['userId'], duplicating: false }
+              { model: User, as: "creator", attributes: ['username'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false },
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           },
+          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
         ]
       });
 
       if (!user) return res.status(404).json({ message: 'This user does not exist.'});
 
-      let count = await Meal.count({
-        where: {
-          creatorId: user.id
-        }
-      });
-
       let userMeals = {
         id: user.id,
         username: user.username,
         profilePic: user.profilePic,
-        count: count,
+        count: user.meals.length,
         rows: user.meals
       }
       res.status(200).json(userMeals);

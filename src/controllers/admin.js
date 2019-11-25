@@ -5,7 +5,7 @@ const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 
 const attributesArray = [
-  'id', 'username', 'profilePic', 'firstName', 'lastName', 
+  'id', 'username', 'firstName', 'lastName', 
   'email', 'isVerified', 'isAdmin', 'createdAt'
 ];
 

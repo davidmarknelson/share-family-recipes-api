@@ -7,6 +7,8 @@ const SavedMeal = require('../../models/sequelize').saved_meal;
 const User = require('../../models/sequelize').user;
 const Meal = require('../../models/sequelize').meal;
 const Like = require('../../models/sequelize').like;
+const ProfilePic = require('../../models/sequelize').profile_pic;
+const MealPic = require('../../models/sequelize').meal_pic;
 
 
 describe('Users', () => {
@@ -106,7 +108,7 @@ describe('Users', () => {
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('Username must not include a space.');
+          res.body.message.should.equal('Username must not contain a space.');
           if(err) done(err);
           done();
         });
@@ -267,7 +269,6 @@ describe('Users', () => {
           res.body.should.have.property('firstName');
           res.body.should.have.property('lastName');
           res.body.should.have.property('email');
-          res.body.should.have.property('originalUsername');
           res.body.should.have.property('isVerified');
           res.body.should.have.property('isAdmin');
           res.body.should.have.property('profilePic');
@@ -296,16 +297,13 @@ describe('Users', () => {
   });
 
   describe('UPDATE /user/update', () => {
-    it('should return a success message when the user is updated and it includes JPEG image', (done) => {
+    it('should return a success message when the user is updated', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
         .put('/user/update')
         .set("Authorization", token)
-        .field('username', 'johndoe')
         .field('firstName', 'Jane')
-        .field('lastName', 'Doe')
-        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .then(res => {
           res.should.have.status(201);
           res.body.message.should.equal("Profile successfully updated.");
@@ -342,44 +340,29 @@ describe('Users', () => {
         .catch(err => done(err));
     });
 
-    it('should not change the originalUsername property if the user changes their username', (done) => {
+    it('should delete the old picture when the user uploads a new picture', (done) => {
       let token = `Bearer ${user.jwt}`;
+      let originalPic;
 
-      chai.request(server)
-        .put('/user/update')
-        .set("Authorization", token)
-        .field('username', 'thejohndoe')
+      ProfilePic.findAll()
+        .then(profilePics => {
+          originalPic = profilePics[0].profilePicName;
+          profilePics.length.should.equal(1);
+        })
+        .then(() => chai.request(server)
+          .put('/user/update')
+          .set("Authorization", token)
+          .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg'))
         .then(res => {
           res.should.have.status(201);
           res.body.message.should.equal("Profile successfully updated.");
         })
-        .then(() => User.findOne({where: { id: 1 }}))
-        .then(user => {
-          user.dataValues.username.should.equal('thejohndoe');
-          user.dataValues.originalUsername.should.equal('johndoe');
-          done();
+        .then(() => ProfilePic.findAll())
+        .then(profilePics => {
+          profilePics.length.should.equal(1);
+          originalPic.should.not.equal(profilePics[0].profilePicName);
         })
-        .catch(err => done(err));
-    });
-
-    it('should not change the name of the uploaded profile picture if the user has changed their username', (done) => {
-      let token = `Bearer ${user.jwt}`;
-
-      chai.request(server)
-        .put('/user/update')
-        .set("Authorization", token)
-        .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
-        .then(res => {
-          res.should.have.status(201);
-          res.body.message.should.equal("User successfully updated.");
-        })
-        .then(() => User.findOne({where: { id: 1 }}))
-        .then(user => {
-          user.dataValues.username.should.equal('thejohndoe');
-          user.dataValues.originalUsername.should.equal('johndoe');
-          user.dataValues.profilePic.should.equal('public/images/profilePics/johndoe.jpeg');
-          done();
-        })
+        .then(() => done())
         .catch(err => done(err));
     });
 
@@ -515,6 +498,8 @@ describe('Users', () => {
         .then(likes => expect(likes.length).to.equal(0))
         .then(() => Meal.findAll())
         .then(meals => expect(meals.length).to.equal(0))
+        .then(() => MealPic.findAll())
+        .then(mealPics => expect(mealPics.length).to.equal(0))
         .then(() => SavedMeal.findAll())
         .then(savedMeals => expect(savedMeals.length).to.equal(0))
         .then(() => done())

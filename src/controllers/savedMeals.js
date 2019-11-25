@@ -5,6 +5,7 @@ const SavedMeal = require('../models/sequelize').saved_meal;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 const Like = require('../models/sequelize').like;
+const MealPic = require('../models/sequelize').meal_pic;
 
 module.exports = {
   findAllAtoZ: async (req, res) => {
@@ -18,11 +19,12 @@ module.exports = {
         include: [
           { 
             model: Meal, 
-            attributes: ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'], 
+            attributes: ['id', 'difficulty', 'name', 'cookTime', 'creatorId'], 
             duplicating: false, 
             include: [
-              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-              { model: Like, attributes: ['userId'], duplicating: false }
+              { model: User, as: "creator", attributes: ['username'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false },
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           }
         ]
@@ -54,11 +56,12 @@ module.exports = {
         include: [
           { 
             model: Meal, 
-            attributes: ['id', 'difficulty', 'mealPic', 'name', 'cookTime', 'creatorId'], 
+            attributes: ['id', 'difficulty', 'name', 'cookTime', 'creatorId'], 
             duplicating: false, 
             include: [
-              { model: User, as: "creator", attributes: ['username', 'profilePic'], duplicating: false },
-              { model: Like, attributes: ['userId'], duplicating: false }
+              { model: User, as: "creator", attributes: ['username'], duplicating: false },
+              { model: Like, attributes: ['userId'], duplicating: false },
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           }
         ]

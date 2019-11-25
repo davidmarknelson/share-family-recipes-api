@@ -24,9 +24,8 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
+          res.body.rows[0].should.have.property('mealPic');
           res.body.rows[0].name.should.equal('Soup');
           res.body.rows[0].should.have.property('likes');
           res.body.rows[0].should.have.property('description');
@@ -54,7 +53,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Soup');
@@ -87,7 +85,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Soup');
@@ -117,7 +114,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -154,7 +150,6 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Soup');
@@ -184,7 +179,6 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -214,7 +208,6 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -240,7 +233,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Soup');
@@ -270,7 +262,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -296,7 +287,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -322,7 +312,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
@@ -376,7 +365,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
-          res.body.rows[0].creator.should.have.property('profilePic', null);
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Sandwich');
@@ -432,7 +420,6 @@ describe('Meal searches', () => {
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Sandwich');

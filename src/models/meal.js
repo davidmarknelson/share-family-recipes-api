@@ -7,18 +7,10 @@ module.exports = (sequelize, type) => {
       autoIncrement: true,
       allowNull: false
     },
-    mealPic: {
-      type: type.STRING,
-      allowNull: true
-    },
     name: {
       type: type.STRING,
       allowNull: false,
-      unique: true      
-    },
-    originalName: {
-      type: type.STRING,
-      allowNull: false
+      unique: true   
     },
     description: {
       type: type.STRING,
@@ -31,7 +23,7 @@ module.exports = (sequelize, type) => {
       }
     },
     ingredients: {
-      type: type.ARRAY(type.STRING),
+      type: type.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -40,7 +32,7 @@ module.exports = (sequelize, type) => {
       }
     },
     instructions: {
-      type: type.ARRAY(type.STRING),
+      type: type.STRING,
       allowNull: false,
       validate: {
         notNull: {
@@ -94,6 +86,26 @@ module.exports = (sequelize, type) => {
         if (typeof meal.cookTime === 'string') {
           meal.cookTime = Number(meal.cookTime);
         }
+        if (Array.isArray(meal.ingredients)) {
+          meal.ingredients = JSON.stringify(meal.ingredients);
+        }
+        if (Array.isArray(meal.instructions)) {
+          meal.instructions = JSON.stringify(meal.instructions);
+        }
+      },
+      beforeBulkUpdate: function parseIngredients(meal) {
+        if (typeof meal.difficulty === 'string') {
+          meal.difficulty = Number(meal.difficulty);
+        }
+        if (typeof meal.cookTime === 'string') {
+          meal.cookTime = Number(meal.cookTime);
+        }
+        if (Array.isArray(meal.ingredients)) {
+          meal.ingredients = JSON.stringify(meal.ingredients);
+        }
+        if (Array.isArray(meal.instructions)) {
+          meal.instructions = JSON.stringify(meal.instructions);
+        }
       }
     }
   });
@@ -101,6 +113,7 @@ module.exports = (sequelize, type) => {
   meal.associate = (models) => {
     meal.belongsTo(models.user, {as: "creator"});
     meal.hasMany(models.like);
+    meal.hasOne(models.meal_pic, {foreignKey: 'mealId', as: 'mealPic'});
   };
 
   return meal;

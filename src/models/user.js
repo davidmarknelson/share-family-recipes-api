@@ -31,10 +31,6 @@ module.exports = (sequelize, type) => {
       autoIncrement: true,
       allowNull: false
     },
-    profilePic: {
-      type: type.STRING,
-      allowNull: true
-    },
     username: {
       type: type.STRING,
       allowNull: false,
@@ -49,10 +45,6 @@ module.exports = (sequelize, type) => {
           msg: "Username must not contain a space."
         }
       }
-    },
-    originalUsername: {
-      type: type.STRING,
-      allowNull: false
     },
     firstName: {
       type: type.STRING,
@@ -98,6 +90,7 @@ module.exports = (sequelize, type) => {
     user.hasMany(models.meal, {foreignKey: 'creatorId', as: "meals"});
     user.hasMany(models.saved_meal, {as: "savedMeals"});
     user.hasMany(models.like, {as: "likes"});
+    user.hasOne(models.profile_pic, {foreignKey: 'userId', as: 'profilePic'});
   };
 
   user.comparePasswords = (reqPassword, dbPassword) => {

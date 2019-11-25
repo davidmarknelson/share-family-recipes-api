@@ -68,7 +68,6 @@ describe('Saved meals', () => {
         res.body.rows[0].cookTime.should.equal(5);
         res.body.rows[0].creatorId.should.equal(1);
         res.body.rows[0].creator.username.should.equal('johndoe');
-        res.body.rows[0].creator.should.have.property('profilePic', null);
         res.body.rows[0].likes.should.be.an('array');
         done();
       })
@@ -91,7 +90,6 @@ describe('Saved meals', () => {
           res.body.rows[1].cookTime.should.equal(5);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creator.should.have.property('profilePic', null);
           res.body.rows[1].likes.should.be.an('array');
           if(err) done(err);
           done();
