@@ -308,7 +308,7 @@ describe('Users', () => {
         .attach('profilePic', 'src/test/testImages/testImageJpeg.jpg')
         .then(res => {
           res.should.have.status(201);
-          res.body.message.should.equal("User successfully updated.");
+          res.body.message.should.equal("Profile successfully updated.");
         })
         .then(() => User.findOne({where: { id: 1}}))
         .then(user => {
@@ -331,7 +331,7 @@ describe('Users', () => {
           .field('email', 'email@email.com'))
         .then(res => {
           res.should.have.status(201);
-          res.body.message.should.equal("User successfully updated.");
+          res.body.message.should.equal("Profile successfully updated.");
         })
         .then(() => User.findOne({where: { id: 1}}))
         .then(user => {
@@ -351,7 +351,7 @@ describe('Users', () => {
         .field('username', 'thejohndoe')
         .then(res => {
           res.should.have.status(201);
-          res.body.message.should.equal("User successfully updated.");
+          res.body.message.should.equal("Profile successfully updated.");
         })
         .then(() => User.findOne({where: { id: 1 }}))
         .then(user => {
@@ -506,7 +506,7 @@ describe('Users', () => {
           .set("Authorization", token)
           .then(res => {
             res.should.have.status(200);
-            res.body.message.should.equal("User successfully deleted.");
+            res.body.message.should.equal("Profile successfully deleted.");
           }))
         // Check if this has also deleted user 2 likes and saves related to user 1 created content
         .then(() => User.findOne({where: {id: 1}}))

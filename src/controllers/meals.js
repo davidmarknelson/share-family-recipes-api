@@ -74,10 +74,10 @@ module.exports = {
     } catch (err) {
       if (err.errors) {
         if (err.errors[0].message === 'name must be unique') {
-          return res.status(400).json({ message: 'This meal name is already taken.' });
+          return res.status(400).json({ message: 'This recipe name is already taken.' });
         }
       }
-      res.status(500).json({ message: 'There was an error creating your meal.' });
+      res.status(500).json({ message: 'There was an error creating your recipe.' });
     }
   },
 
@@ -86,8 +86,6 @@ module.exports = {
       if (req.file) {
         req.body.mealPic = req.file.path;
       }
-
-      req.body.ingredients = JSON.stringify(req.body.ingredients);
 
       let meal = await  Meal.update(req.body, {
         where: { 

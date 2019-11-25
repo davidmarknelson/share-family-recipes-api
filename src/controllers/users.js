@@ -136,7 +136,6 @@ module.exports = {
           return res.status(400).json({ message: 'Username must not contain a space.' });
         }
       }
-      
       res.status(500).json({ message: err.message || 'There was an error signing up. Please try again.' });
     }
   },
@@ -187,7 +186,7 @@ module.exports = {
       });
 
       if (user[0] === 1) {
-        return res.status(201).json({ message: "User successfully updated." });
+        return res.status(201).json({ message: "Profile successfully updated." });
       } else if (user[0] === 0) {
         throw Error();
       }
@@ -270,7 +269,7 @@ module.exports = {
       let deleteduser = await User.destroy({where: { id: req.decoded.id }});
 
       if (deleteduser) {
-        return res.status(200).json({ message: "User successfully deleted." });
+        return res.status(200).json({ message: "Profile successfully deleted." });
       } else {
         throw Error();
       }

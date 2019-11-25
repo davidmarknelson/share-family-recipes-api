@@ -85,7 +85,7 @@ module.exports = {
       if (email.accepted[0] === `${req.body.email}`) {
         return res.status(200).json({ message: `An email has been sent to ${req.body.email} with further instructions.` });
       } else {
-        throw new Error();
+        throw Error();
       }
     } catch (err) {
       res.status(500).json({ message: "There was an error sending your password reset email." });
@@ -102,7 +102,7 @@ module.exports = {
       });
 
       if (!tokenAndUser) {
-        return res.status(404).json({ message: "Password reset token is invalid or has expired." });
+        return res.status(404).json({ message: "Password reset token is invalid or has expired. Resend reset email." });
       }
 
       if (req.body.password !== req.body.passwordConfirmation) {
@@ -120,10 +120,10 @@ module.exports = {
       });
   
       if (updatedUser[0] === 0) {
-        return res.status(404).json({ message: 'There was an error updating your password.' });
+        throw Error();
       }
 
-      res.status(201).json({ message: "Your password was successfully reset." });
+      res.status(201).json({ message: "Your password was successfully reset. Please log in with your new password." });
     } catch (err) {
       res.status(500).json({ message: "There was an error resetting your password." });
     }

@@ -1,6 +1,8 @@
 const sequelize = require('../models/sequelize').sequelize;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
+const Verification = require('../models/sequelize').verification_token;
+const ResetPW = require('../models/sequelize').reset_password_token;
 
 module.exports = {
   destroy: async (req, res) => {
@@ -20,32 +22,126 @@ module.exports = {
   seed: async (req, res) => {
     try {
       if (process.env.NODE_ENV === 'test') {
-        let admin = await User.create({
-          username: "johndoe",
-          originalUsername: "johndoe",
+        let verified = await User.create({
+          username: "verifiedUser",
+          originalUsername: "verifiedUser",
           firstName: "John",
           lastName: "Doe",
-          email: "test@email.com",
+          email: "verified@email.com",
           password: "password",
           isAdmin: true,
           isVerified: true
         });
 
-        let adminMeal = await Meal.create({
-          name: 'Sandwich',
-          originalName: 'Sandwich',
-          description: 'An easy sandwich for those busy days!',
-          ingredients: ['bread', 'cheese', 'meat'],
-          instructions: [
-            'Put the bread on the counter.', 
-            'Put the meat between 2 slices of bread.', 
-            'Put the cheese on the meat.'
-          ],
-          cookTime: 5,
-          difficulty: 1
+        res.status(200).json({message: 'The database was successfully seeded.' });
+      } else {
+        res.status(404).json({ message: 'This route only exists during tests.' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+  seedUnverified: async (req, res) => {
+    try {
+      if (process.env.NODE_ENV === 'test') {
+        let unverified = await User.create({
+          username: "unverifiedUser",
+          originalUsername: "unverifiedUser",
+          firstName: "John",
+          lastName: "Doe",
+          email: "unverified@email.com",
+          password: "password",
+          isAdmin: false,
+          isVerified: false
         });
 
         res.status(200).json({message: 'The database was successfully seeded.' });
+      } else {
+        res.status(404).json({ message: 'This route only exists during tests.' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+  seedEmailTokenAndUser: async (req, res) => {
+    try {
+      if (process.env.NODE_ENV === 'test') {
+        let unverified = await User.create({
+          username: "unverifiedUser",
+          originalUsername: "unverifiedUser",
+          firstName: "John",
+          lastName: "Doe",
+          email: "unverified@email.com",
+          password: "password",
+          isAdmin: false,
+          isVerified: false
+        });
+
+        let tokenObj = await Verification.create({
+          token: '1234567890',
+          userId: unverified.dataValues.id
+        });
+
+        res.status(200).json({message: 'The database was successfully seeded.' });
+      } else {
+        res.status(404).json({ message: 'This route only exists during tests.' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+  seedPasswordTokenAndUser: async (req, res) => {
+    try {
+      if (process.env.NODE_ENV === 'test') {
+        let unverified = await User.create({
+          username: "verifiedUser",
+          originalUsername: "verifiedUser",
+          firstName: "John",
+          lastName: "Doe",
+          email: "verified@email.com",
+          password: "password",
+          isAdmin: true,
+          isVerified: true
+        });
+
+        let tokenObj = await ResetPW.create({
+          token: '1234567890',
+          userId: unverified.dataValues.id
+        });
+
+        res.status(200).json({message: 'The database was successfully seeded.' });
+      } else {
+        res.status(404).json({ message: 'This route only exists during tests.' });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+  seedMultipleUsers: async (req, res) => {
+    try {
+      if (process.env.NODE_ENV === 'test') {
+
+        let usersArray = [];
+        for (let i = 0; i < 25; i++) {
+          usersArray.push({
+            username: `${i}user`,
+            originalUsername: `${i}user`,
+            firstName: `${i}user`,
+            lastName: `${i}user`,
+            email: `${i}user@email.com`,
+            password: `${i}password`,
+            isAdmin: true,
+            isVerified: true
+          });
+        }
+
+        let users = await User.bulkCreate(usersArray);
+
+        if (users) {
+          res.status(200).json({message: 'The database was successfully seeded.' });
+        } else {
+          throw Error();
+        }
       } else {
         res.status(404).json({ message: 'This route only exists during tests.' });
       }

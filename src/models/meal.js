@@ -22,10 +22,16 @@ module.exports = (sequelize, type) => {
     },
     description: {
       type: type.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        len: {
+          args: [0, 150],
+          msg: 'The description has a max of 150 characters.'
+        }
+      }
     },
     ingredients: {
-      type: type.STRING,
+      type: type.ARRAY(type.STRING),
       allowNull: false,
       validate: {
         notNull: {
@@ -82,13 +88,11 @@ module.exports = (sequelize, type) => {
     ],
     hooks: {
       beforeValidate: function parseIngredients(meal) {
-        if (Array.isArray(meal.ingredients)) {
-          meal.ingredients = JSON.stringify(meal.ingredients);
+        if (typeof meal.difficulty === 'string') {
+          meal.difficulty = Number(meal.difficulty);
         }
-      },
-      beforeBulkUpdate: function parseUpdatedIngredients(meal) {
-        if (Array.isArray(meal.attributes.ingredients)) {
-          meal.attributes.ingredients = JSON.stringify(meal.attributes.ingredients);
+        if (typeof meal.cookTime === 'string') {
+          meal.cookTime = Number(meal.cookTime);
         }
       }
     }

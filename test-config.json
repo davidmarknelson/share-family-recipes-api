@@ -7,7 +7,7 @@
   "DB_PW": null,
   "JWT_SECRET": "secret",
   "SG_API_KEY": "",
-  "URL": "http://localhost:3000/",
+  "URL": "http://localhost:4200/",
   "EMAIL": "dev@email.com",
   "EMAIL_HOST": "smtp.ethereal.email",
   "EMAIL_USER": "trenton.wyman55@ethereal.email",

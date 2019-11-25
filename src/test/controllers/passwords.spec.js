@@ -149,7 +149,7 @@ describe('Password', () => {
       })
       .then(res => {
         res.should.have.status(201);
-        res.body.message.should.equal("Your password was successfully reset.");
+        res.body.message.should.equal("Your password was successfully reset. Please log in with your new password.");
         done();
       })
       .catch(err => done(err));
