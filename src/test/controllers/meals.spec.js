@@ -79,8 +79,8 @@ describe('Meals', () => {
           meal.should.have.property('description');
           meal.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
           meal.should.have.property('youtubeUrl', 'www.testvideo.com');
-          meal.ingredients.should.not.be.an('array');
-          meal.instructions.should.not.be.an('array');
+          meal.ingredients.should.be.an('array');
+          meal.instructions.should.be.an('array');
           meal.mealPic.should.have.property('mealPicName');
         })
         .then(() => done())

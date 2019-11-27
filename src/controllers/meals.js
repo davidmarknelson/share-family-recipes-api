@@ -26,9 +26,6 @@ module.exports = {
 
       if (!meal) return res.status(404).json({ message: 'That meal does not exist.' });
 
-      meal.instructions = JSON.parse(meal.instructions);
-      meal.ingredients = JSON.parse(meal.ingredients);
-
       res.status(200).json(meal);
     } catch (err) {
       res.status(500).json({ message: 'There was an error getting the meal.' });

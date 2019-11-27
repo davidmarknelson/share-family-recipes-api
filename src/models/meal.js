@@ -23,7 +23,7 @@ module.exports = (sequelize, type) => {
       }
     },
     ingredients: {
-      type: type.STRING,
+      type: type.ARRAY(type.STRING),
       allowNull: false,
       validate: {
         notNull: {
@@ -32,7 +32,7 @@ module.exports = (sequelize, type) => {
       }
     },
     instructions: {
-      type: type.STRING,
+      type: type.ARRAY(type.STRING),
       allowNull: false,
       validate: {
         notNull: {
@@ -86,12 +86,6 @@ module.exports = (sequelize, type) => {
         if (typeof meal.cookTime === 'string') {
           meal.cookTime = Number(meal.cookTime);
         }
-        if (Array.isArray(meal.ingredients)) {
-          meal.ingredients = JSON.stringify(meal.ingredients);
-        }
-        if (Array.isArray(meal.instructions)) {
-          meal.instructions = JSON.stringify(meal.instructions);
-        }
       },
       beforeBulkUpdate: function parseIngredients(meal) {
         if (typeof meal.difficulty === 'string') {
@@ -99,12 +93,6 @@ module.exports = (sequelize, type) => {
         }
         if (typeof meal.cookTime === 'string') {
           meal.cookTime = Number(meal.cookTime);
-        }
-        if (Array.isArray(meal.ingredients)) {
-          meal.ingredients = JSON.stringify(meal.ingredients);
-        }
-        if (Array.isArray(meal.instructions)) {
-          meal.instructions = JSON.stringify(meal.instructions);
         }
       }
     }

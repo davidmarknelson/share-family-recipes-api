@@ -114,16 +114,12 @@ module.exports = {
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+      let ingredients = temp.map(val => `\'%${val.toLowerCase()}%\'`);
 
-      let meals = await Meal.findAndCountAll({
+      let meals = await Meal.findAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        where: {
-          ingredients: {
-            [Op.like]: sequelize.fn('ALL', ingredients)
-          }
-        },
+        where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: attributesArray,
         include: [
@@ -133,9 +129,12 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
-      res.status(200).json(meals);
+      res.status(200).json({
+        count: meals.length,
+        rows: meals
+      });
     } catch (err) {
       res.status(500).json({ message: errorMessage });
     }
@@ -151,16 +150,12 @@ module.exports = {
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+      let ingredients = temp.map(val => `\'%${val.toLowerCase()}%\'`);
 
-      let meals = await Meal.findAndCountAll({
+      let meals = await Meal.findAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        where: {
-          ingredients: {
-            [Op.like]: sequelize.fn('ALL', ingredients)
-          }
-        },
+        where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
         order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
         attributes: attributesArray,
         include: [
@@ -170,9 +165,12 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
-      res.status(200).json(meals);
+      res.status(200).json({
+        count: meals.length,
+        rows: meals
+      });
     } catch (err) {
       res.status(500).json({ message: errorMessage });
     }
@@ -188,16 +186,12 @@ module.exports = {
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+      let ingredients = temp.map(val => `\'%${val.toLowerCase()}%\'`);
 
-      let meals = await Meal.findAndCountAll({
+      let meals = await Meal.findAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        where: {
-          ingredients: {
-            [Op.like]: sequelize.fn('ALL', ingredients)
-          }
-        },
+        where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
         order: [['createdAt', 'DESC']],
         attributes: attributesArray,
         include: [
@@ -207,9 +201,12 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
-      res.status(200).json(meals);
+      res.status(200).json({
+        count: meals.length,
+        rows: meals
+      });
     } catch (err) {
       res.status(500).json({ message: errorMessage });
     }
@@ -225,16 +222,12 @@ module.exports = {
       } else {
         temp = req.query.ingredient;
       }
-      let ingredients = temp.map(val => `%${val.toLowerCase()}%`);
+      let ingredients = temp.map(val => `\'%${val.toLowerCase()}%\'`);
 
-      let meals = await Meal.findAndCountAll({
+      let meals = await Meal.findAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        where: {
-          ingredients: {
-            [Op.like]: sequelize.fn('ALL', ingredients)
-          }
-        },
+        where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
         order: ['createdAt'],
         attributes: attributesArray,
         include: [
@@ -244,9 +237,12 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
 
-      res.status(200).json(meals);
+      res.status(200).json({
+        count: meals.length,
+        rows: meals
+      });
     } catch (err) {
       res.status(500).json({ message: errorMessage });
     }
