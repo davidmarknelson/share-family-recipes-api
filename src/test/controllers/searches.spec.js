@@ -344,7 +344,7 @@ describe('Meal searches', () => {
         .get('/search/byingredients-a-z?ingredient=beef')
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.message.should.equal('There are no meals with those ingredients.');
+          res.body.message.should.equal('There are no recipes with those ingredients.');
           if(err) done(err);
           done();
         });
@@ -366,7 +366,7 @@ describe('Meal searches', () => {
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
+          res.body.rows[0].mealPic.mealPicName.should.equal('https://mealpicurl');
           res.body.rows[0].name.should.equal('Sandwich');
           res.body.rows[0].should.have.property('likes');
           res.body.rows[0].should.have.property('description');
@@ -421,7 +421,7 @@ describe('Meal searches', () => {
           res.body.rows.should.have.lengthOf(2);
           res.body.rows[1].creator.username.should.equal('johndoe');
           res.body.rows[1].creatorId.should.equal(1);
-          res.body.rows[1].should.have.property('mealPic', null);
+          res.body.rows[1].mealPic.mealPicName.should.equal('https://mealpicurl');
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].should.have.property('likes');
           res.body.rows[1].should.have.property('description');
@@ -487,9 +487,8 @@ describe('Meal searches', () => {
       chai.request(server)
         .get('/search/name?name=Beef')
         .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.an('array');
-          res.body.should.have.lengthOf(0);
+          res.should.have.status(404);
+          res.body.should.not.have.property('message');
           if(err) done(err);
           done();
         });

@@ -9,5 +9,7 @@ router.route('/seedunverified').post(tests.seedUnverified);
 router.route('/seedemailtoken').post(tests.seedEmailTokenAndUser);
 router.route('/seedpasswordtoken').post(tests.seedPasswordTokenAndUser);
 router.route('/seedmultipleusers').post(tests.seedMultipleUsers);
+router.route('/seedmeal').post(tests.seedMeal);
+router.route('/seedmeal2').post(tests.seedMeal2);
 
 module.exports = router;

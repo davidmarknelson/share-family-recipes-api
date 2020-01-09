@@ -21,7 +21,7 @@ module.exports = {
         order: [['createdAt', 'DESC']],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -40,7 +40,7 @@ module.exports = {
         order: ['createdAt'],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -59,7 +59,7 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('username'))],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -78,7 +78,7 @@ module.exports = {
         order: [[sequelize.fn('lower', sequelize.col('username')), 'DESC']],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -97,7 +97,7 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('firstName'))],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -116,7 +116,7 @@ module.exports = {
         order: [[sequelize.fn('lower', sequelize.col('firstName')), 'DESC']],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -135,7 +135,7 @@ module.exports = {
         order: [sequelize.fn('lower', sequelize.col('lastName'))],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
 
@@ -154,7 +154,7 @@ module.exports = {
         order: [[sequelize.fn('lower', sequelize.col('lastName')), 'DESC']],
         distinct: true,
         include: [
-          { model: Meal, as: 'meals', attributes: ['id'], duplicating: false  }
+          { model: Meal, as: 'meals', attributes: ['id'] }
         ]
       });
       

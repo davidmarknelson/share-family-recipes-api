@@ -58,7 +58,7 @@ describe('Parse middleware', () => {
   });
 
   describe('parseMealFields()', () => {
-    it('should remove the whitespace from meal name, turn ingredients and instructions to arrays, and lowercase ingredients', () => {
+    it('should remove the whitespace from meal name, and lowercase ingredients', () => {
       let request  = httpMocks.createRequest({
         method: 'POST',
         url: '/',
@@ -80,11 +80,84 @@ describe('Parse middleware', () => {
 
       expect(nextSpy).to.have.been.called();
       request.body.name.should.equal('Soup');
-      request.body.ingredients.should.be.an('array');
-      request.body.ingredients[0].should.equal('water');
-      request.body.ingredients[1].should.equal('meat');
-      request.body.ingredients[2].should.equal('vegetables');
-      request.body.instructions.should.be.an('array');
+      request.body.ingredients.should.be.an('string');
+      request.body.ingredients.should.equal('["water","meat","vegetables"]');
+      request.body.instructions.should.be.an('string');
+    });
+
+    it('should add an http to the beginning of originalRecipeUrl if it does not have http', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          originalRecipeUrl: 'www.recipe.com'
+        }
+      });
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.have.been.called();
+      request.body.originalRecipeUrl.should.equal('http://www.recipe.com');
+    });
+
+    it('should return an iframe friendly url when the youtubeUrl matches the pattern', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ'
+        }
+      });
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.have.been.called();
+      request.body.youtubeUrl.should.equal('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    });
+
+    it('should return an error if youtubeUrl is too long', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          youtubeUrl: 'https://youtu.be/thisiswaytoolong'
+        }
+      });
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.not.have.been.called();
+      response._getData().should.equal('{"message":"There was an error with your YouTube link."}');
+    });
+
+    it('should return an error if youtubeUrl is too short', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          youtubeUrl: 'https://youtu.be/short'
+        }
+      });
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.not.have.been.called();
+      response._getData().should.equal('{"message":"There was an error with your YouTube link."}');
+    });
+
+    it('should return an error if youtubeUrl does not match https://youtu.be/', () => {
+      let request  = httpMocks.createRequest({
+        method: 'POST',
+        url: '/',
+        body: {
+          youtubeUrl: 'https://nottu.be/dQw4w9WgXcQ'
+        }
+      });
+
+      parse.parseMealFields(request, response, nextSpy);
+
+      expect(nextSpy).to.not.have.been.called();
+      response._getData().should.equal('{"message":"There was an error with your YouTube link."}');
     });
 
     it('should call next() if name, ingredients, and instructions are not included', () => {

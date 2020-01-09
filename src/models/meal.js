@@ -10,7 +10,13 @@ module.exports = (sequelize, type) => {
     name: {
       type: type.STRING,
       allowNull: false,
-      unique: true   
+      unique: true, 
+      validate: {
+        len: {
+          args: [0, 50],
+          msg: 'The name has a max of 50 characters.'
+        }
+      }
     },
     description: {
       type: type.STRING,
@@ -71,6 +77,12 @@ module.exports = (sequelize, type) => {
     youtubeUrl: {
       type: type.STRING,
       allowNull: true,
+      validate: {
+        len: {
+          args: [0, 50],
+          msg: 'There was an error with your YouTube link.'
+        }
+      }
     },
     createdAt: type.DATE,
     updatedAt: type.DATE
@@ -86,6 +98,12 @@ module.exports = (sequelize, type) => {
         if (typeof meal.cookTime === 'string') {
           meal.cookTime = Number(meal.cookTime);
         }
+        if (typeof meal.ingredients === 'string') {
+          meal.ingredients = JSON.parse(meal.ingredients)
+        }
+        if (typeof meal.instructions === 'string') {
+          meal.instructions = JSON.parse(meal.instructions)
+        }
       },
       beforeBulkUpdate: function parseIngredients(meal) {
         if (typeof meal.difficulty === 'string') {
@@ -93,6 +111,12 @@ module.exports = (sequelize, type) => {
         }
         if (typeof meal.cookTime === 'string') {
           meal.cookTime = Number(meal.cookTime);
+        }
+        if (typeof meal.ingredients === 'string') {
+          meal.ingredients = JSON.parse(meal.ingredients)
+        }
+        if (typeof meal.instructions === 'string') {
+          meal.instructions = JSON.parse(meal.instructions)
         }
       }
     }

@@ -29,7 +29,7 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
       res.status(200).json(meals);
 
@@ -52,7 +52,7 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -74,7 +74,7 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -96,7 +96,7 @@ module.exports = {
         ]
       });
 
-      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no meals.' });
+      if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
       res.status(200).json(meals);
     } catch (err) {
@@ -129,7 +129,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no recipes with those ingredients.' });
 
       res.status(200).json({
         count: meals.length,
@@ -165,7 +165,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no recipes with those ingredients.' });
 
       res.status(200).json({
         count: meals.length,
@@ -201,7 +201,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no recipes with those ingredients.' });
 
       res.status(200).json({
         count: meals.length,
@@ -237,7 +237,7 @@ module.exports = {
         ]
       });
 
-      if (meals.length === 0) return res.status(404).json({ message: 'There are no meals with those ingredients.' });
+      if (meals.length === 0) return res.status(404).json({ message: 'There are no recipes with those ingredients.' });
 
       res.status(200).json({
         count: meals.length,
@@ -328,17 +328,21 @@ module.exports = {
   },
 
   searchByName: async (req, res) => {
+    let formattedName = req.query.name.replace('%20', ' ');
+
     try {
       let meals = await Meal.findAll({
         where: {
           name: {
-            [Op.iLike]: `%${req.query.name}%`
+            [Op.iLike]: `${formattedName}%`
           }
         },
-        limit: 10,
+        limit: req.query.limit,
         order: [sequelize.fn('lower', sequelize.col('name'))],
         attributes: ['id', 'name']
       });
+
+      if (meals.length === 0) return res.status(404).json();
 
       res.status(200).json(meals);
     } catch (err) {

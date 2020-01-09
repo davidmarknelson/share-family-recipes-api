@@ -24,8 +24,13 @@ describe('Saved meals', () => {
       .get('/saved/a-z')
       .set("Authorization", token)
       .end((err, res) => {
-        res.should.have.status(404);
-        res.body.message.should.equal('You have not saved any meals.');
+        res.should.have.status(200);
+        res.body.should.have.property('id', 1);
+        res.body.should.have.property('username', 'johndoe');
+        res.body.should.have.property('profilePic', null);
+        res.body.should.have.property('count', 0);
+        res.body.should.have.property('rows');
+        res.body.rows.should.have.length(0);
         if(err) done(err);
         done();
       });
@@ -35,15 +40,15 @@ describe('Saved meals', () => {
   describe('POST save meal', () => {
     it('should return a message when a meal is successfully saved', (done) => {
       chai.request(server)
-      .post('/saved/save')
-      .set("Authorization", token)
-      .send({ mealId: 1 })
-      .end((err, res) => {
-        res.should.have.status(201);
-        res.body.message.should.equal('Meal successfully saved.');
-        if(err) done(err);
-        done();
-      });
+        .post('/saved/save')
+        .set("Authorization", token)
+        .send({ recipeId: 1 })
+        .end((err, res) => {
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
+          if(err) done(err);
+          done();
+        });
     });
   });
 
@@ -52,26 +57,26 @@ describe('Saved meals', () => {
       chai.request(server)
         .post('/saved/save')
         .set("Authorization", token)
-        .send({ mealId: 2 })
-      .then(() => chai.request(server)
-        .get('/saved/a-z')
-        .set("Authorization", token))
-      .then(res => {
-        res.should.have.status(200);
-        res.body.count.should.equal(2);
-        res.body.rows.should.be.an('array');
-        res.body.rows.should.have.lengthOf(2);
-        res.body.rows[0].id.should.equal(1);
-        res.body.rows[0].name.should.equal('Sandwich');
-        res.body.rows[0].difficulty.should.equal(1);
-        res.body.rows[0].should.have.property('mealPic', null);
-        res.body.rows[0].cookTime.should.equal(5);
-        res.body.rows[0].creatorId.should.equal(1);
-        res.body.rows[0].creator.username.should.equal('johndoe');
-        res.body.rows[0].likes.should.be.an('array');
-        done();
-      })
-      .catch(err => done(err));
+        .send({ recipeId: 2 })
+        .then(() => chai.request(server)
+          .get('/saved/a-z')
+          .set("Authorization", token))
+        .then(res => {
+          res.should.have.status(200);
+          res.body.count.should.equal(2);
+          res.body.rows.should.be.an('array');
+          res.body.rows.should.have.lengthOf(2);
+          res.body.rows[0].id.should.equal(1);
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].difficulty.should.equal(1);
+          res.body.rows[0].mealPic.mealPicName.should.equal('https://mealpicurl');
+          res.body.rows[0].cookTime.should.equal(5);
+          res.body.rows[0].creatorId.should.equal(1);
+          res.body.rows[0].creator.username.should.equal('johndoe');
+          res.body.rows[0].likes.should.be.an('array');
+          done();
+        })
+        .catch(err => done(err));
     });
 
     it('should return an array with the meals', (done) => {
@@ -86,7 +91,7 @@ describe('Saved meals', () => {
           res.body.rows[1].id.should.equal(1);
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].difficulty.should.equal(1);
-          res.body.rows[1].should.have.property('mealPic', null);
+          res.body.rows[1].mealPic.mealPicName.should.equal('https://mealpicurl');
           res.body.rows[1].cookTime.should.equal(5);
           res.body.rows[1].creatorId.should.equal(1);
           res.body.rows[1].creator.username.should.equal('johndoe');
@@ -102,10 +107,10 @@ describe('Saved meals', () => {
       chai.request(server)
         .delete('/saved/unsave')
         .set("Authorization", token)
-        .send({ mealId: 1 })
+        .send({ recipeId: 1 })
         .end((err, res) => {
-          res.should.have.status(200);
-          res.body.message.should.equal('Meal successfully unsaved.');
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
           if(err) done(err);
           done();
         });

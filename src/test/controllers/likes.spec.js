@@ -19,10 +19,10 @@ describe('Likes', () => {
       chai.request(server)
       .post('/likes/add')
       .set("Authorization", token)
-      .send({mealId: 1})
+      .send({recipeId: 1})
       .end((err, res) => {
-        res.should.have.status(201);
-        res.body.message.should.equal('Meal successfully liked.');
+        res.should.have.status(204);
+        res.body.should.not.have.property('message');
         if(err) done(err);
         done();
       });
@@ -34,10 +34,10 @@ describe('Likes', () => {
       chai.request(server)
       .post('/likes/add')
       .set("Authorization", token)
-      .send({mealId: 2})
+      .send({recipeId: 2})
       .end((err, res) => {
         res.should.have.status(500);
-        res.body.message.should.equal('There was an error liking this meal.');
+        res.body.message.should.equal('There was an error liking this recipe.');
         if(err) done(err);
         done();
       });
@@ -49,10 +49,10 @@ describe('Likes', () => {
       chai.request(server)
       .post('/likes/add')
       .set("Authorization", token)
-      .send({mealId: 1})
+      .send({recipeId: 1})
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.message.should.equal('You have already liked this meal.');
+        res.body.message.should.equal('You have already liked this recipe.');
         if(err) done(err);
         done();
       });
@@ -66,10 +66,10 @@ describe('Likes', () => {
       chai.request(server)
       .delete('/likes/remove')
       .set("Authorization", token)
-      .send({mealId: 1})
+      .send({recipeId: 1})
       .end((err, res) => {
-        res.should.have.status(200);
-        res.body.message.should.equal('Meal successfully unliked.');
+        res.should.have.status(204);
+        res.body.should.not.have.property('message');
         if(err) done(err);
         done();
       });
@@ -81,10 +81,10 @@ describe('Likes', () => {
       chai.request(server)
       .delete('/likes/remove')
       .set("Authorization", token)
-      .send({mealId: 2})
+      .send({recipeId: 2})
       .end((err, res) => {
         res.should.have.status(500);
-        res.body.message.should.equal('There was an error unliking this meal.');
+        res.body.message.should.equal('There was an error unliking this recipe.');
         if(err) done(err);
         done();
       });

@@ -21,5 +21,8 @@ module.exports = {
   EMAIL_PW: process.env.EMAIL_PW || config.EMAIL_PW,
   EMAIL_PORT: process.env.EMAIL_PORT || config.EMAIL_PORT,
   ADMIN_CODE: process.env.ADMIN_CODE || config.ADMIN_CODE,
-  JWT_EXPIRATION_TIME: process.env.JWT_EXPIRATION_TIME || config.JWT_EXPIRATION_TIME
+  JWT_EXPIRATION_TIME: process.env.JWT_EXPIRATION_TIME || config.JWT_EXPIRATION_TIME,
+  CLOUD_NAME: process.env.CLOUD_NAME || config.CLOUD_NAME,
+  CLOUD_API_KEY: process.env.CLOUD_API_KEY || config.CLOUD_API_KEY,
+  CLOUD_API_SECRET: process.env.CLOUD_API_SECRET || config.CLOUD_API_SECRET
 };

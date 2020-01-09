@@ -7,23 +7,23 @@ module.exports = {
     try {
       let previousLike = await Like.findOne({
         where: {
-          mealId: req.body.mealId,
+          mealId: req.body.recipeId,
           userId: req.decoded.id
         }
       });
 
-      if (previousLike) return res.status(400).json({ message: 'You have already liked this meal.' });
+      if (previousLike) return res.status(400).json({ message: 'You have already liked this recipe.' });
 
       let like = await Like.create({
-        mealId: req.body.mealId,
+        mealId: req.body.recipeId,
         userId: req.decoded.id
       });
 
       if (!like) throw Error();
 
-      res.status(201).json({ message: 'Meal successfully liked.' });
+      res.status(204).json();
     } catch (err) {
-      res.status(500).json({ message: 'There was an error liking this meal.' });
+      res.status(500).json({ message: 'There was an error liking this recipe.' });
     }
   },
 
@@ -31,18 +31,18 @@ module.exports = {
     try {
       let like = await Like.destroy({
         where: {
-          mealId: req.body.mealId,
+          mealId: req.body.recipeId,
           userId: req.decoded.id
         }
       });
 
       if (like) {
-        res.status(200).json({ message: "Meal successfully unliked." });
+        res.status(204).json();
       } else {
         throw Error();
       }
     } catch (err) {
-      res.status(500).json({ message: "There was an error unliking this meal." });      
+      res.status(500).json({ message: "There was an error unliking this recipe." });      
     }
   }
 };

@@ -10,8 +10,29 @@ module.exports = {
   },
   parseMealFields: (req, res, next) => {
     if (req.body.name) req.body.name = req.body.name.trim();
-    if (req.body.ingredients) req.body.ingredients = JSON.parse(req.body.ingredients.toLowerCase());
-    if (req.body.instructions) req.body.instructions = JSON.parse(req.body.instructions);
+
+    // Ingredients are still a string at this point because they have not been parsed from form data yet
+    if (req.body.ingredients) {
+      req.body.ingredients = req.body.ingredients.toLowerCase();
+    }
+
+    if (req.body.originalRecipeUrl) {
+      if (!req.body.originalRecipeUrl.startsWith('http://') && !req.body.originalRecipeUrl.startsWith('https://')) {
+        req.body.originalRecipeUrl = `http://${req.body.originalRecipeUrl}`;
+      }
+    }
+
+    if (req.body.youtubeUrl) {
+      // Youtube urls are 28 characters long and start with 'https://youtu.be/'
+      if (req.body.youtubeUrl.length !== 28 || !req.body.youtubeUrl.startsWith('https://youtu.be/')) {
+        return res.status(400).json({ message: 'There was an error with your YouTube link.' });
+      }
+      // This replaces the url with an iframe friendly url
+      if (req.body.youtubeUrl.startsWith('https://youtu.be/')) {
+        req.body.youtubeUrl = req.body.youtubeUrl.replace('https://youtu.be/', 'https://www.youtube-nocookie.com/embed/');
+      }
+    }
+
     next();
   },
   parseOffsetAndLimit: (req, res, next) => {
@@ -21,13 +42,6 @@ module.exports = {
   },
   checkPasswordValidity: (req, res, next) => {
     if (req.body.password.length < 8) {
-      fs.stat(`public/images/profilePics/${req.body.username}.jpeg`, (err, stats) => {
-        if (stats) {
-          fs.unlink(`public/images/profilePics/${req.body.username}.jpeg`, (err) => {
-            if (err) return res.status(500).json({ message: 'There was an error removing your profile picture.' });
-          });
-        }
-      });
       return res.status(400).json({ message: 'Password must be at least 8 characters long.' });
     }
     next();

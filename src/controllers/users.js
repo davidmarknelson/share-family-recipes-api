@@ -5,18 +5,43 @@ const Like = require('../models/sequelize').like;
 const User = require('../models/sequelize').user;
 const Meal = require('../models/sequelize').meal;
 const ProfilePic = require('../models/sequelize').profile_pic;
+const MealPic = require('../models/sequelize').meal_pic;
 const Op = require('sequelize').Op;
 // JWT and file system
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 // Config
 const config = require('../../config');
+// Cloudinary
+const cloudinary = require('cloudinary').v2;
 
 function jwtSignUser(user) {
   return jwt.sign(user, config.JWT_SECRET, {
     expiresIn: config.JWT_EXPIRATION_TIME
   });
 }
+
+function deleteCloudinaryImage(public_id) {
+  return new Promise(function (resolve, reject) {
+    cloudinary.uploader.destroy(public_id, {
+      invalidate: true
+    }, function(error,result) {
+      if (error) reject(error);
+      resolve(result);
+    });
+  });
+};
+
+function deleteMultipleCloudinaryImage(publicIds) {
+  return new Promise(function (resolve, reject) {
+    cloudinary.api.delete_resources(
+      publicIds, {invalidate: true},
+      function(error, result) {
+        if (error) reject(error);
+        resolve(result);
+      }
+    );
+  });
+};
 
 module.exports = {
 
@@ -43,13 +68,17 @@ module.exports = {
   renewJwt: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { id: req.decoded.id }
+        where: { id: req.decoded.id },
+        include: [
+          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
+        ]
       });
 
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username
+        username: user.dataValues.username,
+        savedRecipes: user.dataValues.savedMeals
       };
 
       res.status(200).json({
@@ -67,7 +96,8 @@ module.exports = {
           id: req.decoded.id
         },
         include: [
-          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
+          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false },
+          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
         ]
       });
 
@@ -92,14 +122,25 @@ module.exports = {
         req.body.isAdmin = false;
       }
       
+      // passwordConfirmation is not part of the sql model
       delete req.body.passwordConfirmation;
+
+      // save these properties to variables
+      let tempProfilePicName = req.body.profilePicName;
+      let tempPublicId = req.body.publicId;
+
+      // delete properties from req.body because the user model
+      // does not have them
+      delete req.body.profilePicName;
+      delete req.body.publicId;
       
       let user = await User.create(req.body);
-      
-      if (req.file) {
+
+      if (tempProfilePicName && tempPublicId) {
         let profilePic = await ProfilePic.create({
           userId: user.dataValues.id,
-          profilePicName: req.file.filename
+          profilePicName: tempProfilePicName,
+          publicId: tempPublicId
         });
       }
       
@@ -107,26 +148,13 @@ module.exports = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
         username: user.dataValues.username,
+        savedRecipes: []
       };
       
       res.status(201).json({
         jwt: jwtSignUser(userToken)
       });
     } catch (err) {
-      // This deletes any profile picture a user uploaded during an attempt that had
-      // an error. This is deleted so if they change their username on any following 
-      // attempts, there won't be an unused picture.
-      if (req.file) {
-        // Checks if the profile picture exists
-        fs.stat(`public/images/profilePics/${req.file.filename}`, (err, stats) => {
-          if (stats) {
-            // Deletes profile picture
-            fs.unlink(`public/images/profilePics/${req.file.filename}`, (err) => {
-              if (err) return res.status(500).json({ message: 'There was an error.' });
-            });
-          }
-        });
-      }
 
       if (err.errors) {
         if (err.errors[0].message === 'email must be unique') {
@@ -144,17 +172,20 @@ module.exports = {
       }
 
       if (err.message === 'Passwords do not match.') {
-        return res.status(400).json({ message: "Passwords do not match." });
+        err.status = 400;
       }
 
-      res.status(500).json({ message: err.message || 'There was an error signing up. Please try again.' });
+      res.status(err.status || 500).json({ message: err.message || 'There was an error signing up. Please try again.' });
     }
   },
 
   login: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { email: req.body.email }
+        where: { email: req.body.email },
+        include: [
+          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
+        ]
       });
 
       if (!user) {
@@ -170,7 +201,8 @@ module.exports = {
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username
+        username: user.dataValues.username,
+        savedRecipes: user.dataValues.savedMeals
       };
 
       res.status(200).json({
@@ -183,59 +215,58 @@ module.exports = {
 
   update: async (req, res) => {
     try {
+      // Keep password from updating. Updating the password
+      // is in a different route.
       if (req.body.password) delete req.body.password;
 
+      // Change isVerified to false if the user is updating their email.
       if (req.body.email) req.body.isVerified = false;
+
+      // save these properties to variables
+      let tempProfilePicName = req.body.profilePicName;
+      let tempPublicId = req.body.publicId;
+
+      // delete properties from req.body because the user model
+      // does not have them
+      delete req.body.profilePicName;
+      delete req.body.publicId;
 
       let user = await User.update(req.body, {
         where: { id: req.decoded.id }
       });
 
       let profilePic;
-
       // This deletes the old profile pic and creates the new one
-      if (req.file) {
+      if (tempProfilePicName && tempPublicId) {
         let deletePic = await ProfilePic.findOne({
           where: { userId: req.decoded.id }
         });
 
         if (deletePic) {
-          // Checks if the profile picture exists
-          fs.stat(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err, stats) => {
-            if (stats) {
-              // Deletes profile picture
-              fs.unlink(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err) => {
-                if (err) return res.status(500).json({ message: 'There was an error.' });
-              });
-            }
-          });
+          // This deletes the old profile pic from cloudinary
+          // result returns { result: 'ok' } on success
+          let deleteCloudImg = await deleteCloudinaryImage(deletePic.publicId);
         }
 
-        let deleted = ProfilePic.destroy({where: { userId: req.decoded.id }});
-
-        profilePic = await ProfilePic.create({
+        // If .upsert creates a new object, it returns true. If it updates
+        // an old object, it returns false. Passing {returning: true} returns the 
+        // updated object and make profilePic a truthy variable.
+        profilePic = await ProfilePic.upsert({
           userId: req.decoded.id,
-          profilePicName: req.file.filename
-        });
+          profilePicName: tempProfilePicName,
+          publicId: tempPublicId
+        }, { returning: true });
       }
 
+      // If the user only updates the profilePic, then the user object will return 0 because nothing
+      // has updated. This if statement will allow a truthy result if the user only updated the profilePic
+      // or the user object.
       if (user[0] === 1 || profilePic) {
         return res.status(201).json({ message: "Profile successfully updated." });
       } else if (user[0] === 0) {
         throw Error();
       }
     } catch (err) {
-      if (req.file) {
-        // Checks if the profile picture exists
-        fs.stat(`public/images/profilePics/${req.file.filename}`, (err, stats) => {
-          if (stats) {
-            // Deletes profile picture
-            fs.unlink(`public/images/profilePics/${req.file.filename}`, (err) => {
-              if (err) return res.status(500).json({ message: 'There was an error.' });
-            });
-          }
-        });
-      }
 
       if (err.errors) {
         if (err.errors[0].message === 'email must be unique') {
@@ -261,46 +292,44 @@ module.exports = {
         where: { id: req.decoded.id }
       });
 
-      let deletePic = await ProfilePic.findOne({
+      let deleteProfilePic = await ProfilePic.findOne({
         where: { userId: req.decoded.id }
       });
 
-      if (deletePic) {
-        // Checks if the profile picture exists
-        fs.stat(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err, stats) => {
-          if (stats) {
-            // Deletes profile picture
-            fs.unlink(`public/images/profilePics/${deletePic.dataValues.profilePicName}`, (err) => {
-              if (err) return res.status(500).json({ message: 'There was an error.' });
-            });
-          }
-        });
+      if (deleteProfilePic) {
+        // This deletes the old profile pic from cloudinary
+        // result returns { result: 'ok' } on success
+        let deleteCloudImg = await deleteCloudinaryImage(deleteProfilePic.publicId);
       }
 
+      // Get all meals created by user
       let meals = await Meal.findAll({
         where: {
           creatorId: req.decoded.id
         }
       });
 
-      let mealPics;
-      if (meals) {
-        mealPics = meals.reduce((pictures, meal) => {
-          if (meal.dataValues.mealPic) {
-            pictures.push(meal.dataValues.mealPic);
-          }
+      if (meals.length > 0) {
+        // Put mealIds in array
+        let mealIds = meals.reduce((pictures, meal) => {
+          pictures.push({id: meal.dataValues.id});
           return pictures;
         }, []);
-      }
 
-      for (let mealPic of mealPics) {
-        fs.stat(mealPic, (err, stats) => {
-          if (stats) {
-            fs.unlink(mealPic, (err) => {
-              if (err) return res.status(500).json({ message: 'There was an error deleting a meal picture.' });
-            });
-          }
+        // find meals that have pictures
+        let mealPics = await MealPic.findAll({
+          where: { [Op.or]: mealIds },
+          attributes: ['publicId']
         });
+
+        // put public_ids into an array
+        let publicIds = mealPics.reduce((public_ids, pics) => {
+          public_ids.push(pics.dataValues.publicId);
+          return public_ids;
+        }, []);
+
+        // delete pictures from cloudinary
+        let cloudMealPics = await deleteMultipleCloudinaryImage(publicIds);
       }
       
       // User is deleted separately from the others because the userId fields in meal, likes, and saved meal

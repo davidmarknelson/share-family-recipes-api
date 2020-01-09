@@ -11,6 +11,10 @@ module.exports = (sequelize, type) => {
       type: type.STRING,
       allowNull: false,
       unique: true   
+    },
+    publicId: {
+      type: type.STRING,
+      allowNull: false
     }
   }, {
     indexes: [

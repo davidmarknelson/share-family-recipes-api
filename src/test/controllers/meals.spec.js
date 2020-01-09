@@ -18,53 +18,17 @@ describe('Meals', () => {
   });
 
   describe('POST create meal', () => {
-    it('should return an error messsage if the uploaded image is PNG', (done) => {
+    it('should return a new meal without an image', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
         .post('/meals/create')
         .set("Authorization", token)
-        .field('name', 'Sandwich')
-        .field('description', 'An easy sandwich for those busy days!')
-        .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
-        .field('instructions', JSON.stringify([
-          'Put the bread on the counter.', 
-          'Put the meat between 2 slices of bread.', 
-          'Put the cheese on the meat.'
-        ]))
-        .field('cookTime', 5)
-        .field('difficulty', 1)
-        .attach('mealPic', 'src/test/testImages/testMealPng.png')
-        .end((err, res) => {
-          res.should.have.status(415);
-          res.body.message.should.equal('Please upload a JPEG image.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return a new meal', (done) => {
-      let token = `Bearer ${user.jwt}`;
-
-      chai.request(server)
-        .post('/meals/create')
-        .set("Authorization", token)
-        .field('name', 'Meat and Cheese Sandwich')
-        .field('description', 'An easy sandwich for those busy days!')
-        .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
-        .field('instructions', JSON.stringify([
-          'Put the bread on the counter.', 
-          'Put the meat between 2 slices of bread.', 
-          'Put the cheese on the meat.'
-        ]))
-        .field('cookTime', 5)
-        .field('difficulty', 1)
-        .field('originalRecipeUrl', 'www.testrecipe.com')
-        .field('youtubeUrl', 'www.testvideo.com')
-        .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg')
+        .send(utils.mealNoPic)
         .then(res => {
           res.should.have.status(201);
           res.body.id.should.equal(1);
+          res.body.name.should.equal('Meat and Cheese Sandwich');
           res.body.message.should.equal('Meal successfully created.')
         })
         .then(() => Meal.findOne({ 
@@ -77,39 +41,48 @@ describe('Meals', () => {
           meal.name.should.equal("Meat and Cheese Sandwich");
           meal.id.should.equal(1)
           meal.should.have.property('description');
-          meal.should.have.property('originalRecipeUrl', 'www.testrecipe.com');
-          meal.should.have.property('youtubeUrl', 'www.testvideo.com');
+          meal.should.have.property('originalRecipeUrl', 'http://www.testrecipe.com');
+          meal.should.have.property('youtubeUrl', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
           meal.ingredients.should.be.an('array');
           meal.instructions.should.be.an('array');
-          meal.mealPic.should.have.property('mealPicName');
+          meal.should.have.property('mealPic', null);
         })
         .then(() => done())
         .catch(err => done(err));
     });
 
-    it('should return a new meal with lowercase ingredients when received ingredients are uppercase', (done) => {
+    it('should return a new meal with an image and lowercase ingredients', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
         .post('/meals/create')
         .set("Authorization", token)
-        .field('name', 'Soup')
-        .field('description', 'A tasty soup for a cold day!')
-        .field('ingredients', JSON.stringify(['WATER', 'VEGETABLES', 'MEAT']))
-        .field('instructions', JSON.stringify([
-          'Cut the veggies.', 
-          'Boil the water.', 
-          'Put veggies and meat in the water until it is cooked.'
-        ]))
-        .field('cookTime', 20)
-        .field('difficulty', 3)
-        .end((err, res) => {
+        .send(utils.mealWithPic)
+        .then(res => {
           res.should.have.status(201);
           res.body.id.should.equal(2);
+          res.body.name.should.equal('Meat and Tomato Sandwich');
           res.body.message.should.equal('Meal successfully created.')
-          if(err) done(err);
-          done();
-        });
+        })
+        .then(() => Meal.findOne({ 
+          where: { id: 2 },
+          include: [
+            { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
+          ]
+        }))
+        .then(meal => {
+          meal.name.should.equal("Meat and Tomato Sandwich");
+          meal.id.should.equal(2)
+          meal.should.have.property('description');
+          meal.should.have.property('originalRecipeUrl', 'http://www.testrecipe.com');
+          meal.should.have.property('youtubeUrl', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+          meal.ingredients.should.be.an('array');
+          meal.ingredients[1].should.equal('tomato');
+          meal.instructions.should.be.an('array');
+          meal.mealPic.should.have.property('mealPicName', 'https://mealpicurl');
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
 
     it('should return an error if the description is too long', (done) => {
@@ -126,16 +99,18 @@ describe('Meals', () => {
       chai.request(server)
         .post('/meals/create')
         .set("Authorization", token)
-        .field('name', 'Soup')
-        .field('description', msg())
-        .field('ingredients', JSON.stringify(['WATER', 'VEGETABLES', 'MEAT']))
-        .field('instructions', JSON.stringify([
-          'Cut the veggies.', 
-          'Boil the water.', 
-          'Put veggies and meat in the water until it is cooked.'
-        ]))
-        .field('cookTime', 20)
-        .field('difficulty', 3)
+        .send({
+          name: 'Meat and Lettuce Sandwich',
+          description: msg(),
+          ingredients: JSON.stringify(['bread', 'lettuce', 'meat']),
+          instructions: JSON.stringify(['Make sandwich.']),
+          cookTime: 5,
+          difficulty: 1,
+          originalRecipeUrl: 'www.testrecipe.com',
+          youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
+          mealPicName: null,
+          publicId: null
+        })
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('The description has a max of 150 characters.')
@@ -144,6 +119,40 @@ describe('Meals', () => {
         });
     });
 
+    it('should return an error if the name is too long', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      let name = function() {
+        let string = '';
+        for (let i = 0; i < 51; i++) {
+          string = string + 'a';
+        }
+        return string;
+      }
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send({
+          name: name(),
+          description: 'An easy sandwich for those busy days!',
+          ingredients: JSON.stringify(['bread', 'lettuce', 'meat']),
+          instructions: JSON.stringify(['Make sandwich.']),
+          cookTime: 5,
+          difficulty: 1,
+          originalRecipeUrl: 'www.testrecipe.com',
+          youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
+          mealPicName: null,
+          publicId: null
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('The name has a max of 50 characters.')
+          if(err) done(err);
+          done();
+        });
+    });
+    
 
     it('should return an error when the meal name is already being used', (done) => {
       let token = `Bearer ${user.jwt}`;
@@ -151,19 +160,88 @@ describe('Meals', () => {
       chai.request(server)
         .post('/meals/create')
         .set("Authorization", token)
-        .field('name', 'Meat and Cheese Sandwich')
-        .field('description', 'An easy sandwich for those busy days!')
-        .field('ingredients', JSON.stringify(['bread', 'cheese', 'meat']))
-        .field('instructions', JSON.stringify([
-          'Put the bread on the counter.', 
-          'Put the meat between 2 slices of bread.', 
-          'Put the cheese on the meat.'
-        ]))
-        .field('cookTime', 5)
-        .field('difficulty', 1)
+        .send(utils.mealNoPic)
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This recipe name is already taken.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error when the youtube url is too long', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send({
+          name: 'Meat and lettuce sandwich',
+          description: 'An easy sandwich for those busy days!',
+          ingredients: JSON.stringify(['bread', 'lettuce', 'meat']),
+          instructions: JSON.stringify(['Make sandwich.']),
+          cookTime: 5,
+          difficulty: 1,
+          originalRecipeUrl: 'www.testrecipe.com',
+          youtubeUrl: 'https://youtu.be/linkiswaytoolong',
+          mealPicName: null,
+          publicId: null
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('There was an error with your YouTube link.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error when the youtube url is too short', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send({
+          name: 'Meat and lettuce sandwich',
+          description: 'An easy sandwich for those busy days!',
+          ingredients: JSON.stringify(['bread', 'lettuce', 'meat']),
+          instructions: JSON.stringify(['Make sandwich.']),
+          cookTime: 5,
+          difficulty: 1,
+          originalRecipeUrl: 'www.testrecipe.com',
+          youtubeUrl: 'https://youtu.be/short',
+          mealPicName: null,
+          publicId: null
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('There was an error with your YouTube link.');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error when the beginning of the youtube url does not match the youtube url', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send({
+          name: 'Meat and lettuce sandwich',
+          description: 'An easy sandwich for those busy days!',
+          ingredients: JSON.stringify(['bread', 'lettuce', 'meat']),
+          instructions: JSON.stringify(['Make sandwich.']),
+          cookTime: 5,
+          difficulty: 1,
+          originalRecipeUrl: 'www.testrecipe.com',
+          youtubeUrl: 'https://nottu.be/dQw4w9WgXcQ',
+          mealPicName: null,
+          publicId: null
+        })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.message.should.equal('There was an error with your YouTube link.');
           if(err) done(err);
           done();
         });
@@ -173,7 +251,7 @@ describe('Meals', () => {
   describe('GET available meal name', () => {
     it('should return an error message if the meal name is taken', (done) => {
       chai.request(server)
-        .get('/meals/available-names?name=Soup')
+        .get('/meals/available-names?name=Meat%20and%20Cheese%20Sandwich')
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.not.have.property('message');
@@ -184,7 +262,7 @@ describe('Meals', () => {
 
     it('should return an error message if the case insensitive meal name is taken', (done) => {
       chai.request(server)
-        .get('/meals/available-names?name=soup')
+        .get('/meals/available-names?name=meat%20and%20cheese%20sandwich')
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.not.have.property('message');          
@@ -206,14 +284,42 @@ describe('Meals', () => {
   });
 
 
-  describe('GET specific meal', () => {
+  describe('GET specific meal by id', () => {
     it('should return a meal', (done) => {
       chai.request(server)
-        .get('/meals/meal?name=Soup')
+        .get('/meals/meal-by-id?id=1')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('id');
-          res.body.should.have.property('name', 'Soup');
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.creator.username.should.equal('johndoe');
+          res.body.ingredients.should.be.an('array');
+          res.body.instructions.should.be.an('array');
+          if(err) done(err);
+          done();
+        });
+    });
+
+    it('should return an error message when there is no meal that matches the query', (done) => {
+      chai.request(server)
+        .get('/meals/meal-by-id?id=3')
+        .end((err, res) => {
+          res.should.have.status(404);
+          res.body.message.should.equal('That recipe does not exist.');
+          if(err) done(err);
+          done();
+        });
+    });
+  });
+
+  describe('GET specific meal by name', () => {
+    it('should return a meal', (done) => {
+      chai.request(server)
+        .get('/meals/meal-by-name?name=Meat%20and%20Cheese%20Sandwich')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('id');
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.creator.username.should.equal('johndoe');
           res.body.ingredients.should.be.an('array');
           res.body.instructions.should.be.an('array');
@@ -224,11 +330,11 @@ describe('Meals', () => {
 
     it('should return a meal regardless of capitalization', (done) => {
       chai.request(server)
-        .get('/meals/meal?name=soUp')
+        .get('/meals/meal-by-name?name=meat%20and%20cheese%20sandwich')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.have.property('id');
-          res.body.should.have.property('name', 'Soup');
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.creator.username.should.equal('johndoe');
           if(err) done(err);
           done();
@@ -237,10 +343,10 @@ describe('Meals', () => {
 
     it('should return an error message when there is no meal that matches the query', (done) => {
       chai.request(server)
-        .get('/meals/meal?name=coffee')
+        .get('/meals/meal-by-name?name=coffee')
         .end((err, res) => {
           res.should.have.status(404);
-          res.body.message.should.equal('That meal does not exist.');
+          res.body.message.should.equal('That recipe does not exist.');
           if(err) done(err);
           done();
         });
@@ -254,37 +360,13 @@ describe('Meals', () => {
       chai.request(server)
         .put('/meals/update')
         .set("Authorization", token)
-        .field('id', 1)
-        .field('name', 'Soup')
+        .send({
+          id: 1,
+          name: 'Meat and Tomato Sandwich'
+        })
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('This meal name is already taken.');
-          if(err) done(err);
-          done();
-        });
-    });
-
-    it('should return an error message when the uploaded picture is PNG', (done) => {
-      let token = `Bearer ${user.jwt}`;
-
-      chai.request(server)
-        .put('/meals/update')
-        .set("Authorization", token)
-        .field('id', 1)
-        .field('name', 'Meat and Cheese Sandwich')
-        .field('description', 'An easy sandwich for those busy days!')
-        .field('ingredients', JSON.stringify(['bread', 'cheese', 'lettuce', 'meat']))
-        .field('instructions', JSON.stringify([
-          'Put the bread on the counter.', 
-          'Put the meat between 2 slices of bread.', 
-          'Put the cheese and lettuce on the meat.'
-        ]))
-        .field('cookTime', 5)
-        .field('difficulty', 1)
-        .attach('mealPic', 'src/test/testImages/testMealPng.png')
-        .end((err, res) => {
-          res.should.have.status(415);
-          res.body.message.should.equal('Please upload a JPEG image.');
+          res.body.message.should.equal('This recipe name is already taken.');
           if(err) done(err);
           done();
         });
@@ -299,17 +381,79 @@ describe('Meals', () => {
         .then(() => chai.request(server)
           .put('/meals/update')
           .set("Authorization", token)
-          .field('id', 1)
-          .field('name', 'Meat Sandwich')
-          .attach('mealPic', 'src/test/testImages/testMealJpeg.jpeg'))
+          .send({
+            id: 2,
+            mealPicName: 'https://newmealpicurl',
+            publicId: 'folder/newmealpicname'
+          }))
         .then(res => {
           res.should.have.status(201);
-          res.body.message.should.equal('Meal successfully updated.');
+          res.body.message.should.equal('Recipe successfully updated.');
         })
         .then(() => MealPic.findAll())
         .then(mealPics => {
           mealPics.length.should.equal(1);
-          mealPics[0].dataValues.mealPicName.should.not.equal(originalPic);
+          mealPics[0].mealPicName.should.not.equal(originalPic);
+          mealPics[0].mealPicName.should.equal('https://newmealpicurl');
+          mealPics[0].publicId.should.equal('folder/newmealpicname');
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should update the meal without updating the meal pic', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      let originalPic;
+
+      MealPic.findAll()
+        .then(mealPics => originalPic = mealPics[0].dataValues.mealPicName)
+        .then(() => chai.request(server)
+          .put('/meals/update')
+          .set("Authorization", token)
+          .send({
+            id: 1,
+            difficulty: 5
+          }))
+        .then(res => {
+          res.should.have.status(201);
+          res.body.message.should.equal('Recipe successfully updated.');
+        })
+        .then(() => MealPic.findAll())
+        .then(mealPics => {
+          mealPics.length.should.equal(1);
+          mealPics[0].mealPicName.should.equal(originalPic);
+          mealPics[0].mealPicName.should.equal('https://newmealpicurl');
+          mealPics[0].publicId.should.equal('folder/newmealpicname');
+        })
+        .then(() => Meal.findOne({where: {name: 'Meat and Cheese Sandwich'}}))
+        .then(meal => {
+          meal.name.should.equal('Meat and Cheese Sandwich');
+          meal.difficulty.should.equal(5);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should add a picture url to a meal when there was not a pervious picture url', (done) => {
+      let token = `Bearer ${user.jwt}`;
+
+      chai.request(server)
+        .put('/meals/update')
+        .set("Authorization", token)
+        .send({
+          id: 1,
+          mealPicName: 'https://brandnewmealpicurl',
+          publicId: 'folder/brandnewmealpicname'
+        })
+        .then(res => {
+          res.should.have.status(201);
+          res.body.message.should.equal('Recipe successfully updated.');
+        })
+        .then(() => MealPic.findAll())
+        .then(mealPics => {
+          mealPics.length.should.equal(2);
+          mealPics[1].mealPicName.should.equal('https://brandnewmealpicurl');
+          mealPics[1].publicId.should.equal('folder/brandnewmealpicname');
         })
         .then(() => done())
         .catch(err => done(err));
@@ -337,9 +481,9 @@ describe('Meals', () => {
           .send({ id: 1 })
         .then(res => {
           res.should.have.status(200);
-          res.body.message.should.equal('Meal successfully deleted.');
+          res.body.message.should.equal('Recipe successfully deleted.');
         }))
-        // check if meal, saved meal, and likes are deleted
+        // check if meal, saved meal, meal pics, and likes are deleted
         .then(() => Like.findAll())
         .then(likes => expect(likes.length).to.equal(0))
         .then(() => Meal.findOne({where: {id: 1}}))
@@ -347,12 +491,36 @@ describe('Meals', () => {
         .then(() => SavedMeal.findAll())
         .then(savedMeals => expect(savedMeals.length).to.equal(0))
         .then(() => MealPic.findAll())
-        .then(mealPics => expect(mealPics.length).to.equal(0))
+        .then(mealPics => expect(mealPics.length).to.equal(1))
         .then(() => done())
         .catch(err => done(err));
     });
 
-    it('should return an error message when there is no meal to delete', (done) => {
+    it('should delete a meal when there is no related meal pic', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      let mealId;
+      // user 1 saves meal
+      chai.request(server)
+        .post('/meals/create')
+        .set("Authorization", token)
+        .send(utils.mealNoPic)
+        .then(res => mealId = res.body.id)
+        // user deletes meal
+        .then(() => chai.request(server)
+          .delete('/meals/delete')
+          .set("Authorization", token)
+          .send({ id: mealId })
+        .then(res => {
+          res.should.have.status(200);
+          res.body.message.should.equal('Recipe successfully deleted.');
+        }))
+        .then(() => Meal.findOne({where: {id: mealId}}))
+        .then(meal => expect(meal).to.equal(null))
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return an error message when the meal id and the creator id do not match', (done) => {
       let token = `Bearer ${user.jwt}`;
 
       chai.request(server)
@@ -360,8 +528,8 @@ describe('Meals', () => {
         .set("Authorization", token)
         .send({ id: 1 })
         .end((err, res) => {
-          res.should.have.status(500);
-          res.body.message.should.equal('There was an error deleting your meal.');
+          res.should.have.status(403);
+          res.body.message.should.equal('You do not have permission to delete this recipe.');
           if(err) done(err);
           done();
         });
