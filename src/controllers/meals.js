@@ -108,12 +108,12 @@ module.exports = {
       req.body.creatorId = req.decoded.id;
       
       // save these properties to variables
-      let tempMealPicName = req.body.mealPicName;
+      let tempMealPicName = req.body.recipePicName;
       let tempPublicId = req.body.publicId;
 
       // delete properties from req.body because the meal model
       // does not have them
-      delete req.body.mealPicName;
+      delete req.body.recipePicName;
       delete req.body.publicId;
 
       let meal = await Meal.create(req.body);
@@ -129,7 +129,7 @@ module.exports = {
       res.status(201).json({
         id: meal.id,
         name: meal.name,
-        message: "Meal successfully created."
+        message: "Recipe successfully created."
       });
     } catch (err) {
 
@@ -159,12 +159,12 @@ module.exports = {
       delete req.body.id;
 
       // save these properties to variables
-      let tempMealPicName = req.body.mealPicName;
+      let tempMealPicName = req.body.recipePicName;
       let tempPublicId = req.body.publicId;
 
       // delete properties from req.body because the meal model
       // does not have them
-      delete req.body.mealPicName;
+      delete req.body.recipePicName;
       delete req.body.publicId;
 
       let meal = await Meal.update(req.body, {

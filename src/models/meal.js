@@ -13,8 +13,8 @@ module.exports = (sequelize, type) => {
       unique: true, 
       validate: {
         len: {
-          args: [0, 50],
-          msg: 'The name has a max of 50 characters.'
+          args: [0, 75],
+          msg: 'The name has a max of 75 characters.'
         }
       }
     },

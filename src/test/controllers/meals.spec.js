@@ -29,7 +29,7 @@ describe('Meals', () => {
           res.should.have.status(201);
           res.body.id.should.equal(1);
           res.body.name.should.equal('Meat and Cheese Sandwich');
-          res.body.message.should.equal('Meal successfully created.')
+          res.body.message.should.equal('Recipe successfully created.')
         })
         .then(() => Meal.findOne({ 
           where: { id: 1 },
@@ -62,7 +62,7 @@ describe('Meals', () => {
           res.should.have.status(201);
           res.body.id.should.equal(2);
           res.body.name.should.equal('Meat and Tomato Sandwich');
-          res.body.message.should.equal('Meal successfully created.')
+          res.body.message.should.equal('Recipe successfully created.')
         })
         .then(() => Meal.findOne({ 
           where: { id: 2 },
@@ -124,7 +124,7 @@ describe('Meals', () => {
 
       let name = function() {
         let string = '';
-        for (let i = 0; i < 51; i++) {
+        for (let i = 0; i < 76; i++) {
           string = string + 'a';
         }
         return string;
@@ -147,7 +147,7 @@ describe('Meals', () => {
         })
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.message.should.equal('The name has a max of 50 characters.')
+          res.body.message.should.equal('The name has a max of 75 characters.')
           if(err) done(err);
           done();
         });
@@ -383,7 +383,7 @@ describe('Meals', () => {
           .set("Authorization", token)
           .send({
             id: 2,
-            mealPicName: 'https://newmealpicurl',
+            recipePicName: 'https://newmealpicurl',
             publicId: 'folder/newmealpicname'
           }))
         .then(res => {
@@ -442,7 +442,7 @@ describe('Meals', () => {
         .set("Authorization", token)
         .send({
           id: 1,
-          mealPicName: 'https://brandnewmealpicurl',
+          recipePicName: 'https://brandnewmealpicurl',
           publicId: 'folder/brandnewmealpicname'
         })
         .then(res => {

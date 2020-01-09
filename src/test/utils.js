@@ -63,7 +63,7 @@ module.exports = {
     difficulty: 1,
     originalRecipeUrl: 'www.testrecipe.com',
     youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
-    mealPicName: null,
+    recipePicName: null,
     publicId: null
   },
   mealWithPic: {
@@ -79,7 +79,7 @@ module.exports = {
     difficulty: 1,
     originalRecipeUrl: 'www.testrecipe.com',
     youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
-    mealPicName: 'https://mealpicurl',
+    recipePicName: 'https://mealpicurl',
     publicId: 'folder/mealpicname'
   },
   createAdmin: () => {
@@ -124,7 +124,7 @@ module.exports = {
         difficulty: 1,
         originalRecipeUrl: 'www.testrecipe.com',
         youtubeUrl: 'https://youtu.be/dQw4w9WgXcQ',
-        mealPicName: 'https://mealpicurl',
+        recipePicName: 'https://mealpicurl',
         publicId: 'folder/mealpicname'
       });
   },
@@ -143,7 +143,7 @@ module.exports = {
         ]),
         cookTime: 20,
         difficulty: 3,
-        mealPicName: null,
+        recipePicName: null,
         publicId: null
       });
   }
