@@ -24,5 +24,6 @@ module.exports = {
   JWT_EXPIRATION_TIME: process.env.JWT_EXPIRATION_TIME || config.JWT_EXPIRATION_TIME,
   CLOUD_NAME: process.env.CLOUD_NAME || config.CLOUD_NAME,
   CLOUD_API_KEY: process.env.CLOUD_API_KEY || config.CLOUD_API_KEY,
-  CLOUD_API_SECRET: process.env.CLOUD_API_SECRET || config.CLOUD_API_SECRET
+  CLOUD_API_SECRET: process.env.CLOUD_API_SECRET || config.CLOUD_API_SECRET,
+  FRONT_END_URL: process.env.FRONT_END_URL || config.FRONT_END_URL
 };
