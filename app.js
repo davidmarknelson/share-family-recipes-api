@@ -6,7 +6,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const routes = require('./src/routes/index');
 const config = require('./config');
-const rateLimit = require('express-rate-limit')
+const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 // Cloudinary
 const cloudinary = require('cloudinary').v2;
 
@@ -18,7 +19,7 @@ const origin = {
 // rate limiter
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 75 // 75 requests
+  max: (process.env.NODE_ENV === 'production') ? 100 : 0 // 75 requests
 })
 
 
@@ -28,7 +29,7 @@ app.use(bodyParser.json());
 app.use(cors(origin));
 app.use(limiter)
 app.use(helmet());
-app.use(compression())
+app.use(compression());
 
 // Cloudinary configuration
 cloudinary.config({ 
