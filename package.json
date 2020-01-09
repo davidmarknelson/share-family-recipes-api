@@ -4,6 +4,7 @@
   "description": "An api for authentication and sharing recipes.",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "cross-env NODE_ENV=test UNIT_TEST=true mocha --opts src/test/mocha.opts --exit",
     "api-dev": "cross-env NODE_ENV=development nodemon -r dotenv/config app.js",
     "api-test": "cross-env NODE_ENV=test nodemon -r dotenv/config app.js"
