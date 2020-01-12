@@ -6,6 +6,7 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 module.exports = {
+  NODE_ENV: process.env.NODE_ENV || config.NODE_ENV,
   PORT: process.env.PORT || config.PORT,
   HOST: process.env.HOST || config.HOST,
   DB: process.env.DB || config.DB,
