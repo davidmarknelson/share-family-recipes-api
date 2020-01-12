@@ -26,7 +26,7 @@ Run `npm run api-dev` for development.
 `SG_API_KEY` is the api key for SendGrid.  
 `URL` is the url where your api is hosted.  
 `EMAIL` is the email address of where you send the emails from.  
-`EMAIL_HOST` SendGrid or Ethereal host.  
+`EMAIL_HOST` SendGrid or Ethereal host.  -> smtp  
 `EMAIL_USER` SendGrid or Ethereal username.  
 `EMAIL_PW` SendGrid or Etherial password.  
 `EMAIL_PORT` email port.  

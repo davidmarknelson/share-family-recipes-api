@@ -54,14 +54,27 @@ module.exports = {
         userId: user.id
       });
 
-      let transporter = nodemailer.createTransport({
-        host: config.EMAIL_HOST,
-        port: config.EMAIL_PORT,
-        auth: {
-          user: config.EMAIL_USER,
-          pass: config.EMAIL_PW
-        }
-      });
+      let transporter;
+      if (process.env.NODE_ENV === 'production') {
+        transporter = nodemailer.createTransport({
+          host: config.EMAIL_HOST,
+          port: config.EMAIL_PORT,
+          secure: true,
+          auth: {
+            user: config.EMAIL_USER,
+            pass: config.EMAIL_PW
+          }
+        });
+      } else {
+        transporter = nodemailer.createTransport({
+          host: config.EMAIL_HOST,
+          port: config.EMAIL_PORT,
+          auth: {
+            user: config.EMAIL_USER,
+            pass: config.EMAIL_PW
+          }
+        });
+      }
         
       let message = helpers.resetPasswordEmail(
         config.URL, 
