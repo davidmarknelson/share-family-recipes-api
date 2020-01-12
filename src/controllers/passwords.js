@@ -84,7 +84,7 @@ module.exports = {
       const mailOptions = {
         from: `${config.EMAIL}`,
         to: `${req.body.email}`,
-        subject: 'Verify email',
+        subject: 'Password Reset',
         html: message
       };
 
