@@ -68,17 +68,13 @@ module.exports = {
   renewJwt: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { id: req.decoded.id },
-        include: [
-          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
-        ]
+        where: { id: req.decoded.id }
       });
 
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
         username: user.dataValues.username,
-        savedRecipes: user.dataValues.savedMeals
       };
 
       res.status(200).json({
@@ -96,8 +92,7 @@ module.exports = {
           id: req.decoded.id
         },
         include: [
-          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false },
-          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
+          { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
         ]
       });
 
@@ -147,8 +142,7 @@ module.exports = {
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username,
-        savedRecipes: []
+        username: user.dataValues.username
       };
       
       res.status(201).json({
@@ -182,10 +176,7 @@ module.exports = {
   login: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: { email: req.body.email },
-        include: [
-          { model: SavedMeal, as: 'savedMeals', attributes: ['mealId'], duplicating: false  }
-        ]
+        where: { email: req.body.email }
       });
 
       if (!user) {
@@ -201,8 +192,7 @@ module.exports = {
       let userToken = {
         id: user.dataValues.id,
         isAdmin: user.dataValues.isAdmin,
-        username: user.dataValues.username,
-        savedRecipes: user.dataValues.savedMeals
+        username: user.dataValues.username
       };
 
       res.status(200).json({
@@ -322,14 +312,16 @@ module.exports = {
           attributes: ['publicId']
         });
 
-        // put public_ids into an array
-        let publicIds = mealPics.reduce((public_ids, pics) => {
-          public_ids.push(pics.dataValues.publicId);
-          return public_ids;
-        }, []);
+        if (mealPics.length > 0) {
+          // put public_ids into an array
+          let publicIds = mealPics.reduce((public_ids, pics) => {
+            public_ids.push(pics.dataValues.publicId);
+            return public_ids;
+          }, []);
 
-        // delete pictures from cloudinary
-        let cloudMealPics = await deleteMultipleCloudinaryImage(publicIds);
+          // delete pictures from cloudinary
+          let cloudMealPics = await deleteMultipleCloudinaryImage(publicIds);
+        }
       }
       
       // User is deleted separately from the others because the userId fields in meal, likes, and saved meal

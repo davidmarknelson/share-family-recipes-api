@@ -88,7 +88,7 @@ module.exports = (sequelize, type) => {
 
   user.associate = (models) => {
     user.hasMany(models.meal, {foreignKey: 'creatorId', as: "meals"});
-    user.hasMany(models.saved_meal, {as: "savedMeals"});
+    user.hasMany(models.saved_meal, {as: "savedRecipes"});
     user.hasMany(models.like, {as: "likes"});
     user.hasOne(models.profile_pic, {foreignKey: 'userId', as: 'profilePic'});
   };

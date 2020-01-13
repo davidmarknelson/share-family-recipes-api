@@ -4,6 +4,7 @@ const sequelize = require('../models/sequelize').sequelize;
 const Meal = require('../models/sequelize').meal;
 const User = require('../models/sequelize').user;
 const Like = require('../models/sequelize').like;
+const SavedMeal = require('../models/sequelize').saved_meal;
 const ProfilePic = require('../models/sequelize').profile_pic;
 const MealPic = require('../models/sequelize').meal_pic;
 const Op = require('sequelize').Op;
@@ -25,6 +26,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -48,6 +50,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -70,6 +73,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -92,6 +96,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -125,6 +130,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -161,6 +167,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -197,6 +204,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -233,6 +241,7 @@ module.exports = {
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
@@ -265,6 +274,7 @@ module.exports = {
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
+              { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
               { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           },
@@ -305,6 +315,7 @@ module.exports = {
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
+              { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false },
               { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
             ]
           },

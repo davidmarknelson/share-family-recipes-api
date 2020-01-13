@@ -292,6 +292,8 @@ describe('Meals', () => {
           res.should.have.status(200);
           res.body.should.have.property('id');
           res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.should.have.property('savedRecipes');
+          res.body.savedRecipes.should.be.an('array');
           res.body.creator.username.should.equal('johndoe');
           res.body.ingredients.should.be.an('array');
           res.body.instructions.should.be.an('array');
@@ -321,6 +323,8 @@ describe('Meals', () => {
           res.body.should.have.property('id');
           res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.creator.username.should.equal('johndoe');
+          res.body.should.have.property('savedRecipes');
+          res.body.savedRecipes.should.be.an('array');
           res.body.ingredients.should.be.an('array');
           res.body.instructions.should.be.an('array');
           if(err) done(err);

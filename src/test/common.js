@@ -27,7 +27,7 @@ const deleteOneScope = nock('https://api.cloudinary.com')
   .reply(200, {result: 'ok'})
   .log(info => console.log('nock: ',info));
 
-  const deleteMultipleScope = nock('https://api.cloudinary.com')
+const deleteMultipleScope = nock('https://api.cloudinary.com')
   .persist()
   .delete(`/v1_1/${process.env.CLOUD_NAME}/resources/image/upload`)
   .reply(200, {

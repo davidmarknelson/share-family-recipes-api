@@ -126,6 +126,7 @@ module.exports = (sequelize, type) => {
     meal.belongsTo(models.user, {as: "creator"});
     meal.hasMany(models.like);
     meal.hasOne(models.meal_pic, {foreignKey: 'mealId', as: 'mealPic'});
+    meal.hasMany(models.saved_meal, {as: "savedRecipes"});
   };
 
   return meal;

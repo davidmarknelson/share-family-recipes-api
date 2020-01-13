@@ -119,7 +119,6 @@ describe('Users', () => {
           decodedToken.should.have.property('id');
           decodedToken.should.have.property('isAdmin', true);
           decodedToken.should.have.property('username', 'johndoe');
-          decodedToken.should.have.property('savedRecipes');
           decodedToken.should.have.property('iat');
           decodedToken.should.have.property('exp');
           if(err) done(err);
@@ -148,7 +147,6 @@ describe('Users', () => {
           decodedToken.should.have.property('id');
           decodedToken.should.have.property('isAdmin', false);
           decodedToken.should.have.property('username', 'jackdoe');
-          decodedToken.should.have.property('savedRecipes');
           decodedToken.should.have.property('iat');
           decodedToken.should.have.property('exp');
           if(err) done(err);
@@ -202,7 +200,6 @@ describe('Users', () => {
         decodedToken.should.have.property('id');
         decodedToken.should.have.property('isAdmin', false);
         decodedToken.should.have.property('username', 'janetdoe');
-        decodedToken.should.have.property('savedRecipes');
         decodedToken.should.have.property('iat');
         decodedToken.should.have.property('exp');
         return decodedToken;
@@ -271,7 +268,6 @@ describe('Users', () => {
           decodedToken.should.have.property('id');
           decodedToken.should.have.property('isAdmin', true);
           decodedToken.should.have.property('username', 'johndoe');
-          decodedToken.should.have.property('savedRecipes');
           decodedToken.should.have.property('iat');
           decodedToken.should.have.property('exp');
           if(err) done(err);
@@ -343,7 +339,6 @@ describe('Users', () => {
           decodedToken.should.have.property('id');
           decodedToken.should.have.property('isAdmin', true);
           decodedToken.should.have.property('username', 'johndoe');
-          decodedToken.should.have.property('savedRecipes');
           decodedToken.should.have.property('iat');
           decodedToken.should.have.property('exp');
           if(err) done(err);

@@ -32,6 +32,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
@@ -61,6 +62,7 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
           res.body.rows[1].likes.should.be.an('array');
+          res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].cookTime.should.equal(20);
           res.body.rows[1].should.not.have.property('ingredients');
           res.body.rows[1].should.not.have.property('instructions');
@@ -93,6 +95,7 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
           res.body.rows[1].likes.should.be.an('array');
+          res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].cookTime.should.equal(20);
           res.body.rows[1].should.not.have.property('ingredients');
           res.body.rows[1].should.not.have.property('instructions');
@@ -122,6 +125,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
@@ -154,6 +158,7 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('mealPic', null);
           res.body.rows[1].name.should.equal('Soup');
           res.body.rows[1].should.have.property('likes');
+          res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].should.have.property('description');
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
@@ -183,6 +188,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('mealPic', null);
           res.body.rows[0].name.should.equal('Soup');
           res.body.rows[0].should.have.property('likes');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].should.have.property('description');
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
@@ -216,6 +222,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
@@ -241,6 +248,7 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
           res.body.rows[1].likes.should.be.an('array');
+          res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].cookTime.should.equal(20);
           res.body.rows[1].should.not.have.property('ingredients');
           res.body.rows[1].should.not.have.property('instructions');
@@ -270,6 +278,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
@@ -295,6 +304,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');      
@@ -320,6 +330,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');    
@@ -373,6 +384,7 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(5);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
@@ -428,6 +440,7 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
           res.body.rows[1].likes.should.be.an('array');
+          res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].cookTime.should.equal(5);
           res.body.rows[1].should.not.have.property('ingredients');
           res.body.rows[1].should.not.have.property('instructions');

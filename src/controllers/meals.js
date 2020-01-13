@@ -39,7 +39,8 @@ module.exports = {
             ]
           },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
         ]
       });
 
@@ -70,7 +71,8 @@ module.exports = {
             ]
           },
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
-          { model: Like, attributes: ['userId'], duplicating: false }
+          { model: Like, attributes: ['userId'], duplicating: false },
+          { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
         ]
       });
 

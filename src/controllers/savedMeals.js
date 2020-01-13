@@ -27,7 +27,8 @@ module.exports = {
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
-              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
+              { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
             ]
           }
         ]
@@ -42,7 +43,7 @@ module.exports = {
         where: {
           userId: req.decoded.id
         },
-        attributes: ['profilePicName'],
+        attributes: ['profilePicName']
       });
 
       res.status(200).json({
@@ -77,7 +78,8 @@ module.exports = {
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
-              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
+              { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
+              { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
             ]
           }
         ]
@@ -92,7 +94,7 @@ module.exports = {
         where: {
           userId: req.decoded.id
         },
-        attributes: ['profilePicName'],
+        attributes: ['profilePicName']
       });
 
       res.status(200).json({
