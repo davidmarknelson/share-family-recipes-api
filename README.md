@@ -1,5 +1,7 @@
 # Food Auth Api
 
+The website is running live at https://www.sharefamilyrecipes.com/  
+
 The documentation is running live at https://davidmarknelson.github.io/share-family-recipes-api-docs/
 
 Or you can get the documentation to run locally at https://github.com/davidmarknelson/share-family-recipes-documentation
@@ -32,6 +34,9 @@ Run `npm run api-dev` for development.
 `EMAIL_PORT` email port.  
 `ADMIN_CODE` is the code to give to users to add to the signup process to become admins.  
 `JWT_EXPIRATION_TIME` set time in milliseconds.  
+`CLOUD_NAME` is the name of your cloudinary cloud.  
+`CLOUD_API_KEY` is your cloudinary api key.  
+`CLOUD_API_SECRET` is your cloudinary api secret.  
 
 ### Running tests
 Run `npm run test` to execute tests.  
