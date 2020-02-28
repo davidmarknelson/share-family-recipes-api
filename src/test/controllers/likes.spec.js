@@ -9,7 +9,8 @@ describe('Likes', () => {
     return db.sync({ force: true })
       .then(() => utils.createAdmin())
       .then(res => user = res.body)
-      .then(() => utils.createMeal1(user.jwt));
+      .then(() => utils.createMeal1(user.jwt))
+      .then(() => utils.createMeal2(user.jwt));
   });
 
   describe('POST add like', () => {
@@ -34,7 +35,7 @@ describe('Likes', () => {
       chai.request(server)
         .post('/likes/add')
         .set("Authorization", token)
-        .send({ recipeId: 2 })
+        .send({ recipeId: 3 })
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal('There was an error liking this recipe.');
@@ -56,6 +57,41 @@ describe('Likes', () => {
           if (err) done(err);
           done();
         });
+    });
+  });
+
+  describe('GET recipe likes', () => {
+    it('should return an array of userIds who liked the recipe', (done) => {
+      chai.request(server)
+        .get('/likes/recipe-likes?recipeId=1')
+        .then(res => {
+          res.body.should.be.an('array');
+          res.body[0].userId.should.equal(1);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return an empty array if no one has liked the recipe', (done) => {
+      chai.request(server)
+        .get('/likes/recipe-likes?recipeId=2')
+        .then(res => {
+          res.body.should.be.an('array');
+          res.body.should.have.length(0);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return an error if the recipe does not exist', (done) => {
+      chai.request(server)
+        .get('/likes/recipe-likes?recipeId=3')
+        .then(res => {
+          res.status.should.equal(404);
+          res.body.message.should.equal('That recipe does not exist.');
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
   });
 
@@ -81,7 +117,7 @@ describe('Likes', () => {
       chai.request(server)
         .delete('/likes/remove')
         .set("Authorization", token)
-        .send({ recipeId: 2 })
+        .send({ recipeId: 3 })
         .end((err, res) => {
           res.should.have.status(500);
           res.body.message.should.equal('There was an error unliking this recipe.');

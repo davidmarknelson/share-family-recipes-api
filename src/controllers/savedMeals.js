@@ -133,7 +133,7 @@ module.exports = {
   
       res.status(200).json(savedRecipes);
     } catch (err) {
-    res.status(500).send({ message: 'There was an error.' });
+      res.status(500).send({ message: 'There was an error.' });
     }
   },
 
