@@ -10,11 +10,14 @@ const MealPic = require('../../models/sequelize').meal_pic;
 
 describe('Meals', () => {
   let user;
+  let user2;
 
   before(() => {
-    return db.sync({force: true})
+    return db.sync({ force: true })
       .then(() => utils.createAdmin())
-      .then(res => user = res.body);
+      .then(res => user = res.body)
+      .then(() => utils.createUser())
+      .then(res => user2 = res.body);
   });
 
   describe('POST create meal', () => {
@@ -31,7 +34,7 @@ describe('Meals', () => {
           res.body.name.should.equal('Meat and Cheese Sandwich');
           res.body.message.should.equal('Recipe successfully created.')
         })
-        .then(() => Meal.findOne({ 
+        .then(() => Meal.findOne({
           where: { id: 1 },
           include: [
             { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
@@ -64,7 +67,7 @@ describe('Meals', () => {
           res.body.name.should.equal('Meat and Tomato Sandwich');
           res.body.message.should.equal('Recipe successfully created.')
         })
-        .then(() => Meal.findOne({ 
+        .then(() => Meal.findOne({
           where: { id: 2 },
           include: [
             { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
@@ -88,7 +91,7 @@ describe('Meals', () => {
     it('should return an error if the description is too long', (done) => {
       let token = `Bearer ${user.jwt}`;
 
-      let msg = function() {
+      let msg = function () {
         let string = '';
         for (let i = 0; i < 151; i++) {
           string = string + 'a';
@@ -114,7 +117,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('The description has a max of 150 characters.')
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -122,7 +125,7 @@ describe('Meals', () => {
     it('should return an error if the name is too long', (done) => {
       let token = `Bearer ${user.jwt}`;
 
-      let name = function() {
+      let name = function () {
         let string = '';
         for (let i = 0; i < 76; i++) {
           string = string + 'a';
@@ -148,11 +151,11 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('The name has a max of 75 characters.')
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
-    
+
 
     it('should return an error when the meal name is already being used', (done) => {
       let token = `Bearer ${user.jwt}`;
@@ -164,7 +167,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This recipe name is already taken.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -190,7 +193,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('There was an error with your YouTube link.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -216,7 +219,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('There was an error with your YouTube link.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -242,7 +245,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('There was an error with your YouTube link.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -255,7 +258,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.not.have.property('message');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -265,8 +268,8 @@ describe('Meals', () => {
         .get('/meals/available-names?name=meat%20and%20cheese%20sandwich')
         .end((err, res) => {
           res.should.have.status(400);
-          res.body.should.not.have.property('message');          
-          if(err) done(err);
+          res.body.should.not.have.property('message');
+          if (err) done(err);
           done();
         });
     });
@@ -276,8 +279,8 @@ describe('Meals', () => {
         .get('/meals/available-names?name=coffee')
         .end((err, res) => {
           res.should.have.status(204);
-          res.body.should.not.have.property('message');          
-          if(err) done(err);
+          res.body.should.not.have.property('message');
+          if (err) done(err);
           done();
         });
     });
@@ -290,14 +293,14 @@ describe('Meals', () => {
         .get('/meals/meal-by-id?id=1')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('id');
+          res.body.should.have.property('id', 1);
           res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.should.have.property('savedRecipes');
           res.body.savedRecipes.should.be.an('array');
           res.body.creator.username.should.equal('johndoe');
           res.body.ingredients.should.be.an('array');
           res.body.instructions.should.be.an('array');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -308,9 +311,78 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('That recipe does not exist.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
+    });
+
+    it('should return likes as an ordered array', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      let token2 = `Bearer ${user2.jwt}`;
+
+      chai.request(server)
+        .post('/likes/add')
+        .set("Authorization", token2)
+        .send({ recipeId: 1 })
+        .then(res => {
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
+        })
+        .then(() => chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", token)
+          .send({ recipeId: 1 }))
+        .then(res => {
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
+        })
+        .then(() => chai.request(server)
+          .get('/meals/meal-by-id?id=1')
+        )
+        .then(res => {
+          res.should.have.status(200);
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.likes.should.be.an('array');
+          res.body.likes[0].userId.should.equal(1);
+          res.body.likes[1].userId.should.equal(2);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return savedRecipes as an ordered array', (done) => {
+      let token = `Bearer ${user.jwt}`;
+      let token2 = `Bearer ${user2.jwt}`;
+
+      chai.request(server)
+        .post('/saved/save')
+        .set("Authorization", token2)
+        .send({ recipeId: 1 })
+        .then(res => {
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
+        })
+        .then(() => chai.request(server)
+          .post('/saved/save')
+          .set("Authorization", token)
+          .send({ recipeId: 1 })
+        )
+        .then(res => {
+          res.should.have.status(204);
+          res.body.should.not.have.property('message');
+        })
+        .then(() => chai.request(server)
+          .get('/meals/meal-by-id?id=1')
+        )
+        .then(res => {
+          res.should.have.status(200);
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.savedRecipes.should.be.an('array');
+          res.body.savedRecipes[0].userId.should.equal(1);
+          res.body.savedRecipes[1].userId.should.equal(2);
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
   });
 
@@ -320,14 +392,14 @@ describe('Meals', () => {
         .get('/meals/meal-by-name?name=Meat%20and%20Cheese%20Sandwich')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.should.have.property('id');
+          res.body.should.have.property('id', 1);
           res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.creator.username.should.equal('johndoe');
           res.body.should.have.property('savedRecipes');
           res.body.savedRecipes.should.be.an('array');
           res.body.ingredients.should.be.an('array');
           res.body.instructions.should.be.an('array');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -340,7 +412,7 @@ describe('Meals', () => {
           res.body.should.have.property('id');
           res.body.should.have.property('name', 'Meat and Cheese Sandwich');
           res.body.creator.username.should.equal('johndoe');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -351,9 +423,41 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('That recipe does not exist.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
+    });
+
+    it('should return likes as an ordered array', (done) => {
+      // Likes and savedRecipes were added in previous describe function
+
+      chai.request(server)
+        .get('/meals/meal-by-name?name=Meat%20and%20Cheese%20Sandwich')
+        .then(res => {
+          res.should.have.status(200);
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.likes.should.be.an('array');
+          res.body.likes[0].userId.should.equal(1);
+          res.body.likes[1].userId.should.equal(2);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return savedRecipes as an ordered array', (done) => {
+      // Likes and savedRecipes were added in previous describe function
+
+      chai.request(server)
+        .get('/meals/meal-by-name?name=Meat%20and%20Cheese%20Sandwich')
+        .then(res => {
+          res.should.have.status(200);
+          res.body.should.have.property('name', 'Meat and Cheese Sandwich');
+          res.body.savedRecipes.should.be.an('array');
+          res.body.savedRecipes[0].userId.should.equal(1);
+          res.body.savedRecipes[1].userId.should.equal(2);
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
   });
 
@@ -371,7 +475,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('This recipe name is already taken.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -429,7 +533,7 @@ describe('Meals', () => {
           mealPics[0].mealPicName.should.equal('https://newmealpicurl');
           mealPics[0].publicId.should.equal('folder/newmealpicname');
         })
-        .then(() => Meal.findOne({where: {name: 'Meat and Cheese Sandwich'}}))
+        .then(() => Meal.findOne({ where: { name: 'Meat and Cheese Sandwich' } }))
         .then(meal => {
           meal.name.should.equal('Meat and Cheese Sandwich');
           meal.difficulty.should.equal(5);
@@ -477,20 +581,20 @@ describe('Meals', () => {
         .then(() => chai.request(server)
           .post('/likes/add')
           .set("Authorization", token)
-          .send({mealId: 1}))
+          .send({ mealId: 1 }))
         // user deletes meal
         .then(() => chai.request(server)
           .delete('/meals/delete')
           .set("Authorization", token)
           .send({ id: 1 })
-        .then(res => {
-          res.should.have.status(200);
-          res.body.message.should.equal('Recipe successfully deleted.');
-        }))
+          .then(res => {
+            res.should.have.status(200);
+            res.body.message.should.equal('Recipe successfully deleted.');
+          }))
         // check if meal, saved meal, meal pics, and likes are deleted
         .then(() => Like.findAll())
         .then(likes => expect(likes.length).to.equal(0))
-        .then(() => Meal.findOne({where: {id: 1}}))
+        .then(() => Meal.findOne({ where: { id: 1 } }))
         .then(meal => expect(meal).to.equal(null))
         .then(() => SavedMeal.findAll())
         .then(savedMeals => expect(savedMeals.length).to.equal(0))
@@ -514,11 +618,11 @@ describe('Meals', () => {
           .delete('/meals/delete')
           .set("Authorization", token)
           .send({ id: mealId })
-        .then(res => {
-          res.should.have.status(200);
-          res.body.message.should.equal('Recipe successfully deleted.');
-        }))
-        .then(() => Meal.findOne({where: {id: mealId}}))
+          .then(res => {
+            res.should.have.status(200);
+            res.body.message.should.equal('Recipe successfully deleted.');
+          }))
+        .then(() => Meal.findOne({ where: { id: mealId } }))
         .then(meal => expect(meal).to.equal(null))
         .then(() => done())
         .catch(err => done(err));
@@ -534,7 +638,7 @@ describe('Meals', () => {
         .end((err, res) => {
           res.should.have.status(403);
           res.body.message.should.equal('You do not have permission to delete this recipe.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });

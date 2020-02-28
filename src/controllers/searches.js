@@ -22,7 +22,12 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: [['createdAt', 'DESC']],
+        distinct: true,
+        order: [
+          ['createdAt', 'DESC'],
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
@@ -46,7 +51,12 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         attributes: attributesArray,
-        order: ['createdAt'],
+        distinct: true,
+        order: [
+          'createdAt',
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
@@ -68,8 +78,13 @@ module.exports = {
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
-        order: [sequelize.fn('lower', sequelize.col('name'))],
+        distinct: true,
         attributes: attributesArray,
+        order: [
+          sequelize.fn('lower', sequelize.col('name')),
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
@@ -91,8 +106,13 @@ module.exports = {
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
+        distinct: true,
         attributes: attributesArray,
-        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+        order: [
+          [sequelize.fn('lower', sequelize.col('name')), 'DESC'],
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
@@ -125,7 +145,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
-        order: [sequelize.fn('lower', sequelize.col('name'))],
+        order: [
+          sequelize.fn('lower', sequelize.col('name')),
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
@@ -162,7 +186,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
-        order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+        order: [
+          [sequelize.fn('lower', sequelize.col('name')), 'DESC'],
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
@@ -199,7 +227,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
-        order: [['createdAt', 'DESC']],
+        order: [
+          ['createdAt', 'DESC'],
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
@@ -236,7 +268,11 @@ module.exports = {
         offset: req.query.offset,
         limit: req.query.limit,
         where: sequelize.literal(`array_to_string(ingredients, \',\') LIKE ALL(ARRAY[${ingredients}])`),
-        order: ['createdAt'],
+        order: [
+          'createdAt',
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+        ],
         attributes: attributesArray,
         include: [
           { model: User, as: "creator", attributes: ['username'], duplicating: false },
@@ -260,17 +296,21 @@ module.exports = {
   getMealsCreatedByUserAtoZ: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: {          
+        where: {
           username: req.query.username
         },
         attributes: ['username'],
         include: [
-          { 
-            model: Meal, as: 'meals', 
+          {
+            model: Meal, as: 'meals',
             attributes: attributesArray,
             offset: req.query.offset,
             limit: req.query.limit,
-            order: [[sequelize.fn('lower', sequelize.col('name'))]],
+            order: [
+              [sequelize.fn('lower', sequelize.col('name'))],
+              [Like, 'userId', 'ASC'],
+              [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+            ],
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
@@ -282,7 +322,7 @@ module.exports = {
         ]
       });
 
-      if (!user) return res.status(404).json({ message: 'This user does not exist.'});
+      if (!user) return res.status(404).json({ message: 'This user does not exist.' });
 
       let userMeals = {
         id: user.id,
@@ -301,17 +341,21 @@ module.exports = {
   getMealsCreatedByUserZtoA: async (req, res) => {
     try {
       let user = await User.findOne({
-        where: {          
+        where: {
           username: req.query.username
         },
         attributes: ['username'],
         include: [
-          { 
-            model: Meal, as: 'meals', 
+          {
+            model: Meal, as: 'meals',
             attributes: attributesArray,
             offset: req.query.offset,
             limit: req.query.limit,
-            order: [[sequelize.fn('lower', sequelize.col('name')), 'DESC']],
+            order: [
+              [sequelize.fn('lower', sequelize.col('name')), 'DESC'],
+              [Like, 'userId', 'ASC'],
+              [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
+            ],
             include: [
               { model: User, as: "creator", attributes: ['username'], duplicating: false },
               { model: Like, attributes: ['userId'], duplicating: false },
@@ -323,7 +367,7 @@ module.exports = {
         ]
       });
 
-      if (!user) return res.status(404).json({ message: 'This user does not exist.'});
+      if (!user) return res.status(404).json({ message: 'This user does not exist.' });
 
       let userMeals = {
         id: user.id,
@@ -345,7 +389,7 @@ module.exports = {
       let meals = await Meal.findAll({
         where: {
           name: {
-            [Op.iLike]: `${formattedName}%`
+            [Op.iLike]: `%${formattedName}%`
           }
         },
         limit: req.query.limit,

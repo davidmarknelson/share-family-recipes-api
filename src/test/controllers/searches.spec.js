@@ -5,13 +5,39 @@ const utils = require("../utils");
 
 describe('Meal searches', () => {
   let jwt;
+  let jwt2;
   before(() => {
-    return db.sync({force: true})
+    return db.sync({ force: true })
       .then(() => utils.createAdmin())
       .then(res => jwt = res.body.jwt)
       .then(() => utils.createUser())
+      .then(res => jwt2 = res.body.jwt)
       .then(() => utils.createMeal1(jwt))
-      .then(() => utils.createMeal2(jwt));
+      .then(() => utils.createMeal2(jwt))
+      .then(() => {
+        return chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", `Bearer ${jwt2}`)
+          .send({ recipeId: 1 })
+      })
+      .then(() => {
+        return chai.request(server)
+          .post('/likes/add')
+          .set("Authorization", `Bearer ${jwt}`)
+          .send({ recipeId: 1 })
+      })
+      .then(() => {
+        return chai.request(server)
+          .post('/saved/save')
+          .set("Authorization", `Bearer ${jwt}`)
+          .send({ recipeId: 1 })
+      })
+      .then(() => {
+        return chai.request(server)
+          .post('/saved/save')
+          .set("Authorization", `Bearer ${jwt2}`)
+          .send({ recipeId: 1 })
+      });
   });
 
   describe('GET all meals', () => {
@@ -40,7 +66,16 @@ describe('Meal searches', () => {
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
-          if(err) done(err);
+          res.body.rows[1].should.have.property('id', 1);
+          // likes are ordered
+          res.body.rows[1].likes.should.have.length(2);
+          res.body.rows[1].likes[0].userId.should.equal(1);
+          res.body.rows[1].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[1].savedRecipes.should.have.length(2);
+          res.body.rows[1].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[1].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
@@ -70,7 +105,15 @@ describe('Meal searches', () => {
           res.body.rows[0].name.should.equal('Sandwich');
           res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
-          if(err) done(err);
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
@@ -103,7 +146,15 @@ describe('Meal searches', () => {
           res.body.rows[0].name.should.equal('Sandwich');
           res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
-          if(err) done(err);
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
@@ -133,7 +184,15 @@ describe('Meal searches', () => {
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
-          if(err) done(err);
+          // likes are ordered
+          res.body.rows[1].likes.should.have.length(2);
+          res.body.rows[1].likes[0].userId.should.equal(1);
+          res.body.rows[1].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[1].savedRecipes.should.have.length(2);
+          res.body.rows[1].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[1].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
@@ -143,30 +202,25 @@ describe('Meal searches', () => {
   describe('GET all meals the match ingredients', () => {
     it('should return meals containing specified ingredients A to Z by name', (done) => {
       chai.request(server)
-        .get('/search/byingredients-a-z?ingredient=meat')
+        .get('/search/byingredients-a-z?ingredient=tomato')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.count.should.equal(2);
+          res.body.count.should.equal(1);
           res.body.rows.should.be.an('array');
-          res.body.rows.should.have.lengthOf(2);
+          res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].name.should.equal('Sandwich');
           res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
-          res.body.rows[1].creator.username.should.equal('johndoe');
-          res.body.rows[1].creatorId.should.equal(1);
-          res.body.rows[1].should.have.property('mealPic', null);
-          res.body.rows[1].name.should.equal('Soup');
-          res.body.rows[1].should.have.property('likes');
-          res.body.rows[1].savedRecipes.should.be.an('array');
-          res.body.rows[1].should.have.property('description');
-          res.body.rows[1].should.have.property('createdAt');
-          res.body.rows[1].should.have.property('updatedAt');
-          res.body.rows[1].likes.should.be.an('array');
-          res.body.rows[1].cookTime.should.equal(20);
-          res.body.rows[1].should.not.have.property('ingredients');
-          res.body.rows[1].should.not.have.property('instructions');
-          if(err) done(err);
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
@@ -183,6 +237,14 @@ describe('Meal searches', () => {
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
+          // likes are ordered
+          res.body.rows[1].likes.should.have.length(2);
+          res.body.rows[1].likes[0].userId.should.equal(1);
+          res.body.rows[1].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[1].savedRecipes.should.have.length(2);
+          res.body.rows[1].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[1].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
@@ -196,7 +258,7 @@ describe('Meal searches', () => {
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -213,6 +275,14 @@ describe('Meal searches', () => {
           res.body.rows[1].name.should.equal('Sandwich');
           res.body.rows[1].should.have.property('creator');
           res.body.rows[1].should.have.property('likes');
+          // likes are ordered
+          res.body.rows[1].likes.should.have.length(2);
+          res.body.rows[1].likes[0].userId.should.equal(1);
+          res.body.rows[1].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[1].savedRecipes.should.have.length(2);
+          res.body.rows[1].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[1].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
           res.body.rows[0].should.have.property('mealPic', null);
@@ -226,7 +296,7 @@ describe('Meal searches', () => {
           res.body.rows[0].cookTime.should.equal(20);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -256,40 +326,57 @@ describe('Meal searches', () => {
           res.body.rows[0].name.should.equal('Sandwich');
           res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
-          if(err) done(err);
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
+          if (err) done(err);
           done();
         });
     });
 
     it('should return meals containing specified case insensitive ingredients', (done) => {
       chai.request(server)
-        .get('/search/byingredients-a-z?ingredient=Water')
+        .get('/search/byingredients-a-z?ingredient=Bread')
         .end((err, res) => {
           res.should.have.status(200);
-          res.body.count.should.equal(1);        
+          res.body.count.should.equal(1);
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
-          res.body.rows[0].name.should.equal('Soup');
+          res.body.rows[0].mealPic.should.have.property('mealPicName');
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].should.have.property('creator');
           res.body.rows[0].should.have.property('likes');
+          res.body.rows[0].likes.should.be.an('array');
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].should.have.property('description');
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
-          res.body.rows[0].likes.should.be.an('array');
           res.body.rows[0].savedRecipes.should.be.an('array');
-          res.body.rows[0].cookTime.should.equal(20);
+          res.body.rows[0].cookTime.should.equal(5);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
 
     it('should return meals containing multiple ingredients', (done) => {
       chai.request(server)
-        .get('/search/byingredients-a-z?ingredient=water&ingredient=meat')
+        .get('/search/byingredients-a-z?ingredient=meat&ingredient=bread')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.count.should.equal(1);
@@ -297,25 +384,35 @@ describe('Meal searches', () => {
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
-          res.body.rows[0].name.should.equal('Soup');
+          res.body.rows[0].mealPic.should.have.property('mealPicName');
           res.body.rows[0].should.have.property('likes');
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].should.have.property('creator');
+          res.body.rows[0].should.have.property('likes');
+          res.body.rows[0].likes.should.be.an('array');
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].should.have.property('description');
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
-          res.body.rows[0].likes.should.be.an('array');
           res.body.rows[0].savedRecipes.should.be.an('array');
-          res.body.rows[0].cookTime.should.equal(20);
+          res.body.rows[0].cookTime.should.equal(5);
           res.body.rows[0].should.not.have.property('ingredients');
-          res.body.rows[0].should.not.have.property('instructions');      
-          if(err) done(err);
+          res.body.rows[0].should.not.have.property('instructions');
+          if (err) done(err);
           done();
         });
     });
 
     it('should return meals containing multiple ingredients where an ingredient is only part of the word', (done) => {
       chai.request(server)
-        .get('/search/byingredients-a-z?ingredient=water&ingredient=veget')
+        .get('/search/byingredients-a-z?ingredient=bread&ingredient=me')
         .end((err, res) => {
           res.should.have.status(200);
           res.body.count.should.equal(1);
@@ -323,18 +420,28 @@ describe('Meal searches', () => {
           res.body.rows.should.have.lengthOf(1);
           res.body.rows[0].creator.username.should.equal('johndoe');
           res.body.rows[0].creatorId.should.equal(1);
-          res.body.rows[0].should.have.property('mealPic', null);
-          res.body.rows[0].name.should.equal('Soup');
+          res.body.rows[0].mealPic.should.have.property('mealPicName');
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].should.have.property('creator');
+          res.body.rows[0].should.have.property('likes');
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].should.have.property('likes');
           res.body.rows[0].should.have.property('description');
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
           res.body.rows[0].savedRecipes.should.be.an('array');
-          res.body.rows[0].cookTime.should.equal(20);
+          res.body.rows[0].cookTime.should.equal(5);
           res.body.rows[0].should.not.have.property('ingredients');
-          res.body.rows[0].should.not.have.property('instructions');    
-          if(err) done(err);
+          res.body.rows[0].should.not.have.property('instructions');
+          if (err) done(err);
           done();
         });
     });
@@ -345,7 +452,7 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.message.should.equal('You must add ingredients to the search.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -356,7 +463,7 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('There are no recipes with those ingredients.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -384,11 +491,22 @@ describe('Meal searches', () => {
           res.body.rows[0].should.have.property('createdAt');
           res.body.rows[0].should.have.property('updatedAt');
           res.body.rows[0].likes.should.be.an('array');
+          res.body.rows[0].name.should.equal('Sandwich');
+          res.body.rows[0].should.have.property('creator');
+          res.body.rows[0].should.have.property('likes');
+          // likes are ordered
+          res.body.rows[0].likes.should.have.length(2);
+          res.body.rows[0].likes[0].userId.should.equal(1);
+          res.body.rows[0].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[0].savedRecipes.should.have.length(2);
+          res.body.rows[0].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[0].savedRecipes[1].userId.should.equal(2);
           res.body.rows[0].savedRecipes.should.be.an('array');
           res.body.rows[0].cookTime.should.equal(5);
           res.body.rows[0].should.not.have.property('ingredients');
           res.body.rows[0].should.not.have.property('instructions');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -399,7 +517,7 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('This user does not exist.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -415,7 +533,7 @@ describe('Meal searches', () => {
           res.body.count.should.equal(0);
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(0);
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -440,11 +558,19 @@ describe('Meal searches', () => {
           res.body.rows[1].should.have.property('createdAt');
           res.body.rows[1].should.have.property('updatedAt');
           res.body.rows[1].likes.should.be.an('array');
+          // likes are ordered
+          res.body.rows[1].likes.should.have.length(2);
+          res.body.rows[1].likes[0].userId.should.equal(1);
+          res.body.rows[1].likes[1].userId.should.equal(2);
+          // saves are ordered
+          res.body.rows[1].savedRecipes.should.have.length(2);
+          res.body.rows[1].savedRecipes[0].userId.should.equal(1);
+          res.body.rows[1].savedRecipes[1].userId.should.equal(2);
           res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].cookTime.should.equal(5);
           res.body.rows[1].should.not.have.property('ingredients');
           res.body.rows[1].should.not.have.property('instructions');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -455,7 +581,7 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.message.should.equal('This user does not exist.');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -471,7 +597,7 @@ describe('Meal searches', () => {
           res.body.count.should.equal(0);
           res.body.rows.should.be.an('array');
           res.body.rows.should.have.lengthOf(0);
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -491,7 +617,7 @@ describe('Meal searches', () => {
           res.body[1].should.have.property('id');
           res.body[1].should.have.property('name');
           res.body[1].name.should.equal('Soup');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -502,7 +628,7 @@ describe('Meal searches', () => {
         .end((err, res) => {
           res.should.have.status(404);
           res.body.should.not.have.property('message');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });

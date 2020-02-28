@@ -8,7 +8,7 @@ describe('Saved meals', () => {
   let user;
 
   before(() => {
-    return db.sync({force: true})
+    return db.sync({ force: true })
       .then(() => utils.createAdmin())
       .then(res => {
         token = `Bearer ${res.body.jwt}`;
@@ -21,19 +21,19 @@ describe('Saved meals', () => {
   describe('GET user saved meals', () => {
     it('should return an array with the meals', (done) => {
       chai.request(server)
-      .get('/saved/a-z')
-      .set("Authorization", token)
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.have.property('id', 1);
-        res.body.should.have.property('username', 'johndoe');
-        res.body.should.have.property('profilePic', null);
-        res.body.should.have.property('count', 0);
-        res.body.should.have.property('rows');
-        res.body.rows.should.have.length(0);
-        if(err) done(err);
-        done();
-      });
+        .get('/saved/a-z')
+        .set("Authorization", token)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.have.property('id', 1);
+          res.body.should.have.property('username', 'johndoe');
+          res.body.should.have.property('profilePic', null);
+          res.body.should.have.property('count', 0);
+          res.body.should.have.property('rows');
+          res.body.rows.should.have.length(0);
+          if (err) done(err);
+          done();
+        });
     });
   });
 
@@ -46,9 +46,44 @@ describe('Saved meals', () => {
         .end((err, res) => {
           res.should.have.status(204);
           res.body.should.not.have.property('message');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
+    });
+  });
+
+  describe('GET recipe saved recipes', () => {
+    it('should return an array of userIds who saved the recipe', (done) => {
+      chai.request(server)
+        .get('/saved/recipe-saved-recipes?recipeId=1')
+        .then(res => {
+          res.body.should.be.an('array');
+          res.body[0].userId.should.equal(1);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return an empty array if no one has saved the recipe', (done) => {
+      chai.request(server)
+        .get('/saved/recipe-saved-recipes?recipeId=2')
+        .then(res => {
+          res.body.should.be.an('array');
+          res.body.should.have.length(0);
+        })
+        .then(() => done())
+        .catch(err => done(err));
+    });
+
+    it('should return an error if the recipe does not exist', (done) => {
+      chai.request(server)
+        .get('/saved/recipe-saved-recipes?recipeId=3')
+        .then(res => {
+          res.status.should.equal(404);
+          res.body.message.should.equal('That recipe does not exist.');
+        })
+        .then(() => done())
+        .catch(err => done(err));
     });
   });
 
@@ -98,7 +133,7 @@ describe('Saved meals', () => {
           res.body.rows[1].savedRecipes.should.be.an('array');
           res.body.rows[1].creator.username.should.equal('johndoe');
           res.body.rows[1].likes.should.be.an('array');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });
@@ -113,7 +148,7 @@ describe('Saved meals', () => {
         .end((err, res) => {
           res.should.have.status(204);
           res.body.should.not.have.property('message');
-          if(err) done(err);
+          if (err) done(err);
           done();
         });
     });

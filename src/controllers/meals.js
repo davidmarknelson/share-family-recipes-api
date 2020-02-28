@@ -14,7 +14,7 @@ function deleteCloudinaryImage(public_id) {
   return new Promise(function (resolve, reject) {
     cloudinary.uploader.destroy(public_id, {
       invalidate: true
-    }, function(error,result) {
+    }, function (error, result) {
       if (error) reject(error);
       resolve(result);
     });
@@ -30,9 +30,9 @@ module.exports = {
           id: req.query.id
         },
         include: [
-          { 
-            model: User, 
-            as: "creator", 
+          {
+            model: User,
+            as: "creator",
             attributes: ['username'],
             include: [
               { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
@@ -41,6 +41,10 @@ module.exports = {
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
           { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
+        ],
+        order: [
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
         ]
       });
 
@@ -56,15 +60,17 @@ module.exports = {
     try {
       let mealName = req.query.name.replace('%20', ' ');
 
-      let meal = await Meal.findOne({
+      // findAll is being used instead of findOne because findOne adds LIMIT 1 to the end of the query.
+      // This might be because of using sequelize.where or using findOne.
+      let meal = await Meal.findAll({
         where: sequelize.where(
-          sequelize.fn('lower', sequelize.col('name')), 
+          sequelize.fn('lower', sequelize.col('name')),
           sequelize.fn('lower', mealName)
         ),
         include: [
-          { 
-            model: User, 
-            as: "creator", 
+          {
+            model: User,
+            as: "creator",
             attributes: ['username'],
             include: [
               { model: ProfilePic, as: 'profilePic', attributes: ['profilePicName'], duplicating: false }
@@ -73,12 +79,16 @@ module.exports = {
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false },
           { model: Like, attributes: ['userId'], duplicating: false },
           { model: SavedMeal, as: 'savedRecipes', attributes: ['userId'], duplicating: false }
+        ],
+        order: [
+          [Like, 'userId', 'ASC'],
+          [{ model: SavedMeal, as: 'savedRecipes' }, 'userId', 'ASC']
         ]
       });
 
-      if (!meal) return res.status(404).json({ message: 'That recipe does not exist.' });
+      if (meal.length === 0) return res.status(404).json({ message: 'That recipe does not exist.' });
 
-      res.status(200).json(meal);
+      res.status(200).json(meal[0]);
     } catch (err) {
       res.status(500).json({ message: 'There was an error getting the recipe.' });
     }
@@ -90,7 +100,7 @@ module.exports = {
 
       let meal = await Meal.findOne({
         where: sequelize.where(
-          sequelize.fn('lower', sequelize.col('name')), 
+          sequelize.fn('lower', sequelize.col('name')),
           sequelize.fn('lower', mealName)
         )
       });
@@ -108,7 +118,7 @@ module.exports = {
   create: async (req, res) => {
     try {
       req.body.creatorId = req.decoded.id;
-      
+
       // save these properties to variables
       let tempMealPicName = req.body.recipePicName;
       let tempPublicId = req.body.publicId;
@@ -170,7 +180,7 @@ module.exports = {
       delete req.body.publicId;
 
       let meal = await Meal.update(req.body, {
-        where: { 
+        where: {
           id: tempMealId
         }
       });
@@ -186,7 +196,7 @@ module.exports = {
         if (previousMealPic) {
           let cloudImg = await deleteCloudinaryImage(tempPublicId);
         }
-        
+
         // If .upsert creates a new object, it returns true. If it updates
         // an old object, it returns false. Passing {returning: true} returns the 
         // updated object and make profilePic a truthy variable.
@@ -194,16 +204,16 @@ module.exports = {
           mealId: tempMealId,
           mealPicName: tempMealPicName,
           publicId: tempPublicId
-        }, {returning: true});
+        }, { returning: true });
       }
 
       // If the user only updates the mealPic, then the user object will return 0 because nothing
       // has updated. This if statement will allow a truthy result if the user only updated the mealPic
       // or the meal object.
       if (meal[0] === 1 || mealPic) {
-        return res.status(201).json({ 
+        return res.status(201).json({
           id: tempMealId,
-          message: 'Recipe successfully updated.' 
+          message: 'Recipe successfully updated.'
         });
       } else {
         throw Error();
@@ -239,21 +249,21 @@ module.exports = {
       let mealPicToDelete = await MealPic.findOne({
         where: { mealId: req.body.id }
       });
-      
+
       if (mealPicToDelete) {
         let cloudImg = await deleteCloudinaryImage(mealPicToDelete.publicId);
       }
 
       if (meal) {
         let deletedRelatedData = await Promise.all([
-          SavedMeal.destroy({where: { mealId: meal.dataValues.id }}),
-          Like.destroy({where: { mealId: meal.dataValues.id }}),
-          MealPic.destroy({where: { mealId: req.body.id }})
+          SavedMeal.destroy({ where: { mealId: meal.dataValues.id } }),
+          Like.destroy({ where: { mealId: meal.dataValues.id } }),
+          MealPic.destroy({ where: { mealId: req.body.id } })
         ]);
       }
 
       let deleted = await Meal.destroy({
-        where: { 
+        where: {
           id: req.body.id,
           creatorId: req.decoded.id
         }
