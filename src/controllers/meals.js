@@ -58,14 +58,12 @@ module.exports = {
 
   getMealByName: async (req, res) => {
     try {
-      let mealName = req.query.name.replace('%20', ' ');
-
       // findAll is being used instead of findOne because findOne adds LIMIT 1 to the end of the query.
       // This might be because of using sequelize.where or using findOne.
       let meal = await Meal.findAll({
         where: sequelize.where(
           sequelize.fn('lower', sequelize.col('name')),
-          sequelize.fn('lower', mealName)
+          sequelize.fn('lower', req.query.name)
         ),
         include: [
           {
@@ -96,12 +94,10 @@ module.exports = {
 
   findAvailableMealName: async (req, res) => {
     try {
-      let mealName = req.query.name.replace('%20', ' ');
-
       let meal = await Meal.findOne({
         where: sequelize.where(
           sequelize.fn('lower', sequelize.col('name')),
-          sequelize.fn('lower', mealName)
+          sequelize.fn('lower', req.query.name)
         )
       });
 

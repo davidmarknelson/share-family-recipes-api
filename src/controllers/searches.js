@@ -383,13 +383,11 @@ module.exports = {
   },
 
   searchByName: async (req, res) => {
-    let formattedName = req.query.name.replace('%20', ' ');
-
     try {
       let meals = await Meal.findAll({
         where: {
           name: {
-            [Op.iLike]: `%${formattedName}%`
+            [Op.iLike]: `%${req.query.name}%`
           }
         },
         limit: req.query.limit,
