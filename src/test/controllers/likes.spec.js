@@ -22,8 +22,10 @@ describe('Likes', () => {
         .set("Authorization", token)
         .send({ recipeId: 1 })
         .end((err, res) => {
-          res.should.have.status(204);
+          res.should.have.status(200);
           res.body.should.not.have.property('message');
+          res.body.should.be.an('array');
+          res.body[0].userId.should.equal(1);
           if (err) done(err);
           done();
         });
@@ -57,41 +59,6 @@ describe('Likes', () => {
           if (err) done(err);
           done();
         });
-    });
-  });
-
-  describe('GET recipe likes', () => {
-    it('should return an array of userIds who liked the recipe', (done) => {
-      chai.request(server)
-        .get('/likes/recipe-likes?recipeId=1')
-        .then(res => {
-          res.body.should.be.an('array');
-          res.body[0].userId.should.equal(1);
-        })
-        .then(() => done())
-        .catch(err => done(err));
-    });
-
-    it('should return an empty array if no one has liked the recipe', (done) => {
-      chai.request(server)
-        .get('/likes/recipe-likes?recipeId=2')
-        .then(res => {
-          res.body.should.be.an('array');
-          res.body.should.have.length(0);
-        })
-        .then(() => done())
-        .catch(err => done(err));
-    });
-
-    it('should return an error if the recipe does not exist', (done) => {
-      chai.request(server)
-        .get('/likes/recipe-likes?recipeId=3')
-        .then(res => {
-          res.status.should.equal(404);
-          res.body.message.should.equal('That recipe does not exist.');
-        })
-        .then(() => done())
-        .catch(err => done(err));
     });
   });
 

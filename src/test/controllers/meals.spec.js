@@ -325,16 +325,18 @@ describe('Meals', () => {
         .set("Authorization", token2)
         .send({ recipeId: 1 })
         .then(res => {
-          res.should.have.status(204);
+          res.should.have.status(200);
           res.body.should.not.have.property('message');
+          res.body.should.be.an('array');
         })
         .then(() => chai.request(server)
           .post('/likes/add')
           .set("Authorization", token)
           .send({ recipeId: 1 }))
         .then(res => {
-          res.should.have.status(204);
+          res.should.have.status(200);
           res.body.should.not.have.property('message');
+          res.body.should.be.an('array');
         })
         .then(() => chai.request(server)
           .get('/meals/meal-by-id?id=1')
@@ -359,8 +361,9 @@ describe('Meals', () => {
         .set("Authorization", token2)
         .send({ recipeId: 1 })
         .then(res => {
-          res.should.have.status(204);
+          res.should.have.status(200);
           res.body.should.not.have.property('message');
+          res.body.should.be.an('array');
         })
         .then(() => chai.request(server)
           .post('/saved/save')
@@ -368,8 +371,9 @@ describe('Meals', () => {
           .send({ recipeId: 1 })
         )
         .then(res => {
-          res.should.have.status(204);
+          res.should.have.status(200);
           res.body.should.not.have.property('message');
+          res.body.should.be.an('array');
         })
         .then(() => chai.request(server)
           .get('/meals/meal-by-id?id=1')

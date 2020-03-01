@@ -111,32 +111,6 @@ module.exports = {
     }
   },
 
-  getRecipeSavedRecipes: async (req, res) =>  {
-    try {
-      let recipe = await Meal.findOne({
-        where: {
-          id: req.query.recipeId
-        }
-      });
-
-      if (!recipe) return res.status(404).json({ message: 'That recipe does not exist.' });
-
-      let savedRecipes = await SavedMeal.findAll({
-        where: {
-          mealId: req.query.recipeId
-        },
-        attributes: ['userId'],
-        order: [
-          ['userId', 'ASC']
-        ]
-      });
-  
-      res.status(200).json(savedRecipes);
-    } catch (err) {
-      res.status(500).send({ message: 'There was an error.' });
-    }
-  },
-
   saveMeal: async (req, res) => {
     try {
       let savedMeal = await SavedMeal.create({
@@ -144,11 +118,19 @@ module.exports = {
         userId: req.decoded.id
       });
 
-      if (savedMeal) {
-        res.status(204).json();
-      } else {
-        throw Error();
-      }
+      if (!savedMeal) throw Error();
+
+      let savedRecipes = await SavedMeal.findAll({
+        where: {
+          mealId: req.body.recipeId
+        },
+        attributes: ['userId'],
+        order: [
+          ['userId', 'ASC']
+        ]
+      });
+
+      res.status(200).json(savedRecipes);
     } catch (err) {
       res.status(500).send({ message: 'There was an error saving this recipe.' });
     }

@@ -22,7 +22,17 @@ module.exports = {
 
       if (!like) throw Error();
 
-      res.status(204).json();
+      let likes = await Like.findAll({
+        where: {
+          mealId: req.body.recipeId
+        },
+        attributes: ['userId'],
+        order: [
+          ['userId', 'ASC']
+        ]
+      });
+
+      res.status(200).json(likes);
     } catch (err) {
       res.status(500).json({ message: 'There was an error liking this recipe.' });
     }
@@ -44,32 +54,6 @@ module.exports = {
       }
     } catch (err) {
       res.status(500).json({ message: "There was an error unliking this recipe." });      
-    }
-  },
-
-  getRecipeLikes: async (req, res) =>  {
-    try {
-      let recipe = await Meal.findOne({
-        where: {
-          id: req.query.recipeId
-        }
-      });
-
-      if (!recipe) return res.status(404).json({ message: 'That recipe does not exist.' });
-
-      let likes = await Like.findAll({
-        where: {
-          mealId: req.query.recipeId
-        },
-        attributes: ['userId'],
-        order: [
-          ['userId', 'ASC']
-        ]
-      });
-  
-      res.status(200).json(likes);
-    } catch (err) {
-      res.status(500).send({ message: 'There was an error.' });
     }
   }
 };
