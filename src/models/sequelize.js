@@ -19,6 +19,7 @@ sequelize
     if (process.env.UNIT_TEST !== "true") {
       console.log('Connection has been established successfully.');
     }
+    console.log('did it work?')
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);
