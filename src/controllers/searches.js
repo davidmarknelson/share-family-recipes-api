@@ -41,7 +41,8 @@ module.exports = {
       res.status(200).json(meals);
 
     } catch (err) {
-      res.status(500).json({ message: errorMessage, err: err });
+      console.log('newest err', err)
+      res.status(500).json({ message: errorMessage});
     }
   },
 
