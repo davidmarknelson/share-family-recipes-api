@@ -13,11 +13,10 @@ const cloudinary = require('cloudinary').v2;
 
 // cors setup
 const origin = {
-  origin: (process.env.NODE_ENV === 'production') ? config.FRONT_END_URL : '*',
+  // origin: (process.env.NODE_ENV === 'production') ? config.FRONT_END_URL : '*',
+  origin: '*',
   optionsSuccessStatus: 200
 }
-
-console.log('origin', origin)
 
 // rate limiter
 const limiter = rateLimit({
