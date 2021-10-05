@@ -17,6 +17,8 @@ const origin = {
   optionsSuccessStatus: 200
 }
 
+console.log('origin', origin)
+
 // rate limiter
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
