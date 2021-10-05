@@ -10,7 +10,7 @@ const config = require('../../config');
 const sequelize = new Sequelize(config.DB, config.DB_USER, config.DB_PW, {
   host: config.HOST,
   dialect: 'postgres',
-  logging: true
+  logging: console.log
 });
 
 sequelize
