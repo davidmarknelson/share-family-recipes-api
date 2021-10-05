@@ -38,10 +38,9 @@ module.exports = {
 
       if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
-      res.status(200).json(meals);
+      return res.status(200).json(meals);
 
     } catch (err) {
-      // console.log('newest err', err)
       res.status(500).json({ message: errorMessage});
     }
   },
