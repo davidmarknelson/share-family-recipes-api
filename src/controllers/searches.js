@@ -35,7 +35,7 @@ module.exports = {
           { model: MealPic, as: 'mealPic', attributes: ['mealPicName'], duplicating: false }
         ]
       });
-
+console.log('meals?', meals)
       if (meals.rows.length === 0) return res.status(404).json({ message: 'There are no recipes.' });
 
       return res.status(200).json(meals);
