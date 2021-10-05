@@ -18,6 +18,7 @@ const errorMessage = 'There was an error getting the list of meals.';
 module.exports = {
   getByNewest: async (req, res) => {
     try {
+      return res.status(200).json([]);
       let meals = await Meal.findAndCountAll({
         offset: req.query.offset,
         limit: req.query.limit,
